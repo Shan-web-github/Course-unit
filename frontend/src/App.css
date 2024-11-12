@@ -1,0 +1,5 @@
+.file{
+  flex: auto;
+  justify-items: last baseline;
+  gap: 8px;
+}
