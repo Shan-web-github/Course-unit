@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function Table({ columns, rows }) {
-    const data = Object.values(rows).map(value => `Value: ${value}`);
+    const data = Object.values(rows);
   return (
     <div>
       <table>

@@ -47,7 +47,7 @@ function App() {
       const loadData = await axios.get(`http://localhost:5000/data/${tableName}`);
       setColumns(loadData.data.columns);
       setRows(loadData.data.data);
-      console.log(typeof(loadData.data.data));
+      console.log(rows);
     } catch (error) {
       alert(error);
     }
