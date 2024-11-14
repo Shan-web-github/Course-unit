@@ -122,10 +122,12 @@ function App() {
           />
           <button
             type="submit"
-            onClick={(event) => {
+            onClick={
+              (event) => {
               event.preventDefault();
-              load(tableName);
-            }}
+              load(tableName)
+              }
+          }
           >
             Data
           </button>
