@@ -27,7 +27,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/upload",
+        "http://localhost:5000/studentdata/upload",
         formData,
         {
           headers: {
@@ -49,7 +49,7 @@ function App() {
     }
     try {
       const loadData = await axios.get(
-        `http://localhost:5000/data/${tableName}`
+        `http://localhost:5000/studentdata/data/${tableName}`
       );
       setColumns(loadData.data.columns);
       setRows(loadData.data.data);
