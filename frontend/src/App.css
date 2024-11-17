@@ -1,10 +1,13 @@
-.file{
-  flex: auto;
-  justify-items: last baseline;
-  gap: 8px;
-}
 .label{
   padding: 5;
   background-size: auto;
   background-color: khaki;
+}
+.uploadform{
+  padding: 20px;
+  width: 400px;
+}
+.button{
+  display: flex;
+  justify-content: space-between;
 }

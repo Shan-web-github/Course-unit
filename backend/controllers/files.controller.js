@@ -32,9 +32,13 @@ exports.uploadFile = (req, res) => {
     //Data
     const rows = sheet.slice(1);
     console.log(rows);
-  
-    createTable(headers, tableName);
-    insertData(headers, rows, tableName);
+    try {
+      createTable(headers, tableName);
+      insertData(headers, rows, tableName);
+      return res.status(201);
+    } catch (error) {
+      return res.status(501).send(error);
+    }
   };
   
   exports.getFiles = (req, res) => {
