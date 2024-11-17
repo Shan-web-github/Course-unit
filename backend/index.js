@@ -3,8 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-const filesController = require('./controllers/files.controller');
-const {fileUpload} = require('./config/multer.config');
+// const filesController = require('./controllers/files.controller');
+// const {fileUpload} = require('./config/multer.config');
 
 
 
@@ -18,12 +18,11 @@ app.use(express.json());
 app.use(cors());
 
 try {
-  // const studentData = require("./routes/file.routes.js");
-  // console.log(typeof(studentData));
-  // app.use("/studentdata", studentData);
+  const studentData = require("./routes/file.routes.js");
+  app.use("/studentdata", studentData);
 
-  app.post("/studentdata/upload", fileUpload, filesController.uploadFile);
-  app.get("/studentdata/data/:table", filesController.getFiles);
+  // app.post("/studentdata/upload", fileUpload, filesController.uploadFile);
+  // app.get("/studentdata/data/:table", filesController.getFiles);
   console.log("routing is ok");
 } catch (error) {
   console.log(error);

@@ -1,10 +1,12 @@
 import React from "react";
 
-export default function Table({ columns, rows }) {
+import Table from 'react-bootstrap/Table';
+
+export default function TableTag({ columns, rows }) {
     const data = Object.values(rows);
   return (
     <div>
-      <table>
+      <Table responsive striped bordered hover size="md" variant="secondary">
         <thead>
           <tr>
             {columns.map((col, index) => (
@@ -21,7 +23,7 @@ export default function Table({ columns, rows }) {
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 }

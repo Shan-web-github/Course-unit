@@ -1,11 +1,11 @@
-// //Packages
-// const express = require('express');
-// const filesController = require('../controllers/files.controller');
-// const {fileUpload} = require('../config/multer.config');
+//Packages
+const express = require('express');
+const filesController = require('../controllers/files.controller');
+const {fileUpload} = require('../config/multer.config');
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.post("/upload", fileUpload, filesController.uploadFile);
-// router.get("/data/:table", filesController.getFiles);
+router.post("/upload", fileUpload, filesController.uploadFile);
+router.get("/data/:table", filesController.getFiles);
 
-// exports.module = router;
+module.exports = router;

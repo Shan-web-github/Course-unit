@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import axios from "axios";
 
 //components
-import Table from "../components/Table";
+import TableTag from "../components/Table";
 
 //bootstrapt lib
 import Form from "react-bootstrap/Form";
@@ -55,7 +55,7 @@ export default function Home() {
         </div>
         <div>
           <label className="label">
-            <Table columns={columns} rows={rows} />
+            <TableTag columns={columns} rows={rows} />
           </label>
         </div>
       </div>
