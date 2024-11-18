@@ -8,15 +8,16 @@ const DBpool = require("../models/db");
 //     .join(",");
 //   const quary = `CREATE TABLE IF NOT EXISTS\`${tableName}\`(${column})`;
 //   try {
-//     await new Promise((resolve, reject) => {
-//       DB.query(quary, (error) => {
-//         if (error) {
-//           console.log(error);
-//           reject(error);
-//         }
-//         resolve();
-//       });
-//     });
+//     await DB.query(quary);
+//     // await new Promise((resolve, reject) => {
+//     //   DB.query(quary, (error) => {
+//     //     if (error) {
+//     //       console.log(error);
+//     //       reject(error);
+//     //     }
+//     //     resolve();
+//     //   });
+//     // });
 //   } catch (error) {
 //     console.log("SQL error.");
 //   } finally {
@@ -72,6 +73,8 @@ exports.createTable = async (headers, tableName) => {
 exports.insertData = async (headers, rows, tableName) => {
   const connection = await DBpool.getConnection();
   try {
+    rows = rows.filter(row => Object.values(row).some(value => value !== null && value !== ""));
+
     const placeholders = rows.map(() => `(${headers.map(() => '?').join(', ')})`).join(', ');
     const insertSQL = `INSERT INTO ${tableName} (${headers.join(', ')}) VALUES ${placeholders}`;
     const flattenedRows = rows.flat();

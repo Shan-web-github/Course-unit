@@ -1,7 +1,8 @@
 //Packages
 const fs = require("fs");
 const xlsx = require("node-xlsx");
-const DB = require("../models/db");
+// const DB = require("../models/db");
+const DBpool = require("../models/db");
 const { createTable, insertData } = require("./functions");
 
 exports.uploadFile = (req, res) => {
@@ -37,9 +38,9 @@ exports.uploadFile = (req, res) => {
         const headers = sheet[0];
         const rows = sheet.slice(1);
 
-        console.log(`Processing file for table: ${tableName}`);
-        console.log(`Headers: ${headers}`);
-        console.log(`Rows: ${rows.length}`);
+        // console.log(`Processing file for table: ${tableName}`);
+        // console.log(`Headers: ${headers}`);
+        // console.log(`Rows: ${rows.length}`);
 
         // Create table and insert data
         createTable(headers, tableName);
@@ -56,20 +57,31 @@ exports.uploadFile = (req, res) => {
   }
 };
 
-exports.getFiles = (req, res) => {
+exports.getFiles = async(req, res) => {
   const tableName = req.params.table;
-  DB.query(`SELECT * FROM ${tableName}`, (error, result, fields) => {
-    if (error) {
-      res.status(501).send(error);
-      return;
-    }
-
+  try {
+    const [result, fields] = await pool.query(`SELECT * FROM ${tableName}`);
     const columnNames = fields.map((field) => field.name);
-    // console.log(columnNames);
-
     return res.json({
       columns: columnNames,
       data: result,
     });
-  });
+  } catch (error) {
+    res.status(501).send(error);
+    return;
+  }
+  // await DBpool.query(`SELECT * FROM ${tableName}`, (error, result, fields) => {
+  //   if (error) {
+  //     res.status(501).send(error);
+  //     return;
+  //   }
+
+  //   const columnNames = fields.map((field) => field.name);
+  //   // console.log(columnNames);
+
+  //   return res.json({
+  //     columns: columnNames,
+  //     data: result,
+  //   });
+  // });
 };
