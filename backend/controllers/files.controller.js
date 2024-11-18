@@ -60,7 +60,7 @@ exports.uploadFile = (req, res) => {
 exports.getFiles = async(req, res) => {
   const tableName = req.params.table;
   try {
-    const [result, fields] = await pool.query(`SELECT * FROM ${tableName}`);
+    const [result, fields] = await DBpool.query(`SELECT * FROM ${tableName}`);
     const columnNames = fields.map((field) => field.name);
     return res.json({
       columns: columnNames,
