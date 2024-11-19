@@ -3,7 +3,7 @@ const fs = require("fs");
 const xlsx = require("node-xlsx");
 // const DB = require("../models/db");
 const DBpool = require("../models/db");
-const { createTable, insertData } = require("./functions");
+const { createTable, insertData, existTableDrop } = require("./functions");
 
 exports.uploadFile = (req, res) => {
   const coursesFile = req.files["courses"] ? req.files["courses"][0] : null;
@@ -43,6 +43,7 @@ exports.uploadFile = (req, res) => {
         // console.log(`Rows: ${rows.length}`);
 
         // Create table and insert data
+        existTableDrop(tableName);
         createTable(headers, tableName);
         insertData(headers, rows, tableName);
       }

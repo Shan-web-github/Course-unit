@@ -53,13 +53,47 @@ const DBpool = require("../models/db");
 
 //   DB.release();
 // };
+// exports.existTableDrop = async (tableName) => {
+//   try {
+//     const existTables = await DBpool.query(`SHOW TABLES`);
+//     const existTablesName = existTables.map((row) => Object.values(row)[0]);
+//     const isTableExisted = existTablesName.includes(tableName);
+//     if (isTableExisted) {
+//       const dropTables = `DROP TABLE ${tableName}`;
+//       await DBpool.query(dropTables);
+//       console.log(`successfully dropping table ${tableName}`);
+//     } 
+//     // else {
+//     //   return;
+//     // }
+//     // const dropTables = `DROP TABLE IF EXISTS ${tableName}`; 
+//     // await DBpool.query(dropTables);
+//   } catch (error) {
+//     console.error(`Error dropping table ${tableName}:`, error);
+//   }
+// };
+
+exports.existTableDrop = async (tableName) => {
+  try {
+    const query = `DROP TABLE IF EXISTS \`${tableName}\``;
+    await DBpool.query(query);
+    console.log(`Table '${tableName}' dropped successfully (if it existed).`);
+  } catch (error) {
+    console.error(`Error dropping table '${tableName}':`, error.message);
+    throw error; 
+  }
+};
+
 
 exports.createTable = async (headers, tableName) => {
   const connection = await DBpool.getConnection();
   try {
-    const columns = headers.map(header => `${header} VARCHAR(255)`).join(', ');
+    const columns = headers.map((header) => `${header} VARCHAR(255)`).join(", ");
+    
+    // const dropTables = `DROP TABLE IF EXISTS ${tableName}`;  
     const createTableSQL = `CREATE TABLE IF NOT EXISTS ${tableName} (${columns})`;
 
+    // await DBpool.query(dropTables);
     await connection.query(createTableSQL);
     console.log(`Table ${tableName} created successfully.`);
   } catch (error) {
@@ -73,10 +107,12 @@ exports.createTable = async (headers, tableName) => {
 exports.insertData = async (headers, rows, tableName) => {
   const connection = await DBpool.getConnection();
   try {
-    rows = rows.filter(row => Object.values(row).some(value => value !== null && value !== ""));
+    rows = rows.filter((row) =>
+      Object.values(row).some((value) => value !== null && value !== "")
+    );
 
-    const placeholders = rows.map(() => `(${headers.map(() => '?').join(', ')})`).join(', ');
-    const insertSQL = `INSERT INTO ${tableName} (${headers.join(', ')}) VALUES ${placeholders}`;
+    const placeholders = rows.map(() => `(${headers.map(() => "?").join(", ")})`).join(", ");
+    const insertSQL = `INSERT INTO ${tableName} (${headers.join(", ")}) VALUES ${placeholders}`;
     const flattenedRows = rows.flat();
 
     await connection.query(insertSQL, flattenedRows);
