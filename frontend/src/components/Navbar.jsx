@@ -10,15 +10,10 @@ export default function Navbar() {
           <Nav.Link href="/home">Home</Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey="link-1">Loooonger NavLink</Nav.Link>
+          <Nav.Link href="/choosetimetable">ChooseTimeTable</Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link eventKey="link-2">Link</Nav.Link>
-        </Nav.Item>
-        <Nav.Item>
-          <Nav.Link eventKey="disabled" >
-            Disabled
-          </Nav.Link>
+          <Nav.Link href="/createtimetable">CreateTimeTable</Nav.Link>
         </Nav.Item>
       </Nav>
     </div>

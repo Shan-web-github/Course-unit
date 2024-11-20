@@ -43,9 +43,11 @@ exports.uploadFile = (req, res) => {
         // console.log(`Rows: ${rows.length}`);
 
         // Create table and insert data
-        existTableDrop(tableName);
-        createTable(headers, tableName);
-        insertData(headers, rows, tableName);
+        (async () => {
+          await existTableDrop(tableName);
+          await createTable(headers, tableName);
+          await insertData(headers, rows, tableName);
+        })();
       }
     });
 
@@ -58,7 +60,7 @@ exports.uploadFile = (req, res) => {
   }
 };
 
-exports.getFiles = async(req, res) => {
+exports.getFiles = async (req, res) => {
   const tableName = req.params.table;
   try {
     const [result, fields] = await DBpool.query(`SELECT * FROM ${tableName}`);
