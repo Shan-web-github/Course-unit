@@ -2,10 +2,10 @@ import React from "react";
 
 import Nav from "react-bootstrap/Nav";
 
-export default function Navbar() {
+export default function Navbar(props) {
   return (
     <div>
-      <Nav justify variant="tabs" defaultActiveKey="/home">
+      <Nav justify variant="tabs" defaultActiveKey={props.path}>
         <Nav.Item>
           <Nav.Link href="/home">Home</Nav.Link>
         </Nav.Item>

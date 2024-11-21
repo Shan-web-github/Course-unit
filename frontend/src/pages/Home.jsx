@@ -34,7 +34,7 @@ export default function Home() {
   };
   return (
     <div>
-      <Navbar />
+      <Navbar path="/home"/>
       <div>
         <div className="uploadform">
           <InputGroup className="mb-3">

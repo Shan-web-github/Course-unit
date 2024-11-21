@@ -1,7 +1,10 @@
 import React from 'react'
+import Navbar from '../components/Navbar'
 
 export default function ChooseTimeTable() {
   return (
-    <div>ChooseTimeTable</div>
+    <div>
+      <Navbar path="/choosetimetable"/>
+    </div>
   )
 }
