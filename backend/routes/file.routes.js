@@ -7,5 +7,6 @@ const router = express.Router();
 
 router.post("/upload", fileUpload, filesController.uploadFile);
 router.get("/data/:table", filesController.getFiles);
+router.get("/clashes/:level",filesController.getClashes);
 
 module.exports = router;
