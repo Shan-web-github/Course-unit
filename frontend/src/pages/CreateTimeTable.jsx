@@ -10,32 +10,36 @@ import Button from "react-bootstrap/Button";
 
 export default function CreateTimeTable() {
   const [level, setLevel] = useState("");
-  const [clashes, setClashes] = useState("");
+  const [semester, setSemester] = useState("");
+  const [isLevelSelected, setIsLevelSelected] = useState(false);
 
   const selectLevel = (event) => {
-    setLevel(event.target.value);
+    const value = event.target.value;
+    setLevel(value);
+    setIsLevelSelected(value !== "");
+    findClashes(value);
   };
 
-  const selectClashesSet = (event) => {
-    setClashes(event.target.value);
+  const selectSemester = (event) => {
+    setSemester(event.target.value);
   };
 
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
 
-  const submit = async (event) => {
-    event.preventDefault();
-    console.log(level, clashes);
+  const findClashes = async (level) => {
 
-    if (level==="" || clashes==="") {
-      return alert("Select Level and Clashes set");
+    if (level === "") {
+      return alert("Select Level");
     }
 
     try {
-      const clashdata = await axios.get(`http://localhost:5000/studentdata/clashes/${level}`);
-          alert(clashdata.status);
-          setColumns(clashdata.data.columns);
-          setRows(clashdata.data.data);
+      const clashdata = await axios.get(
+        `http://localhost:5000/studentdata/clashes/${level}`
+      );
+      alert(clashdata.status);
+      setColumns(clashdata.data.columns);
+      setRows(clashdata.data.data);
     } catch (error) {
       console.error("get clashes file error:", error);
     }
@@ -44,40 +48,74 @@ export default function CreateTimeTable() {
   return (
     <div>
       <Navbar path="/createtimetable" />
-      <div className="uploadform">
-        <Form onSubmit={submit}>
-          <Form.Group>
-            <Form.Label>LEVEL</Form.Label>
-            <Form.Select value={level} autoFocus onChange={selectLevel}>
-              <option value="">Select...</option>
-              <option value="1000">1000</option>
-              <option value="2000">2000</option>
-              <option value="3000">3000</option>
-            </Form.Select>
-          </Form.Group>
-          <br />
-          <Form.Group>
-            <Form.Label>Clashes Sets</Form.Label>
-            <Form.Select value={clashes} onChange={selectClashesSet}>
-              <option value="">Select...</option>
-              <option value="2 sets">2 sets</option>
-              <option value="3 sets">3 sets</option>
-              <option value="4 sets">4 sets</option>
-            </Form.Select>
-          </Form.Group>
-          <br />
-          <div className="button">
-            <Button variant="dark" type="submit">
-              Submit
-            </Button>
-          </div>
-        </Form>
-      </div>
-      <div>
-          <label className="label">
-            <TableTag columns={columns} rows={rows} />
-          </label>
+      <div className="createtimetable">
+        <div className="leftdiv">
+          <Form>
+            <Form.Group>
+              <Form.Label>Level</Form.Label>
+              <Form.Select value={level} autoFocus onChange={selectLevel}>
+                <option value="">Select...</option>
+                <option value="1000">1000</option>
+                <option value="2000">2000</option>
+                <option value="3000">3000</option>
+              </Form.Select>
+            </Form.Group>
+            <br />
+            <Form.Group>
+              <Form.Label>Semester</Form.Label>
+              <Form.Select value={semester} onChange={selectSemester}>
+                <option value="">Select...</option>
+                <option value="I">1st Semester</option>
+                <option value="II">2nd Semester</option>
+              </Form.Select>
+            </Form.Group>
+            <br />
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Form.Label>Exam Start date</Form.Label>
+              <Form.Control type="date" />
+            </Form.Group>
+            <br />
+            <Form.Group>
+              <Form.Label>Time Slote</Form.Label>
+              <Form.Select>
+                <option value="">Select...</option>
+                <option value="Morning">Morning</option>
+                <option value="Evening">Evening</option>
+                <option value="Both">Both</option>
+              </Form.Select>
+            </Form.Group>
+            <br />
+            <div className="button">
+              <Button variant="dark" type="submit">
+                Continue
+              </Button>
+            </div>
+          </Form>
         </div>
+
+        <div className="rightdiv">
+          <div>
+            {isLevelSelected ? (
+              <div>
+                <br />
+                <Form.Label>{level} Level Clashes </Form.Label>
+                {/* <Button variant="dark" type="submit" onClick={findClashes}>
+                  Find
+                </Button> */}
+                <br />
+                <label className="label">
+                  <TableTag columns={columns} rows={rows} />
+                </label>
+              </div>
+            ) : (
+              <div>
+                <br />
+                <Form.Label>Select Level To Find Clashes </Form.Label>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

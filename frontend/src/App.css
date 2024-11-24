@@ -1,5 +1,6 @@
 .label{
   padding: 20px;
+  width: 400px;
   background-size: auto;
 }
 .uploadform{
@@ -9,4 +10,21 @@
 .button{
   display: flex;
   justify-content: space-between;
+}
+
+/*createtimetable */
+.createtimetable{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+}
+.leftdiv{
+  padding: 20px;
+  background-size: auto;
+  background-color: rgb(223, 224, 224);
+}
+.rightdiv{
+  padding: 20px;
+  background-size: auto;
+  background-color: rgb(237, 239, 237);
 }
