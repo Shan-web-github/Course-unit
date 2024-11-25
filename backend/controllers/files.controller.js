@@ -104,3 +104,23 @@ exports.getClashes = async(req,res) =>{
     return;
   }
 }
+
+exports.getCourses = async(req,res) =>{
+  const coursesAttributes = req.params.coursesAttribute.split('-');
+  const level =coursesAttributes[0];
+  const semester =coursesAttributes[1];
+
+  try {
+    const coursesQuery = `SELECT CO_CODE FROM courses WHERE LEVEL = ${level} AND SEMESTER = '${semester}'`;
+    const [result, fields] = await DBpool.query(coursesQuery);
+    const columnNames = fields.map((field) => field.name);
+    // console.log(result);
+    return res.json({
+      columns: columnNames,
+      data: result,
+    });
+  } catch (error) {
+    res.status(501).send(error);
+    return;
+  }
+}

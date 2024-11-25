@@ -1,30 +1,36 @@
-.label{
+.label {
   padding: 20px;
   width: 400px;
   background-size: auto;
 }
-.uploadform{
+.uploadform {
   padding: 20px;
   width: 400px;
 }
-.button{
+.button {
   display: flex;
   justify-content: space-between;
 }
 
 /*createtimetable */
-.createtimetable{
+.createtimetable {
   display: grid;
   grid-template-columns: 1fr 1fr;
   height: 100vh;
 }
-.leftdiv{
+.leftdiv {
   padding: 20px;
   background-size: auto;
   background-color: rgb(223, 224, 224);
 }
-.rightdiv{
+.rightdiv {
   padding: 20px;
   background-size: auto;
   background-color: rgb(237, 239, 237);
+}
+
+/*Dropdownstyle*/
+.dropdownstyle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
