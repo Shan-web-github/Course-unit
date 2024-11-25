@@ -14,9 +14,6 @@ export default function CreateTimeTable() {
   const [semester, setSemester] = useState("");
   const [isLevelSelected, setIsLevelSelected] = useState(false);
 
-  const [startDate, setStartDate] = useState();
-  const [timeSlot, setTimeSlot] = useState("");
-
   const [buttonClick, setButtonClick] = useState(false);
   const [buttonName, setButtonName] = useState("Continue");
 
@@ -31,18 +28,8 @@ export default function CreateTimeTable() {
     setSemester(event.target.value);
   };
 
-  const selectStartDate = (event) => {
-    setStartDate(event.target.value);
-  };
-
-  const selectTimeSlot = (event) => {
-    setTimeSlot(event.target.value);
-  };
-
   const [columns, setColumns] = useState([]);
   const [rows, setRows] = useState([]);
-
-  const [coursesData, setCoursesData] = useState(null);
 
   const findClashes = async (level) => {
     if (level === "") {
@@ -60,45 +47,46 @@ export default function CreateTimeTable() {
     }
   };
 
+  const [coursesData, setCoursesData] = useState([]);
+
   const pressContinue = async (event) => {
     event.preventDefault();
     if (
       level === "" ||
-      semester === "" ||
-      startDate === undefined ||
-      timeSlot === ""
+      semester === ""
     ) {
-      return alert("Select Level,Semester, Start Date and Time slot");
-    }
-    else if (buttonClick === false) {
+      return alert("Select Level and Semester");
+    } else if (buttonClick === false) {
       const coursesAttribute = `${level}-${semester}`;
       try {
         const courses = await axios.get(
           `http://localhost:5000/studentdata/courses/${coursesAttribute}`
         );
-        alert("Successfully continue");
+        alert("Successfully continued");
+
         setCoursesData(courses.data.data);
-        console.log(coursesData);
+        console.log("Courses data :", courses.data.data);
+
         setButtonClick((prevState) => {
           const newState = !prevState;
-          console.log(newState);
+          console.log("Button click state:", newState);
           setButtonName(newState ? "Edit" : "Update");
           return newState;
         });
       } catch (error) {
-        console.error("get courses data file error:", error);
+        console.error("Error fetching courses data:", error);
       }
     } else {
-
       setButtonClick((prevState) => {
         const newState = !prevState;
-        console.log(newState);
+        console.log("Button click state:", newState);
         setButtonName(newState ? "Edit" : "Update");
         return newState;
       });
-      
     }
   };
+
+  const courseCodes = coursesData.map(course => course.CO_CODE);
 
   return (
     <div>
@@ -135,32 +123,6 @@ export default function CreateTimeTable() {
                 </Form.Select>
               </Form.Group>
               <br />
-              <Form.Group
-                className="mb-3"
-                controlId="exampleForm.ControlInput1"
-              >
-                <Form.Label>Exam Start date</Form.Label>
-                <Form.Control
-                  type="date"
-                  onChange={selectStartDate}
-                  disabled={buttonClick}
-                />
-              </Form.Group>
-              <br />
-              <Form.Group>
-                <Form.Label>Time Slot</Form.Label>
-                <Form.Select
-                  value={timeSlot}
-                  onChange={selectTimeSlot}
-                  disabled={buttonClick}
-                >
-                  <option value="">Select...</option>
-                  <option value="Morning">Morning</option>
-                  <option value="Evening">Evening</option>
-                  <option value="Both">Both</option>
-                </Form.Select>
-              </Form.Group>
-              <br />
               <div className="button">
                 <Button variant="dark" type="submit">
                   {buttonName}
@@ -175,9 +137,7 @@ export default function CreateTimeTable() {
                 <ManualTable
                   level={level}
                   semester={semester}
-                  startDate={startDate}
-                  timeSlot={timeSlot}
-                  columns ={["CS2012", "MT2001", "ST3301"]}
+                  columns={courseCodes}
                 />
               </div>
             )}
