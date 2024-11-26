@@ -42,6 +42,7 @@ export default function ManualTable({ columns }) {
   const saveAndNext = (event) => {
     event.preventDefault();
     setTableData(rowInputs);
+    console.log(rowInputs);
     console.log("Saved Table Data: ", rowInputs);
   };
 
@@ -73,7 +74,14 @@ export default function ManualTable({ columns }) {
       </div>
       {dateAndTime && (
         <div>
-          <Table striped bordered hover responsive size="md" variant="secondary">
+          <Table
+            striped
+            bordered
+            hover
+            responsive
+            size="md"
+            variant="secondary"
+          >
             <thead>
               <tr>
                 <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
@@ -93,13 +101,31 @@ export default function ManualTable({ columns }) {
               {rows.map((_, index) => (
                 <tr key={index}>
                   <td>
-                    <Dropdownstyle
-                      id={`morning-${index}`}
-                      courseList={columns}
-                      onChange={(field, value) =>
-                        handleRowChange(index, "morning", field, value)
-                      }
-                    />
+                    {isBoth ? (
+                      <Dropdownstyle
+                        id={`morning-${index}`}
+                        courseList={columns}
+                        onChange={(field, value) =>
+                          handleRowChange(index, "morning", field, value)
+                        }
+                      />
+                    ) : timeSlot === "Morning" ? (
+                      <Dropdownstyle
+                        id={`morning-${index}`}
+                        courseList={columns}
+                        onChange={(field, value) =>
+                          handleRowChange(index, "morning", field, value)
+                        }
+                      />
+                    ) : (
+                      <Dropdownstyle
+                        id={`evening-${index}`}
+                        courseList={columns}
+                        onChange={(field, value) =>
+                          handleRowChange(index, "evening", field, value)
+                        }
+                      />
+                    )}
                   </td>
                   {isBoth && (
                     <td>
@@ -136,7 +162,7 @@ export default function ManualTable({ columns }) {
   );
 }
 
-
+//************************************************************* */
 // import React, { useState } from "react";
 // import Dropdownstyle from "../components/Dropdownstyle";
 
