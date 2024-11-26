@@ -134,9 +134,11 @@ export default function CreateTimeTable() {
             {buttonClick && (
               <div>
                 <hr />
+                {level} Level {semester} Semester End Examination
+                <hr />
                 <ManualTable
-                  level={level}
-                  semester={semester}
+                  // level={level}
+                  // semester={semester}
                   columns={courseCodes}
                 />
               </div>

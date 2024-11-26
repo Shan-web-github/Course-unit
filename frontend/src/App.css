@@ -41,3 +41,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
+.manualtablebutton{
+  display: flex;
+  justify-content: right;
+  gap: 20px;
+}
