@@ -1,45 +1,3 @@
-// import React, { useState } from "react";
-
-// export default function Dropdownstyle({ id, courseList, onChange }) {
-//   const [selectedOption, setSelectedOption] = useState("");
-//   const [inputTime, setInputTime] = useState("");
-
-//   const handleSelectChange = (event) => {
-//     const value = event.target.value;
-//     setSelectedOption(value);
-//     if (onChange) onChange("selectedOption", value);
-//   };
-
-//   const handleInputChange = (event) => {
-//     const value = event.target.value;
-//     setInputTime(value);
-//     if (onChange) onChange("inputTime", value);
-//   };
-
-//   return (
-//     <div>
-//       <select id={`${id}-select`} value={selectedOption} onChange={handleSelectChange}>
-//         <option value="">Select Course</option>
-//         {courseList.map((course, index) => (
-//           <option key={index} value={course}>
-//             {course}
-//           </option>
-//         ))}
-//       </select>
-//       <input
-//         id={`${id}-input`}
-//         type="text"
-//         value={inputTime}
-//         onChange={handleInputChange}
-//         placeholder="Enter Time"
-//       />
-//     </div>
-//   );
-// }
-
-//*************************************************** */
-
-
 import React, { useState } from "react";
 
 import { Dropdown, Form } from "react-bootstrap";
@@ -74,7 +32,7 @@ const handleInputChange = (event) => {
               type="text"
               placeholder="Search..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(event) => setSearchTerm(event.target.value)}
               style={{ margin: "0.5rem" }}
             />
 
