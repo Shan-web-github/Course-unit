@@ -103,7 +103,30 @@ exports.getClashes = async(req,res) =>{
     res.status(501).send(error);
     return;
   }
-}
+};
+
+exports.uploadClashes = (req, res) => {
+  const level = req.params.level;
+  const tableName = level+"_Level";
+  const headers = req.body.headers;
+  const rows =req.body.rows;
+  // console.log(typeof headers);
+  // console.log(rows);
+  try {
+        (async () => {
+          await existTableDrop(tableName);
+          await createTable(headers, tableName);
+          await insertData(headers, rows, tableName);
+        })();
+
+    return res
+      .status(201)
+      .send("Tables created and data inserted successfully.");
+  } catch (error) {
+    console.error("Error processing files:", error);
+    return res.status(501).send(error.message);
+  }
+};
 
 exports.getCourses = async(req,res) =>{
   const coursesAttributes = req.params.coursesAttribute.split('-');
@@ -123,4 +146,4 @@ exports.getCourses = async(req,res) =>{
     res.status(501).send(error);
     return;
   }
-}
+};

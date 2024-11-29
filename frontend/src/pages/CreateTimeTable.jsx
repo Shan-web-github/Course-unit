@@ -51,14 +51,18 @@ export default function CreateTimeTable() {
 
   const pressContinue = async (event) => {
     event.preventDefault();
-    if (
-      level === "" ||
-      semester === ""
-    ) {
+    if (level === "" || semester === "") {
       return alert("Select Level and Semester");
     } else if (buttonClick === false) {
       const coursesAttribute = `${level}-${semester}`;
       try {
+        await axios.post(
+          `http://localhost:5000/studentdata/uploadClashes/${level}`,
+          {
+            headers: columns,
+            rows: rows,
+          }
+        );
         const courses = await axios.get(
           `http://localhost:5000/studentdata/courses/${coursesAttribute}`
         );
@@ -86,7 +90,7 @@ export default function CreateTimeTable() {
     }
   };
 
-  const courseCodes = coursesData.map(course => course.CO_CODE);
+  const courseCodes = coursesData.map((course) => course.CO_CODE);
 
   return (
     <div>

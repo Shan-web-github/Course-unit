@@ -89,18 +89,16 @@ exports.createTable = async (headers, tableName) => {
   const connection = await DBpool.getConnection();
   try {
     const columns = headers.map((header) => `${header} VARCHAR(255)`).join(", ");
-    
-    // const dropTables = `DROP TABLE IF EXISTS ${tableName}`;  
+     
     const createTableSQL = `CREATE TABLE IF NOT EXISTS ${tableName} (${columns})`;
 
-    // await DBpool.query(dropTables);
     await connection.query(createTableSQL);
     console.log(`Table ${tableName} created successfully.`);
   } catch (error) {
     console.error(`Error creating table ${tableName}:`, error);
     throw error;
   } finally {
-    connection.release(); // Release connection back to the pool
+    connection.release();
   }
 };
 
@@ -113,7 +111,20 @@ exports.insertData = async (headers, rows, tableName) => {
 
     const placeholders = rows.map(() => `(${headers.map(() => "?").join(", ")})`).join(", ");
     const insertSQL = `INSERT INTO ${tableName} (${headers.join(", ")}) VALUES ${placeholders}`;
-    const flattenedRows = rows.flat();
+    // const flattenedRows = rows.flatMap(row => headers.map(header => row[header]));
+    // const flattenedRows = rows.flat();
+
+    //*********************************** */
+    function customFlatten(rows, headers) {
+      return rows.flatMap(row => {
+        return Array.isArray(row) 
+          ? row.flat() 
+          : headers.map(header => row[header]);
+      });
+    }
+    //********************************** */
+    
+    const flattenedRows = customFlatten(rows, headers);    
 
     await connection.query(insertSQL, flattenedRows);
     console.log(`Data inserted into table ${tableName} successfully.`);
@@ -121,6 +132,6 @@ exports.insertData = async (headers, rows, tableName) => {
     console.error(`Error inserting data into table ${tableName}:`, error);
     throw error;
   } finally {
-    connection.release(); // Release connection back to the pool
+    connection.release(); 
   }
 };

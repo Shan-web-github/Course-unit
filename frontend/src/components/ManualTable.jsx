@@ -13,12 +13,14 @@ export default function ManualTable({ columns }) {
   const [startDateArray, setStartDateArray] = useState([]);
   const [timeSlot, setTimeSlot] = useState("");
   const [timeSlotArray, setTimeSlotArray] = useState([]);
-
+//************************************ */
+  // const [column,setColumns] = useState[columns];
+//************************************ */
   const [tableData, setTableData] = useState("");
-  const [groupTableData,setGroupTabledata] = useState([]);
+  const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
 
-  const rows = Array(4).fill(null); 
+  const rows = Array(4).fill(null);
 
   const [rowInputs, setRowInputs] = useState(
     rows.map(() => ({ morning: {}, evening: {} }))
@@ -39,33 +41,70 @@ export default function ManualTable({ columns }) {
   const isBoth = timeSlot === "Both";
 
   const handleRowChange = (rowIndex, time, field, value) => {
-    setRowInputs((prev) => {
-      const updated = [...prev];
-      updated[rowIndex][time][field] = value;
-      return updated;
-    });
+    if (concatenatedOptions.length < 2) {
+      setRowInputs((prev) => {
+        const updated = [...prev];
+        updated[rowIndex][time][field] = value;
+        return updated;
+      });
+    } else {
+      
+      setRowInputs((prev) => {
+        const updated = [...prev];
+        updated[rowIndex][time][field] = value;
+        return updated;
+      });
+    }
   };
 
-  const groupData = (data, batchSize) =>{
-      const result = [];
-      for (let i = 0; i < data.length; i += batchSize) {
-        result.push(data.slice(i, i + batchSize));
-      }
-      return result; 
+  //************************************************** */
+
+  const concatenatedOptions = rowInputs
+    .flatMap((item) => [
+      item.morning?.selectedOption || "N/A",
+      item.evening?.selectedOption || "N/A",
+    ])
+    .filter((item) => item !== "N/A");
+
+  /*************************************************
+
+  const morningOptions = rowInputs.map(
+    (item) => item.morning?.selectedOption || "N/A"
+  );
+
+  const eveningOptions = rowInputs.map(
+    (item) => item.evening?.selectedOption || "N/A"
+  );
+
+  /************************************************* */
+
+  const groupData = (data, batchSize) => {
+    const result = [];
+    for (let i = 0; i < data.length; i += batchSize) {
+      result.push(data.slice(i, i + batchSize));
+    }
+    return result;
   };
 
   const saveAndNext = () => {
+    // if (morningOptions[0]==="N/A" && eveningOptions[0]==="N/A") {
+    //   alert("Select subjects");
+    // }
+    if (concatenatedOptions.length === 0) {
+      alert("Select subjects");
+    } else {
+      setStartDateArray((pre) => [...pre, startDate]);
+      setTimeSlotArray((pre) => [...pre, timeSlot]);
 
-    const newData = [...tableData, ...rowInputs];
+      //these function must be run sequentially
+      const newData = [...tableData, ...rowInputs];
+      setTableData(newData);
+      setGroupTabledata(groupData(newData, 4));
+      setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
 
-    setStartDateArray((pre) => [...pre, startDate]);
-    setTimeSlotArray((pre) => [...pre, timeSlot]);
-
-    setTableData(newData);
-    setGroupTabledata(groupData(newData,4));
-    setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
-    setResetKey((prevKey) => prevKey + 1);
-    console.log("Saved Table Data: ", tableData);
+      setResetKey((prevKey) => prevKey + 1);
+      console.log("Saved Table Data: ", tableData);
+    }
   };
 
   const saveAndFinish = (event) => {
@@ -126,7 +165,7 @@ export default function ManualTable({ columns }) {
                   <td>
                     {isBoth ? (
                       <Dropdownstyle
-                        key={`${resetKey}-morning-${index}`} 
+                        key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={columns}
                         onChange={(field, value) =>
@@ -135,7 +174,7 @@ export default function ManualTable({ columns }) {
                       />
                     ) : timeSlot === "Morning" ? (
                       <Dropdownstyle
-                        key={`${resetKey}-morning-${index}`} 
+                        key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={columns}
                         onChange={(field, value) =>
@@ -144,7 +183,7 @@ export default function ManualTable({ columns }) {
                       />
                     ) : (
                       <Dropdownstyle
-                        key={`${resetKey}-evening-${index}`} 
+                        key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={columns}
                         onChange={(field, value) =>
@@ -156,7 +195,7 @@ export default function ManualTable({ columns }) {
                   {isBoth && (
                     <td>
                       <Dropdownstyle
-                        key={`${resetKey}-evening-${index}`} 
+                        key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={columns}
                         onChange={(field, value) =>
