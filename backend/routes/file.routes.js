@@ -12,5 +12,6 @@ router.get("/clashes/:level",filesController.getClashes);
 router.post("/uploadClashes/:level",filesController.uploadClashes);
 
 router.get("/courses/:coursesAttribute",filesController.getCourses);
+router.get("/notclashes/:coursesList",filesController.getNotClashes);
 
 module.exports = router;

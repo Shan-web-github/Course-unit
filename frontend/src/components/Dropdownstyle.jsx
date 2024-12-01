@@ -7,7 +7,8 @@ function Dropdownstyle({ courseList, onChange }) {
   const [selectedOption, setSelectedOption] = useState("Select an option");
   const[inputTime,setInputTime] = useState("");
 
-  const filteredOptions = courseList.filter((option) =>
+  const courseListNew = courseList.map((course) => course.CO_CODE);
+  const filteredOptions = courseListNew.filter((option) =>
     option.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

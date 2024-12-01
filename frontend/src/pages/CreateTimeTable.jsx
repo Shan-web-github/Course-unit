@@ -47,14 +47,12 @@ export default function CreateTimeTable() {
     }
   };
 
-  const [coursesData, setCoursesData] = useState([]);
 
   const pressContinue = async (event) => {
     event.preventDefault();
     if (level === "" || semester === "") {
       return alert("Select Level and Semester");
     } else if (buttonClick === false) {
-      const coursesAttribute = `${level}-${semester}`;
       try {
         await axios.post(
           `http://localhost:5000/studentdata/uploadClashes/${level}`,
@@ -63,13 +61,6 @@ export default function CreateTimeTable() {
             rows: rows,
           }
         );
-        const courses = await axios.get(
-          `http://localhost:5000/studentdata/courses/${coursesAttribute}`
-        );
-        alert("Successfully continued");
-
-        setCoursesData(courses.data.data);
-        console.log("Courses data :", courses.data.data);
 
         setButtonClick((prevState) => {
           const newState = !prevState;
@@ -78,7 +69,7 @@ export default function CreateTimeTable() {
           return newState;
         });
       } catch (error) {
-        console.error("Error fetching courses data:", error);
+        console.error("Error upload clash courses data:", error);
       }
     } else {
       setButtonClick((prevState) => {
@@ -90,7 +81,7 @@ export default function CreateTimeTable() {
     }
   };
 
-  const courseCodes = coursesData.map((course) => course.CO_CODE);
+  // const courseCodes = coursesData.map((course) => course.CO_CODE);
 
   return (
     <div>
@@ -141,9 +132,9 @@ export default function CreateTimeTable() {
                 {level} Level {semester} Semester End Examination
                 <hr />
                 <ManualTable
-                  // level={level}
-                  // semester={semester}
-                  columns={courseCodes}
+                  level={level}
+                  semester={semester}
+                  // columns={courseCodes}
                 />
               </div>
             )}

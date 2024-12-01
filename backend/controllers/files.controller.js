@@ -147,3 +147,33 @@ exports.getCourses = async(req,res) =>{
     return;
   }
 };
+
+exports.getNotClashes = async (req, res) => {
+  const coursesList = req.params.coursesList;
+  const selectedSubjects = coursesList.split(",");
+  const placeholders = selectedSubjects.map(() => "?").join(", ");
+
+  const semester = req.query.semester;
+  const level = req.query.level;
+
+  if (!semester || !level) {
+    return res.status(400).send("Semester and level are required.");
+  }
+
+  try {
+    const coursesQuery = `SELECT DISTINCT CO_CODE FROM courses WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM 1000_level WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders}) ) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
+
+    const queryParams = [...selectedSubjects, ...selectedSubjects,...selectedSubjects];
+
+    const [result, fields] = await DBpool.query(coursesQuery, queryParams);
+
+    const columnNames = fields.map((field) => field.name);
+    return res.json({
+      columns: columnNames,
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error in getNotClashes:", error);
+    res.status(500).send("Internal Server Error");
+  }
+};

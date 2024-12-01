@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from "axios";
+
 import Dropdownstyle from "../components/Dropdownstyle";
 import SampleTimeTable from "./SampleTimeTable";
 
@@ -6,16 +8,17 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-export default function ManualTable({ columns }) {
+export default function ManualTable({ level, semester }) {
   const [dateAndTime, setDateAndTime] = useState(false);
 
   const [startDate, setStartDate] = useState("");
   const [startDateArray, setStartDateArray] = useState([]);
   const [timeSlot, setTimeSlot] = useState("");
   const [timeSlotArray, setTimeSlotArray] = useState([]);
-//************************************ */
-  // const [column,setColumns] = useState[columns];
-//************************************ */
+  //************************************ */
+  const [coursesData, setCoursesData] = useState([]);
+  const [columns, setColumns] = useState([]);
+  //************************************ */
   const [tableData, setTableData] = useState("");
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
@@ -26,45 +29,58 @@ export default function ManualTable({ columns }) {
     rows.map(() => ({ morning: {}, evening: {} }))
   );
 
-  const selectStartDate = (event) => {
+  const selectStartDate = async (event) => {
     const newStartDate = event.target.value;
     setStartDate(newStartDate);
     setDateAndTime(newStartDate && timeSlot);
+    try {
+      const coursesAttribute = `${level}-${semester}`;
+      const courses = await axios.get(
+        `http://localhost:5000/studentdata/courses/${coursesAttribute}`
+      );
+      alert("Successfully continued");
+
+      setCoursesData(courses.data.data);
+      console.log("Courses data :", courses.data.data);
+    } catch (error) {
+      console.error("Error fetching courses data:", error);
+    }
   };
 
   const selectTimeSlot = (event) => {
     const newTimeSlot = event.target.value;
     setTimeSlot(newTimeSlot);
     setDateAndTime(startDate && newTimeSlot);
+    // const courseCodes = coursesData.map((course) => course.CO_CODE);
+    setColumns(coursesData);
   };
 
   const isBoth = timeSlot === "Both";
-
-  const handleRowChange = (rowIndex, time, field, value) => {
-    if (concatenatedOptions.length < 2) {
-      setRowInputs((prev) => {
-        const updated = [...prev];
-        updated[rowIndex][time][field] = value;
-        return updated;
-      });
-    } else {
-      
-      setRowInputs((prev) => {
-        const updated = [...prev];
-        updated[rowIndex][time][field] = value;
-        return updated;
-      });
-    }
-  };
-
-  //************************************************** */
 
   const concatenatedOptions = rowInputs
     .flatMap((item) => [
       item.morning?.selectedOption || "N/A",
       item.evening?.selectedOption || "N/A",
     ])
-    .filter((item) => item !== "N/A");
+    .filter((item) => item !== "N/A").join(",");
+
+
+  const handleRowChange = async (rowIndex, time, field, value) => {
+      try {
+        setRowInputs((prev) => {
+          const updated = [...prev];
+          updated[rowIndex][time][field] = value;
+          return updated;
+        });
+
+        const response = await axios.get(
+          `http://localhost:5000/studentdata/notclashes/${concatenatedOptions}?semester=${semester}&level=${level}`
+        );
+        setColumns(response.data.data);
+      } catch (error) {
+        console.error("Error fetching not clash courses data:", error);
+      }
+  };
 
   /*************************************************
 
@@ -102,6 +118,7 @@ export default function ManualTable({ columns }) {
       setGroupTabledata(groupData(newData, 4));
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
 
+      setColumns(columns);
       setResetKey((prevKey) => prevKey + 1);
       console.log("Saved Table Data: ", tableData);
     }
