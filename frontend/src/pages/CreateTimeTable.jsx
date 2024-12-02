@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 import Navbar from "../components/Navbar";
-import TableTag from "../components/Table";
+import TableTag from "../components/TableTag";
 
 //bootstrapt lib
 import Form from "react-bootstrap/Form";
@@ -134,7 +134,7 @@ export default function CreateTimeTable() {
                 <ManualTable
                   level={level}
                   semester={semester}
-                  // columns={courseCodes}
+                  buttonClick={buttonClick}
                 />
               </div>
             )}

@@ -161,9 +161,9 @@ exports.getNotClashes = async (req, res) => {
   }
 
   try {
-    const coursesQuery = `SELECT DISTINCT CO_CODE FROM courses WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM 1000_level WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders}) ) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
+    const coursesQuery = `SELECT DISTINCT CO_CODE FROM sem_reg WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM ${level}_level WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders})) AND CO_CODE NOT IN (${placeholders}) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
 
-    const queryParams = [...selectedSubjects, ...selectedSubjects,...selectedSubjects];
+    const queryParams = [...selectedSubjects, ...selectedSubjects,...selectedSubjects,...selectedSubjects];
 
     const [result, fields] = await DBpool.query(coursesQuery, queryParams);
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 import Dropdownstyle from "../components/Dropdownstyle";
@@ -8,7 +8,7 @@ import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-export default function ManualTable({ level, semester }) {
+export default function ManualTable({ level, semester, buttonClick }) {
   const [dateAndTime, setDateAndTime] = useState(false);
 
   const [startDate, setStartDate] = useState("");
@@ -17,7 +17,7 @@ export default function ManualTable({ level, semester }) {
   const [timeSlotArray, setTimeSlotArray] = useState([]);
   //************************************ */
   const [coursesData, setCoursesData] = useState([]);
-  const [columns, setColumns] = useState([]);
+  // const [columns, setColumns] = useState([]);
   //************************************ */
   const [tableData, setTableData] = useState("");
   const [groupTableData, setGroupTabledata] = useState([]);
@@ -52,7 +52,7 @@ export default function ManualTable({ level, semester }) {
     setTimeSlot(newTimeSlot);
     setDateAndTime(startDate && newTimeSlot);
     // const courseCodes = coursesData.map((course) => course.CO_CODE);
-    setColumns(coursesData);
+    // setColumns(coursesData);
   };
 
   const isBoth = timeSlot === "Both";
@@ -66,20 +66,13 @@ export default function ManualTable({ level, semester }) {
 
 
   const handleRowChange = async (rowIndex, time, field, value) => {
-      try {
-        setRowInputs((prev) => {
+
+    setRowInputs((prev) => {
           const updated = [...prev];
           updated[rowIndex][time][field] = value;
           return updated;
         });
 
-        const response = await axios.get(
-          `http://localhost:5000/studentdata/notclashes/${concatenatedOptions}?semester=${semester}&level=${level}`
-        );
-        setColumns(response.data.data);
-      } catch (error) {
-        console.error("Error fetching not clash courses data:", error);
-      }
   };
 
   /*************************************************
@@ -103,9 +96,6 @@ export default function ManualTable({ level, semester }) {
   };
 
   const saveAndNext = () => {
-    // if (morningOptions[0]==="N/A" && eveningOptions[0]==="N/A") {
-    //   alert("Select subjects");
-    // }
     if (concatenatedOptions.length === 0) {
       alert("Select subjects");
     } else {
@@ -118,7 +108,6 @@ export default function ManualTable({ level, semester }) {
       setGroupTabledata(groupData(newData, 4));
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
 
-      setColumns(columns);
       setResetKey((prevKey) => prevKey + 1);
       console.log("Saved Table Data: ", tableData);
     }
@@ -128,6 +117,12 @@ export default function ManualTable({ level, semester }) {
     event.preventDefault();
     console.log("Final Data: ", tableData);
   };
+
+  useEffect(() => {
+  // setColumns([]);
+  setResetKey(0);
+  }
+  ,[buttonClick]);
 
   return (
     <div>
@@ -184,7 +179,10 @@ export default function ManualTable({ level, semester }) {
                       <Dropdownstyle
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
-                        courseList={columns}
+                        courseList={coursesData}
+                        concatenatedOptions={concatenatedOptions} 
+                        semester={semester}
+                        level={level}
                         onChange={(field, value) =>
                           handleRowChange(index, "morning", field, value)
                         }
@@ -193,7 +191,10 @@ export default function ManualTable({ level, semester }) {
                       <Dropdownstyle
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
-                        courseList={columns}
+                        courseList={coursesData}
+                        concatenatedOptions={concatenatedOptions} 
+                        semester={semester}
+                        level={level}
                         onChange={(field, value) =>
                           handleRowChange(index, "morning", field, value)
                         }
@@ -202,7 +203,10 @@ export default function ManualTable({ level, semester }) {
                       <Dropdownstyle
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
-                        courseList={columns}
+                        courseList={coursesData}
+                        concatenatedOptions={concatenatedOptions} 
+                        semester={semester}
+                        level={level}
                         onChange={(field, value) =>
                           handleRowChange(index, "evening", field, value)
                         }
@@ -214,7 +218,10 @@ export default function ManualTable({ level, semester }) {
                       <Dropdownstyle
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
-                        courseList={columns}
+                        courseList={coursesData}
+                        concatenatedOptions={concatenatedOptions} 
+                        semester={semester}
+                        level={level}
                         onChange={(field, value) =>
                           handleRowChange(index, "evening", field, value)
                         }
