@@ -181,6 +181,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         id={`morning-${index}`}
                         courseList={coursesData}
                         concatenatedOptions={concatenatedOptions} 
+                        selectedSubjects={tableData}
                         semester={semester}
                         level={level}
                         onChange={(field, value) =>
@@ -193,6 +194,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         id={`morning-${index}`}
                         courseList={coursesData}
                         concatenatedOptions={concatenatedOptions} 
+                        selectedSubjects={tableData}
                         semester={semester}
                         level={level}
                         onChange={(field, value) =>
@@ -205,6 +207,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         id={`evening-${index}`}
                         courseList={coursesData}
                         concatenatedOptions={concatenatedOptions} 
+                        selectedSubjects={tableData}
                         semester={semester}
                         level={level}
                         onChange={(field, value) =>
@@ -220,6 +223,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         id={`evening-${index}`}
                         courseList={coursesData}
                         concatenatedOptions={concatenatedOptions} 
+                        selectedSubjects={tableData}
                         semester={semester}
                         level={level}
                         onChange={(field, value) =>

@@ -47,7 +47,6 @@ export default function CreateTimeTable() {
     }
   };
 
-
   const pressContinue = async (event) => {
     event.preventDefault();
     if (level === "" || semester === "") {
@@ -142,15 +141,25 @@ export default function CreateTimeTable() {
         </div>
 
         <div className="rightdiv">
-          <div>
             {isLevelSelected ? (
               <div>
                 <br />
                 <Form.Label>{level} Level Clashes </Form.Label>
                 <br />
-                <label className="label">
+                <div
+                  className=" scrollable-container"
+                  style={{
+                    width: "100%",
+                    maxHeight: "70vh",
+                    overflowY: "auto",
+                    background: "rgba(255, 255, 255, 0.8)",
+                    borderRadius: "10px",
+                    padding: "20px",
+                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
                   <TableTag columns={columns} rows={rows} />
-                </label>
+                </div>
               </div>
             ) : (
               <div>
@@ -158,7 +167,6 @@ export default function CreateTimeTable() {
                 <Form.Label>Select Level To Find Clashes </Form.Label>
               </div>
             )}
-          </div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import axios from "axios";
 
 import { Dropdown, Form } from "react-bootstrap";
 
-function Dropdownstyle({ courseList, concatenatedOptions, semester, level, onChange }) {
+function Dropdownstyle({ courseList, concatenatedOptions, selectedSubjects, semester, level, onChange }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOption, setSelectedOption] = useState("Select an option");
   const [inputTime, setInputTime] = useState("");
@@ -11,16 +11,38 @@ function Dropdownstyle({ courseList, concatenatedOptions, semester, level, onCha
   const [columns, setColumns] = useState(courseList);
 
   const dynamicOptions = async () => {
-    if (concatenatedOptions) {
+    if (concatenatedOptions && !selectedSubjects) {
       try {
         const response = await axios.get(
-          `http://localhost:5000/studentdata/notclashes/${concatenatedOptions}?semester=${semester}&level=${level}`
+          `http://localhost:5000/studentdata/notclashes1/${concatenatedOptions}?semester=${semester}&level=${level}`
         );
         setColumns(response.data.data);
         console.log(response.data.data);
       } catch (error) {
         console.error("Error fetching not clash courses data:", error);
       }
+    }
+    if (concatenatedOptions && selectedSubjects) {
+
+      const selectedSubjectArray = selectedSubjects.flatMap(obj => 
+        ['morning', 'evening'].map(time => obj[time]?.selectedOption).filter(Boolean)
+      );
+
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/studentdata/notclashes2/${concatenatedOptions}?selectedSubjects=${selectedSubjectArray}&semester=${semester}&level=${level}`
+        );
+        setColumns(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error("Error fetching not clash courses data:", error);
+      }
+    }
+    if (selectedSubjects) {
+      const selectedSubjectArray = selectedSubjects.flatMap(obj => 
+        ['morning', 'evening'].map(time => obj[time]?.selectedOption).filter(Boolean)
+      );
+      
     }
   };
 

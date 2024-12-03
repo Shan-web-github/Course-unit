@@ -1,66 +1,67 @@
-// import React,{useEffect} from "react";
+import React, { useState, useMemo } from "react";
+import debounce from "lodash.debounce";
 
-// import DataTable from 'datatables.net-dt';
-// import 'datatables.net-responsive-dt';
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
+export default function TableTag({ columns, rows }) {
+  const columnDefs = columns.map((col) => ({
+    headerName: col,
+    field: col.toLowerCase(),
+  }));
 
-// export default function TableTag({ columns, rows }) {
-//     const data = Object.values(rows);
+  const data = rows.map((row) =>
+    columnDefs.reduce((newRow, { field }) => {
+      const originalKey = Object.keys(row).find((key) => key.toLowerCase() === field); 
+      if (originalKey) {
+        newRow[field] = row[originalKey]; 
+      }
+      return newRow;
+    }, {})
+  );
 
-//     useEffect(() => {
-//       const table = new DataTable('#myTable', {
-//         responsive: true,
-//         paging: true, 
-//         searching: true, 
-//         ordering: true,
-//         lengthChange: false, 
-//         info: false, 
-//       });
-  
-//       return () => {
-//         table.destroy();
-//       };
-//     }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredData, setFilteredData] = useState(data);
 
-//   return (
-//     <div>
-//       <table id="myTable" >
-//         <thead>
-//           <tr>
-//             {columns.map((col, index) => (
-//               <th key={index}>{col}</th>
-//             ))}
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {data.map((row, rowIndex) => (
-//             <tr key={rowIndex}>
-//               {columns.map((col, colIndex) => (
-//                 <td key={colIndex}>{row[col]}</td>
-//               ))}
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// }
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((query) => {
+        const filtered = data.filter((row) =>
+          Object.entries(row).some(
+            ([key, value]) =>
+              value &&
+              value.toString().toLowerCase().includes(query.toLowerCase())
+          )
+        );
+        setFilteredData(filtered);
+      }, 300),
+    [data]
+  );
 
+  const handleSearch = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    debouncedSearch(query);
+  };
 
-import React from "react";
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
-
-export default function TableTag({ columns, rows }){
-  const data = Object.values(rows);
   return (
-    <div className="ag-theme-alpine" style={{ height: 500, width: '100%' }}>
+    <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={searchQuery}
+        onChange={handleSearch}
+        style={{ marginBottom: "10px", padding: "8px", width: "300px" }}
+      />
       <AgGridReact
-        rowData={data}
-        columnDefs={columns}
+        rowData={filteredData}
+        columnDefs={columnDefs}
         pagination={true}
+        paginationPageSize= '10'
+        paginationPageSizeSelector={[10, 20, 30, 50]}
       />
     </div>
   );
-};
+}
+
