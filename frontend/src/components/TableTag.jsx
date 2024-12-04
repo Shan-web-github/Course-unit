@@ -49,8 +49,8 @@ export default function TableTag({ columns, rows }) {
   };
 
   const onGridReady = (params) => {
-    params.api.sizeColumnsToFit(); 
-  }
+    params.api.sizeColumnsToFit();
+  };
 
   return (
     <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
@@ -75,7 +75,6 @@ export default function TableTag({ columns, rows }) {
         onGridReady={onGridReady}
         pagination={true}
         paginationPageSize={10}
-        paginationPageSizeSelector={[10, 20, 30, 50]}
         paginationAutoPageSize={true}
         rowStyle={{ fontSize: "14px" }}
         enableRtlSupport={true}
@@ -86,6 +85,7 @@ export default function TableTag({ columns, rows }) {
         }}
         rowClassRules={{
           "row-stripe": (params) => params.node.rowIndex % 2 === 0,
+          "high-priority": (params) => params.data.priority === "high",
         }}
         rowSelection="multiple"
       />

@@ -13,10 +13,10 @@
 }
 
 .scrollable-container {
-  width: 100%; /* Adjusts width to fit content */
-  height: auto; /* Adjusts height to fit content */
-  max-height: 70vh; /* Limits height for scrolling */
-  overflow-y: auto; /* Adds scroll if content exceeds max height */
+  width: 100%; 
+  height: auto; 
+  max-height: 70vh; 
+  overflow-y: auto;
   padding: 10px;
   background: #f9f9f9;
   border-radius: 10px;

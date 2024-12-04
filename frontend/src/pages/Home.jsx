@@ -50,7 +50,7 @@ export default function Home() {
           <div
             className="card p-4 text-center d-flex align-items-center justify-content-center"
             style={{
-              width: "auto",
+              width: viewTable ? '100%' : 'auto',
               background: "rgba(255, 255, 255, 0.1)",
               backdropFilter: "blur(10px)",
               borderRadius: "10px",
