@@ -188,7 +188,8 @@ exports.getNotClashes2 = async (req, res) => {
   const semester = req.query.semester;
   const level = req.query.level;
   const selectedSubjectArray = req.query.selectedSubjects;
-  const preSelectedSubjectArray = selectedSubjectArray.split(",");
+  const preSelectedSubject = selectedSubjectArray.split(",");
+  const preSelectedSubjectArray = preSelectedSubject.map(code => `'${code}'`).join(', ');
 
   if (!semester || !level) {
     return res.status(400).send("Semester and level are required.");

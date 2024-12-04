@@ -9,13 +9,16 @@ export default function TableTag({ columns, rows }) {
   const columnDefs = columns.map((col) => ({
     headerName: col,
     field: col.toLowerCase(),
+    autoHeight: true,
   }));
 
   const data = rows.map((row) =>
     columnDefs.reduce((newRow, { field }) => {
-      const originalKey = Object.keys(row).find((key) => key.toLowerCase() === field); 
+      const originalKey = Object.keys(row).find(
+        (key) => key.toLowerCase() === field
+      );
       if (originalKey) {
-        newRow[field] = row[originalKey]; 
+        newRow[field] = row[originalKey];
       }
       return newRow;
     }, {})
@@ -45,23 +48,47 @@ export default function TableTag({ columns, rows }) {
     debouncedSearch(query);
   };
 
+  const onGridReady = (params) => {
+    params.api.sizeColumnsToFit(); 
+  }
+
   return (
     <div className="ag-theme-alpine" style={{ height: 500, width: "100%" }}>
+      <br />
       <input
         type="text"
-        placeholder="Search..."
+        placeholder="Search courses..."
         value={searchQuery}
         onChange={handleSearch}
-        style={{ marginBottom: "10px", padding: "8px", width: "300px" }}
+        style={{
+          marginBottom: "15px",
+          padding: "10px",
+          width: "100%",
+          maxWidth: "400px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+        }}
       />
       <AgGridReact
         rowData={filteredData}
         columnDefs={columnDefs}
+        onGridReady={onGridReady}
         pagination={true}
-        paginationPageSize= '10'
+        paginationPageSize={10}
         paginationPageSizeSelector={[10, 20, 30, 50]}
+        paginationAutoPageSize={true}
+        rowStyle={{ fontSize: "14px" }}
+        enableRtlSupport={true}
+        defaultColDef={{
+          resizable: true,
+          sortable: true,
+          filter: true,
+        }}
+        rowClassRules={{
+          "row-stripe": (params) => params.node.rowIndex % 2 === 0,
+        }}
+        rowSelection="multiple"
       />
     </div>
   );
 }
-
