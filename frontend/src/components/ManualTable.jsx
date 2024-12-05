@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 import Dropdownstyle from "../components/Dropdownstyle";
@@ -21,6 +21,12 @@ export default function ManualTable({ level, semester, buttonClick }) {
   const [tableData, setTableData] = useState("");
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
+
+  // const handleSaveData = (groupData, startDates, timeSlots) => {
+  //   setGroupTableData(groupData);
+  //   setStartDateArray(startDates);
+  //   setTimeSlotArray(timeSlots);
+  // };
 
   const rows = Array(4).fill(null);
 
@@ -60,22 +66,22 @@ export default function ManualTable({ level, semester, buttonClick }) {
 
   const isBoth = timeSlot === "Both";
 
-  const concatenatedOptions = rowInputs
-    .flatMap((item) => [
-      item.morning?.selectedOption || "N/A",
-      item.evening?.selectedOption || "N/A",
-    ])
-    .filter((item) => item !== "N/A").join(",");
-
+  const concatenatedOptions = useMemo(() => {
+    return rowInputs
+      .flatMap((item) => [
+        item.morning?.selectedOption || "N/A",
+        item.evening?.selectedOption || "N/A",
+      ])
+      .filter((item) => item !== "N/A")
+      .join(",");
+  }, [rowInputs]);
 
   const handleRowChange = (rowIndex, time, field, value) => {
-
     setRowInputs((prev) => {
-          const updated = [...prev];
-          updated[rowIndex][time][field] = value;
-          return updated;
-        });
-
+      const updated = [...prev];
+      updated[rowIndex][time][field] = value;
+      return updated;
+    });
   };
 
   /*************************************************
@@ -123,22 +129,20 @@ export default function ManualTable({ level, semester, buttonClick }) {
   };
 
   useEffect(() => {
-  // setColumns([]);
-  setResetKey(0);
-  }
-  ,[buttonClick]);
+    // setColumns([]);
+    setResetKey(0);
+  }, [buttonClick]);
 
   useEffect(() => {
     setFinalData((prev) => {
-      const updated = [...prev]; 
-      updated[resetKey] = {     
-        metadata: startDate, 
-        data: tableData
+      const updated = [...prev];
+      updated[resetKey] = {
+        metadata: startDate,
+        data: tableData,
       };
       return updated;
     });
   }, [tableData, startDate, resetKey]);
-
 
   return (
     <div>
@@ -196,7 +200,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions} 
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -209,7 +213,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions} 
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -222,7 +226,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions} 
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -238,7 +242,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions} 
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}

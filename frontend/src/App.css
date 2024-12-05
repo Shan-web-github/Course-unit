@@ -13,31 +13,31 @@
 }
 
 .scrollable-container {
-  width: 100%; 
-  height: auto; 
-  max-height: 70vh; 
-  overflow-y: auto;
-  padding: 10px;
-  background: #f9f9f9;
-  border-radius: 10px;
+  width: 100%;               
+  height: 100%;              
+  max-height: 100%;          
+  overflow-y: auto;          
+  background-size: cover;    
+  background-position: center; 
+  padding: 1rem;             
+  background: #f9f9f9;       
+  border-radius: 10px;       
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 /*createtimetable */
 .createtimetable {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   height: 100vh;
 }
-.leftdiv {
-  padding: 20px;
-  background-size: auto;
-  background-color: rgb(223, 224, 224);
+.left-pane,
+.right-pane {
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 4rem;
 }
-.rightdiv {
-  padding: 20px;
-  background-size: auto;
-  background-color: rgb(237, 239, 237);
+
+.left-pane {
+  border-right: 1px solid #ddd;
 }
 
 /*Dropdownstyle*/
