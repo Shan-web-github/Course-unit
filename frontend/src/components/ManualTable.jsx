@@ -2,13 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 import Dropdownstyle from "../components/Dropdownstyle";
-import SampleTimeTable from "./SampleTimeTable";
 
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-export default function ManualTable({ level, semester, buttonClick }) {
+export default function ManualTable({ level, semester, buttonClick, onSave }) {
   const [dateAndTime, setDateAndTime] = useState(false);
 
   const [startDate, setStartDate] = useState("");
@@ -22,11 +21,7 @@ export default function ManualTable({ level, semester, buttonClick }) {
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
 
-  // const handleSaveData = (groupData, startDates, timeSlots) => {
-  //   setGroupTableData(groupData);
-  //   setStartDateArray(startDates);
-  //   setTimeSlotArray(timeSlots);
-  // };
+  
 
   const rows = Array(4).fill(null);
 
@@ -116,6 +111,10 @@ export default function ManualTable({ level, semester, buttonClick }) {
       setTableData(newData);
       setGroupTabledata(groupData(newData, 4));
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
+
+      if (typeof onSave === "function") {
+        onSave(groupTableData, startDateArray, timeSlotArray);
+      }
 
       setResetKey((prevKey) => prevKey + 1);
       console.log("Saved Table Data: ", tableData);
@@ -266,17 +265,6 @@ export default function ManualTable({ level, semester, buttonClick }) {
           </div>
         </div>
       )}
-      <div>
-        <h4>Saved Table Data</h4>
-        {groupTableData.map((data, index) => (
-          <SampleTimeTable
-            key={index}
-            tableData={data}
-            startDate={startDateArray[index]}
-            timeSlot={timeSlotArray[index]}
-          />
-        ))}
-      </div>
     </div>
   );
 }

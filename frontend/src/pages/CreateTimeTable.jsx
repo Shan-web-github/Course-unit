@@ -163,18 +163,20 @@
 //   );
 // }
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import axios from "axios";
+import { debounce } from "lodash";
+
 
 import Navbar from "../components/Navbar";
 import ManualTable from "../components/ManualTable";
 import TableTag from "../components/TableTag";
+import SampleTimeTable from "../components/SampleTimeTable";
 
 //bootstrapt lib
 import Form from "react-bootstrap/Form";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-
 
 export default function CreateTimeTable() {
   const [level, setLevel] = useState("");
@@ -185,6 +187,37 @@ export default function CreateTimeTable() {
   const [buttonName, setButtonName] = useState("Continue");
 
   const [isSplit, setIsSplit] = useState(false);
+
+  // const [groupTableData, setGroupTableData] = useState([]);
+  // const [startDateArray, setStartDateArray] = useState([]);
+  // const [timeSlotArray, setTimeSlotArray] = useState([]);
+
+  // const handleSaveData = (groupData, startDates, timeSlots) => {
+  //   setGroupTableData(groupData);
+  //   setStartDateArray(startDates);
+  //   setTimeSlotArray(timeSlots);
+  // };
+
+  const [tableState, setTableState] = useState({
+    groupTableData: [],
+    startDateArray: [],
+    timeSlotArray: [],
+  });
+  
+  const debouncedSave = useMemo(() => {
+    return debounce((groupData, startDates, timeSlots) => {
+      setTableState({
+        groupTableData: groupData,
+        startDateArray: startDates,
+        timeSlotArray: timeSlots,
+      });
+    }, 300);
+  }, []);
+  
+  const handleSaveData = (groupData, startDates, timeSlots) => {
+    debouncedSave(groupData, startDates, timeSlots);
+  };
+  
 
   const selectLevel = (event) => {
     const value = event.target.value;
@@ -298,6 +331,7 @@ export default function CreateTimeTable() {
               level={level}
               semester={semester}
               buttonClick={buttonClick}
+              onSave={handleSaveData}
             />
           </div>
         )}
@@ -315,6 +349,18 @@ export default function CreateTimeTable() {
           <div className="scrollable-container">
             <TableTag columns={columns} rows={rows} />
           </div>
+          <br />
+          <div>
+            <h4>Saved Table Data</h4>
+            {tableState.groupTableData.map((data, index) => (
+              <SampleTimeTable
+                key={index}
+                tableData={data}
+                startDate={tableState.startDateArray[index]}
+                timeSlot={tableState.timeSlotArray[index]}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         <div>
@@ -324,7 +370,6 @@ export default function CreateTimeTable() {
       )}
     </div>
   );
-
 
   return (
     <div>
