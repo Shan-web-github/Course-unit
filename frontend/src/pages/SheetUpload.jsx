@@ -50,8 +50,16 @@ function SheetUpload() {
 
   const navigate = useNavigate();
 
-  const goNext = () => {
-    navigate("/home");
+  const goNext = async() => {
+    try {
+      await axios
+        .get("http://localhost:5000/studentdata/newsemreg");
+      alert("Successfully uploaded");
+      navigate("/home");
+    } catch (error) {
+      console.error("Update error:", error);
+      alert("An error occurred while uploading files.");
+    }
   };
 
   return (

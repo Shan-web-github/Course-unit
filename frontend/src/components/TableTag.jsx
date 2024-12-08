@@ -76,7 +76,7 @@ export default function TableTag({ columns, rows }) {
         pagination={true}
         paginationPageSize={10}
         paginationAutoPageSize={true}
-        rowStyle={{ fontSize: "14px" }}
+        rowStyle={{ fontSize: "12px" }}
         enableRtlSupport={true}
         defaultColDef={{
           resizable: true,

@@ -212,11 +212,19 @@ export default function CreateTimeTable() {
         timeSlotArray: timeSlots,
       });
     }, 300);
-  }, []);
+  }, [setTableState]);
+  
   
   const handleSaveData = (groupData, startDates, timeSlots) => {
+    console.log("Saving data:", { groupData, startDates, timeSlots });
+    setTableState({
+      groupTableData: groupData,
+      startDateArray: startDates,
+      timeSlotArray: timeSlots,
+    });
     debouncedSave(groupData, startDates, timeSlots);
   };
+  
   
 
   const selectLevel = (event) => {

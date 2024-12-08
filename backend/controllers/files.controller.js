@@ -3,7 +3,7 @@ const fs = require("fs");
 const xlsx = require("node-xlsx");
 // const DB = require("../models/db");
 const DBpool = require("../models/db");
-const { createTable, insertData, existTableDrop } = require("./functions");
+const { createTable, insertData, existTableDrop, createSpecialTable } = require("./functions");
 
 exports.uploadFile = (req, res) => {
   const coursesFile = req.files["courses"] ? req.files["courses"][0] : null;
@@ -54,6 +54,17 @@ exports.uploadFile = (req, res) => {
     return res
       .status(201)
       .send("Tables created and data inserted successfully.");
+  } catch (error) {
+    console.error("Error processing files:", error);
+    return res.status(501).send(error.message);
+  }
+};
+
+exports.createNewSemReg = async (req, res) => {
+  try {
+    await existTableDrop("new_sem_reg");
+    await createSpecialTable();
+    return res.status(201).send("Tables created and updated successfully.");
   } catch (error) {
     console.error("Error processing files:", error);
     return res.status(501).send(error.message);

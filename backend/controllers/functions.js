@@ -62,11 +62,11 @@ const DBpool = require("../models/db");
 //       const dropTables = `DROP TABLE ${tableName}`;
 //       await DBpool.query(dropTables);
 //       console.log(`successfully dropping table ${tableName}`);
-//     } 
+//     }
 //     // else {
 //     //   return;
 //     // }
-//     // const dropTables = `DROP TABLE IF EXISTS ${tableName}`; 
+//     // const dropTables = `DROP TABLE IF EXISTS ${tableName}`;
 //     // await DBpool.query(dropTables);
 //   } catch (error) {
 //     console.error(`Error dropping table ${tableName}:`, error);
@@ -80,16 +80,17 @@ exports.existTableDrop = async (tableName) => {
     console.log(`Table '${tableName}' dropped successfully (if it existed).`);
   } catch (error) {
     console.error(`Error dropping table '${tableName}':`, error.message);
-    throw error; 
+    throw error;
   }
 };
-
 
 exports.createTable = async (headers, tableName) => {
   const connection = await DBpool.getConnection();
   try {
-    const columns = headers.map((header) => `${header} VARCHAR(255)`).join(", ");
-     
+    const columns = headers
+      .map((header) => `${header} VARCHAR(255)`)
+      .join(", ");
+
     const createTableSQL = `CREATE TABLE IF NOT EXISTS ${tableName} (${columns})`;
 
     await connection.query(createTableSQL);
@@ -109,22 +110,71 @@ exports.insertData = async (headers, rows, tableName) => {
       Object.values(row).some((value) => value !== null && value !== "")
     );
 
-    const placeholders = rows.map(() => `(${headers.map(() => "?").join(", ")})`).join(", ");
-    const insertSQL = `INSERT INTO ${tableName} (${headers.join(", ")}) VALUES ${placeholders}`;
-    // const flattenedRows = rows.flatMap(row => headers.map(header => row[header]));
-    // const flattenedRows = rows.flat();
+    //********************************************** */
+    const processedRows = rows
+      .map((row) => {
+        if (row.length !== headers.length) {
+          console.warn(`Skipping invalid row: ${JSON.stringify(row)}`);
+          return null;
+        }
+
+        const processedRow = row.map((cell, index) => {
+          const header = headers[index];
+
+          const normalizeCOCode = (code) => {
+            // Remove spaces, convert to uppercase, and remove non-alphanumeric characters like hyphens
+            return code
+              .replace(/\s+/g, "")
+              .replace(/[^A-Za-z0-9]/g, "")
+              .toUpperCase();
+          };
+
+          // Validate CO_CODE
+          if (header === "CO_CODE") {
+            normalizeCOCode(cell);
+          }
+
+          // Clean strings
+          if (typeof cell === "string") {
+            return cell.trim();
+          }
+
+          return cell;
+        });
+
+        // Handle missing data by setting defaults
+        return processedRow.map((cell, index) => {
+          const header = headers[index];
+          return cell === null || cell === undefined ? "NULL" : cell;
+        });
+      })
+      .filter((row) => row !== null);
+
+    // Filter out rows with no valid data
+    const cleanedRows = processedRows.filter((row) =>
+      row.some((cell) => cell !== null && cell !== "")
+    );
+
+    //********************************************* */
+
+    const placeholders = cleanedRows
+      .map(() => `(${headers.map(() => "?").join(", ")})`)
+      .join(", ");
+    const insertSQL = `INSERT INTO ${tableName} (${headers.join(
+      ", "
+    )}) VALUES ${placeholders}`;
 
     //*********************************** */
     function customFlatten(rows, headers) {
-      return rows.flatMap(row => {
-        return Array.isArray(row) 
-          ? row.flat() 
-          : headers.map(header => row[header]);
+      return rows.flatMap((row) => {
+        return Array.isArray(row)
+          ? row.flat()
+          : headers.map((header) => row[header]);
       });
     }
     //********************************** */
-    
-    const flattenedRows = customFlatten(rows, headers);    
+
+    const flattenedRows = customFlatten(cleanedRows, headers);
 
     await connection.query(insertSQL, flattenedRows);
     console.log(`Data inserted into table ${tableName} successfully.`);
@@ -132,6 +182,57 @@ exports.insertData = async (headers, rows, tableName) => {
     console.error(`Error inserting data into table ${tableName}:`, error);
     throw error;
   } finally {
-    connection.release(); 
+    connection.release();
   }
 };
+
+// exports.createSpecialTable = async () => {
+//   const connection = await DBpool.getConnection();
+//   try {
+//     // Create a new table from the query result
+//     const createTableSQL = `CREATE TABLE new_sem_reg AS SELECT sem_reg.* FROM sem_reg INNER JOIN offer_course_exm ON sem_reg.CO_CODE = offer_course_exm.CO_CODE`;
+
+//     // Update LEVEL and CO_CODE in the newly created table
+//     const updateTableSQL = `UPDATE new_sem_reg AS nsr JOIN mapping AS m ON nsr.CO_CODE = m.OLD_CODE SET nsr.LEVEL = CASE WHEN nsr.LEVEL = 100 THEN 1000 WHEN nsr.LEVEL = 200 THEN 2000 WHEN nsr.LEVEL = 300 THEN 3000 WHEN nsr.LEVEL = 400 THEN 4000 ELSE nsr.LEVEL END, nsr.CO_CODE = m.CO_CODE`;
+
+//     await connection.query(createTableSQL); // Create the table
+//     await connection.query(updateTableSQL); // Update the table
+//     console.log(`Table created and updated successfully.`);
+//   } catch (error) {
+//     console.error(`Error creating or updating table:`, error);
+//     throw error;
+//   } finally {
+//     connection.release();
+//   }
+// };
+
+const checkTableExistence = async (tableName) => {
+  const result = await DBpool.query(`SHOW TABLES LIKE ?`, [tableName]);
+  return result.length > 0;
+};
+
+exports.createSpecialTable = async () => {
+  const connection = await DBpool.getConnection();
+  try {
+    if (!(await checkTableExistence('mapping'))) {
+      throw new Error("Table 'mapping' does not exist.");
+    }
+
+    // Proceed with your update logic if the table exists
+    const createTableSQL = `CREATE TABLE new_sem_reg AS SELECT sem_reg.* FROM sem_reg INNER JOIN offer_course_exm ON sem_reg.CO_CODE = offer_course_exm.CO_CODE`;
+
+    const updateTableSQL = `UPDATE new_sem_reg JOIN mapping ON new_sem_reg.CO_CODE = mapping.OLD_CODE SET new_sem_reg.LEVEL = CASE WHEN new_sem_reg.LEVEL = 100 THEN 1000 WHEN new_sem_reg.LEVEL = 200 THEN 2000 WHEN new_sem_reg.LEVEL = 300 THEN 3000 WHEN new_sem_reg.LEVEL = 400 THEN 4000 ELSE new_sem_reg.LEVEL END, new_sem_reg.CO_CODE = mapping.CO_CODE`;
+
+    await connection.query(createTableSQL);
+    await connection.query(updateTableSQL);
+
+    console.log(`Table created and updated successfully.`);
+  } catch (error) {
+    console.error("Error creating or updating table:", error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
+

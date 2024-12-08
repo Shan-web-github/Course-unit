@@ -26,7 +26,7 @@ export default function SampleTimeTable({ tableData, startDate, timeSlot }) {
 
   return (
     <div>
-      <Table striped bordered hover responsive size="md" variant="secondary">
+      <Table striped bordered hover responsive size="md" variant="light">
         <thead>
           <tr>
             <th colSpan={isBoth ? 2 : 1}>{startDate}</th>

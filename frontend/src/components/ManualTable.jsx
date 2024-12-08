@@ -21,8 +21,6 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
 
-  
-
   const rows = Array(4).fill(null);
 
   const [rowInputs, setRowInputs] = useState(
@@ -106,14 +104,23 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       setStartDateArray((pre) => [...pre, startDate]);
       setTimeSlotArray((pre) => [...pre, timeSlot]);
 
+      //************************************************ */
+      const newStartDateArray = [...startDateArray, startDate];
+      const newTimeSlotArray = [...timeSlotArray, timeSlot];
+      const newTableData = [...tableData, ...rowInputs];
+      const newGroupTableData = groupData(newTableData, 4);
+      //*************************************************/
+
       //these function must be run sequentially
       const newData = [...tableData, ...rowInputs];
       setTableData(newData);
       setGroupTabledata(groupData(newData, 4));
+      console.log(groupTableData);
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
 
       if (typeof onSave === "function") {
-        onSave(groupTableData, startDateArray, timeSlotArray);
+        // onSave(groupTableData, startDateArray, timeSlotArray);
+        onSave(newGroupTableData, newStartDateArray, newTimeSlotArray);
       }
 
       setResetKey((prevKey) => prevKey + 1);
@@ -167,14 +174,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       {dateAndTime && (
         <div>
           <br />
-          <Table
-            striped
-            bordered
-            hover
-            responsive
-            size="md"
-            variant="secondary"
-          >
+          <Table striped bordered hover responsive size="md" variant="light">
             <thead>
               <tr>
                 <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
