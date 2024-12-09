@@ -6,6 +6,7 @@ const {fileUpload} = require('../config/multer.config');
 const router = express.Router();
 
 router.post("/upload", fileUpload, filesController.uploadFile);
+router.get("/requiredtablesexist",filesController.requiredTablesExist);
 router.get("/newsemreg",filesController.createNewSemReg);
 router.get("/data/:table", filesController.getFiles);
 

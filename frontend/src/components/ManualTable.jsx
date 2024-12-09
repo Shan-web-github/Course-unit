@@ -115,7 +115,9 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       const newData = [...tableData, ...rowInputs];
       setTableData(newData);
       setGroupTabledata(groupData(newData, 4));
-      console.log(groupTableData);
+      console.log(typeof groupTableData);
+      console.log(typeof tableData);
+      console.log(typeof finalData);
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
 
       if (typeof onSave === "function") {

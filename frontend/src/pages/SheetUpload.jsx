@@ -34,8 +34,7 @@ function SheetUpload() {
           },
         })
         .then((res) => {
-          alert(res.status);
-          // navigate("/home");
+          console.log(res.status);
         })
         .catch((error) => {
           alert(error);
@@ -50,15 +49,33 @@ function SheetUpload() {
 
   const navigate = useNavigate();
 
-  const goNext = async() => {
+  const goNext = async (event) => {
+    event.preventDefault();
     try {
       await axios
-        .get("http://localhost:5000/studentdata/newsemreg");
-      alert("Successfully uploaded");
+        .get("http://localhost:5000/studentdata/requiredtablesexist")
+        .then((res) => {
+          if (res.status === 200) {
+            createNewSemReg();
+          }
+        })
+        .catch((error) => {
+          alert("please insert all excel sheets", error);
+        });
+    } catch (error) {
+      console.error("Checking Exist Table Error:", error);
+      alert("Checking Exist Table Error");
+    }
+  };
+
+  const createNewSemReg = async () => {
+    try {
+      await axios.get("http://localhost:5000/studentdata/newsemreg");
+      console.log("Successfully newsemreg create");
       navigate("/home");
     } catch (error) {
-      console.error("Update error:", error);
-      alert("An error occurred while uploading files.");
+      console.error("newsemreg error:", error);
+      alert("An error occurred while going next page.");
     }
   };
 
@@ -82,7 +99,7 @@ function SheetUpload() {
         }}
       >
         <div>
-          <Form onSubmit={submit}>
+          <Form>
             <Form.Group controlId="courses" className="mb-3">
               <Form.Label>Insert Courses File</Form.Label>
               <Form.Control
@@ -114,7 +131,7 @@ function SheetUpload() {
               />
             </Form.Group>
             <div className="button">
-              <Button variant="dark" type="submit">
+              <Button variant="dark" type="submit" onClick={submit}>
                 Submit
               </Button>
               <Button variant="dark" type="submit" onClick={goNext}>

@@ -103,6 +103,49 @@ exports.createTable = async (headers, tableName) => {
   }
 };
 
+//************************************************************** */
+
+const normalizeCOCode = (code) => {
+  // Remove spaces, convert to uppercase, and remove non-alphanumeric characters like hyphens
+  return code
+    .replace(/\s+/g, "")
+    .replace(/[^A-Za-z0-9]/g, "")
+    .toUpperCase();
+};
+
+const processedRows = (headers, rows) => {
+  rows
+    .map((row) => {
+      if (row.length !== headers.length) {
+        console.warn(`Skipping invalid row: ${JSON.stringify(row)}`);
+        return null;
+      }
+
+      const processedRow = row.map((cell, index) => {
+        const header = headers[index];
+
+        // Validate CO_CODE
+        if (header === "CO_CODE") {
+          normalizeCOCode(cell);
+        }
+
+        // Clean strings
+        if (typeof cell === "string") {
+          return cell.trim();
+        }
+
+        return cell;
+      });
+
+      // Handle missing data by setting defaults
+      return processedRow.map((cell, index) => {
+        const header = headers[index];
+        return cell === null || cell === undefined ? "NULL" : cell;
+      });
+    })
+    .filter((row) => row !== null);
+};
+
 exports.insertData = async (headers, rows, tableName) => {
   const connection = await DBpool.getConnection();
   try {
@@ -111,53 +154,15 @@ exports.insertData = async (headers, rows, tableName) => {
     );
 
     //********************************************** */
-    const processedRows = rows
-      .map((row) => {
-        if (row.length !== headers.length) {
-          console.warn(`Skipping invalid row: ${JSON.stringify(row)}`);
-          return null;
-        }
-
-        const processedRow = row.map((cell, index) => {
-          const header = headers[index];
-
-          const normalizeCOCode = (code) => {
-            // Remove spaces, convert to uppercase, and remove non-alphanumeric characters like hyphens
-            return code
-              .replace(/\s+/g, "")
-              .replace(/[^A-Za-z0-9]/g, "")
-              .toUpperCase();
-          };
-
-          // Validate CO_CODE
-          if (header === "CO_CODE") {
-            normalizeCOCode(cell);
-          }
-
-          // Clean strings
-          if (typeof cell === "string") {
-            return cell.trim();
-          }
-
-          return cell;
-        });
-
-        // Handle missing data by setting defaults
-        return processedRow.map((cell, index) => {
-          const header = headers[index];
-          return cell === null || cell === undefined ? "NULL" : cell;
-        });
-      })
-      .filter((row) => row !== null);
 
     // Filter out rows with no valid data
-    const cleanedRows = processedRows.filter((row) =>
-      row.some((cell) => cell !== null && cell !== "")
-    );
-
+    if (rows.every((row) => Array.isArray(row))) {
+      console.log("row are arrays");
+      return (rows = processedRows(headers, rows));
+    }
     //********************************************* */
 
-    const placeholders = cleanedRows
+    const placeholders = rows
       .map(() => `(${headers.map(() => "?").join(", ")})`)
       .join(", ");
     const insertSQL = `INSERT INTO ${tableName} (${headers.join(
@@ -174,7 +179,7 @@ exports.insertData = async (headers, rows, tableName) => {
     }
     //********************************** */
 
-    const flattenedRows = customFlatten(cleanedRows, headers);
+    const flattenedRows = customFlatten(rows, headers);
 
     await connection.query(insertSQL, flattenedRows);
     console.log(`Data inserted into table ${tableName} successfully.`);
@@ -185,6 +190,8 @@ exports.insertData = async (headers, rows, tableName) => {
     connection.release();
   }
 };
+
+//******************************************************************* */
 
 // exports.createSpecialTable = async () => {
 //   const connection = await DBpool.getConnection();
@@ -206,17 +213,18 @@ exports.insertData = async (headers, rows, tableName) => {
 //   }
 // };
 
-const checkTableExistence = async (tableName) => {
-  const result = await DBpool.query(`SHOW TABLES LIKE ?`, [tableName]);
-  return result.length > 0;
+exports.checkTableExistence = async (tableName) => {
+  try {
+    const [rows] = await DBpool.query(`SHOW TABLES LIKE ?`, [tableName]);
+    return rows.length > 0;
+  } catch (error) {
+    console.error(`Error creating or updating table:`, error);
+  }
 };
 
 exports.createSpecialTable = async () => {
   const connection = await DBpool.getConnection();
   try {
-    if (!(await checkTableExistence('mapping'))) {
-      throw new Error("Table 'mapping' does not exist.");
-    }
 
     // Proceed with your update logic if the table exists
     const createTableSQL = `CREATE TABLE new_sem_reg AS SELECT sem_reg.* FROM sem_reg INNER JOIN offer_course_exm ON sem_reg.CO_CODE = offer_course_exm.CO_CODE`;
@@ -234,5 +242,3 @@ exports.createSpecialTable = async () => {
     connection.release();
   }
 };
-
-

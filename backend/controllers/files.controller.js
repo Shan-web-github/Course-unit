@@ -3,7 +3,13 @@ const fs = require("fs");
 const xlsx = require("node-xlsx");
 // const DB = require("../models/db");
 const DBpool = require("../models/db");
-const { createTable, insertData, existTableDrop, createSpecialTable } = require("./functions");
+const {
+  createTable,
+  insertData,
+  existTableDrop,
+  createSpecialTable,
+  checkTableExistence,
+} = require("./files.functions");
 
 exports.uploadFile = (req, res) => {
   const coursesFile = req.files["courses"] ? req.files["courses"][0] : null;
@@ -60,11 +66,34 @@ exports.uploadFile = (req, res) => {
   }
 };
 
+exports.requiredTablesExist = async (req, res) => {
+  const requiredTables = ["courses", "mapping", "offer_course_exm", "sem_reg"];
+
+  try {
+    for (const tableName of requiredTables) {
+      const tableExists = await checkTableExistence(tableName);
+      if (!tableExists) {
+        return res
+          .status(401)
+          .send(
+            `Table '${tableName}' does not exist. All required tables must be present.`
+          );
+      }
+    }
+    return res.status(200).send("All required tables exist.");
+  } catch (error) {
+    console.error("Error checking table existence:", error.message);
+    return res
+      .status(500)
+      .send("An error occurred while checking table existence.");
+  }
+};
+
 exports.createNewSemReg = async (req, res) => {
   try {
     await existTableDrop("new_sem_reg");
     await createSpecialTable();
-    return res.status(201).send("Tables created and updated successfully.");
+    return res.status(201).send("Table created and updated successfully.");
   } catch (error) {
     console.error("Error processing files:", error);
     return res.status(501).send(error.message);
@@ -100,7 +129,7 @@ exports.getFiles = async (req, res) => {
   // });
 };
 
-exports.getClashes = async(req,res) =>{
+exports.getClashes = async (req, res) => {
   const level = req.params.level;
   try {
     const clashesQuery = `SELECT r1.CO_CODE AS course1,r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM sem_reg r1 JOIN sem_reg r2 ON r1.REG_NO = r2.REG_NO AND r1.CO_CODE < r2.CO_CODE AND r1.LEVEL =${level} AND r2.LEVEL =${level} GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
@@ -118,17 +147,17 @@ exports.getClashes = async(req,res) =>{
 
 exports.uploadClashes = (req, res) => {
   const level = req.params.level;
-  const tableName = level+"_Level";
+  const tableName = level + "_Level";
   const headers = req.body.headers;
-  const rows =req.body.rows;
+  const rows = req.body.rows;
   // console.log(typeof headers);
   // console.log(rows);
   try {
-        (async () => {
-          await existTableDrop(tableName);
-          await createTable(headers, tableName);
-          await insertData(headers, rows, tableName);
-        })();
+    (async () => {
+      await existTableDrop(tableName);
+      await createTable(headers, tableName);
+      await insertData(headers, rows, tableName);
+    })();
 
     return res
       .status(201)
@@ -139,10 +168,10 @@ exports.uploadClashes = (req, res) => {
   }
 };
 
-exports.getCourses = async(req,res) =>{
-  const coursesAttributes = req.params.coursesAttribute.split('-');
-  const level =coursesAttributes[0];
-  const semester =coursesAttributes[1];
+exports.getCourses = async (req, res) => {
+  const coursesAttributes = req.params.coursesAttribute.split("-");
+  const level = coursesAttributes[0];
+  const semester = coursesAttributes[1];
 
   try {
     const coursesQuery = `SELECT CO_CODE FROM courses WHERE LEVEL = ${level} AND SEMESTER = '${semester}'`;
@@ -159,7 +188,6 @@ exports.getCourses = async(req,res) =>{
   }
 };
 
-
 exports.getNotClashes1 = async (req, res) => {
   const coursesList = req.params.coursesList;
   const selectedSubjects = coursesList.split(",");
@@ -175,7 +203,12 @@ exports.getNotClashes1 = async (req, res) => {
   try {
     const coursesQuery = `SELECT DISTINCT CO_CODE FROM sem_reg WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM ${level}_level WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders})) AND CO_CODE NOT IN (${placeholders}) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
 
-    const queryParams = [...selectedSubjects, ...selectedSubjects,...selectedSubjects,...selectedSubjects];
+    const queryParams = [
+      ...selectedSubjects,
+      ...selectedSubjects,
+      ...selectedSubjects,
+      ...selectedSubjects,
+    ];
 
     const [result, fields] = await DBpool.query(coursesQuery, queryParams);
 
@@ -190,7 +223,6 @@ exports.getNotClashes1 = async (req, res) => {
   }
 };
 
-
 exports.getNotClashes2 = async (req, res) => {
   const coursesList = req.params.coursesList;
   const selectedSubjects = coursesList.split(",");
@@ -200,7 +232,9 @@ exports.getNotClashes2 = async (req, res) => {
   const level = req.query.level;
   const selectedSubjectArray = req.query.selectedSubjects;
   const preSelectedSubject = selectedSubjectArray.split(",");
-  const preSelectedSubjectArray = preSelectedSubject.map(code => `'${code}'`).join(', ');
+  const preSelectedSubjectArray = preSelectedSubject
+    .map((code) => `'${code}'`)
+    .join(", ");
 
   if (!semester || !level) {
     return res.status(400).send("Semester and level are required.");
@@ -209,7 +243,12 @@ exports.getNotClashes2 = async (req, res) => {
   try {
     const coursesQuery = `SELECT DISTINCT CO_CODE FROM sem_reg WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM ${level}_level WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders})) AND CO_CODE NOT IN (${placeholders}) AND CO_CODE NOT IN (${preSelectedSubjectArray}) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
 
-    const queryParams = [...selectedSubjects, ...selectedSubjects,...selectedSubjects,...selectedSubjects];
+    const queryParams = [
+      ...selectedSubjects,
+      ...selectedSubjects,
+      ...selectedSubjects,
+      ...selectedSubjects,
+    ];
 
     const [result, fields] = await DBpool.query(coursesQuery, queryParams);
 

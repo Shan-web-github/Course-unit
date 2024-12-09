@@ -18,8 +18,11 @@ app.use(express.json());
 app.use(cors());
 
 try {
-  const studentData = require("./routes/file.routes.js");
+  const studentData = require("./routes/files.routes.js");
   app.use("/studentdata", studentData);
+
+  const usersdata = require('./routes/users.routes.js');
+  app.use("/usersdata",usersdata);
 
   // app.post("/studentdata/upload", fileUpload, filesController.uploadFile);
   // app.get("/studentdata/data/:table", filesController.getFiles);
