@@ -114,7 +114,7 @@ const normalizeCOCode = (code) => {
 };
 
 const processedRows = (headers, rows) => {
-  rows
+  return rows
     .map((row) => {
       if (row.length !== headers.length) {
         console.warn(`Skipping invalid row: ${JSON.stringify(row)}`);
@@ -126,7 +126,7 @@ const processedRows = (headers, rows) => {
 
         // Validate CO_CODE
         if (header === "CO_CODE") {
-          normalizeCOCode(cell);
+          cell = normalizeCOCode(cell);
         }
 
         // Clean strings
@@ -158,7 +158,7 @@ exports.insertData = async (headers, rows, tableName) => {
     // Filter out rows with no valid data
     if (rows.every((row) => Array.isArray(row))) {
       console.log("row are arrays");
-      return (rows = processedRows(headers, rows));
+      rows = processedRows(headers, rows);
     }
     //********************************************* */
 
@@ -228,11 +228,12 @@ exports.createSpecialTable = async () => {
 
     // Proceed with your update logic if the table exists
     const createTableSQL = `CREATE TABLE new_sem_reg AS SELECT sem_reg.* FROM sem_reg INNER JOIN offer_course_exm ON sem_reg.CO_CODE = offer_course_exm.CO_CODE`;
+    await connection.query(createTableSQL);
 
     const updateTableSQL = `UPDATE new_sem_reg JOIN mapping ON new_sem_reg.CO_CODE = mapping.OLD_CODE SET new_sem_reg.LEVEL = CASE WHEN new_sem_reg.LEVEL = 100 THEN 1000 WHEN new_sem_reg.LEVEL = 200 THEN 2000 WHEN new_sem_reg.LEVEL = 300 THEN 3000 WHEN new_sem_reg.LEVEL = 400 THEN 4000 ELSE new_sem_reg.LEVEL END, new_sem_reg.CO_CODE = mapping.CO_CODE`;
-
-    await connection.query(createTableSQL);
     await connection.query(updateTableSQL);
+    
+    
 
     console.log(`Table created and updated successfully.`);
   } catch (error) {

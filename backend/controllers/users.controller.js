@@ -1,4 +1,7 @@
 const DBpool = require("../models/db");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv")
+dotenv.config();
 const {
   isEmailExist,
   hashPassword,
@@ -67,7 +70,17 @@ exports.userLogin = async (req, res) => {
     const validUser = await verifyPassword(password, storedHash);
 
     if (validUser) {
-      return res.status(200).send("Login successful.");
+      const token = jwt.sign(
+        { email:  user[0].email},
+        process.env.JWT_SECRET_KEY,
+        {
+          expiresIn: "4h",
+        }
+      );
+      res.status(200).json({
+        token,
+        message: "User logged in successfully",
+      });
     } else {
       return res.status(401).send("Invalid password.");
     }

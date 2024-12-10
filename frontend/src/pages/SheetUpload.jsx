@@ -1,81 +1,78 @@
-import { React, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-//components
+// Components
 import background from "../assets/background.jpg";
 
-//bootstrapt lib
+// Bootstrap
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
-function SheetUpload() {
-  const [courses, setCourse] = useState(null);
+export default function SheetUpload() {
+  const [courses, setCourses] = useState(null);
   const [mapping, setMapping] = useState(null);
-  const [sem_reg, setSem_reg] = useState(null);
-  const [offer_course_exm, setOffer_course_exm] = useState(null);
+  const [semReg, setSemReg] = useState(null);
+  const [offerCourseExam, setOfferCourseExam] = useState(null);
+
+  const navigate = useNavigate();
 
   const submit = async (event) => {
     event.preventDefault();
-    if (!courses || !mapping || !sem_reg || !offer_course_exm) {
+    if (!courses || !mapping || !semReg || !offerCourseExam) {
       return alert("Please upload all files.");
     }
     const formData = new FormData();
     formData.append("courses", courses);
     formData.append("mapping", mapping);
-    formData.append("sem_reg", sem_reg);
-    formData.append("offer_course_exm", offer_course_exm);
+    formData.append("sem_reg", semReg);
+    formData.append("offer_course_exm", offerCourseExam);
 
     try {
-      await axios
-        .post("http://localhost:5000/studentdata/upload", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((res) => {
-          console.log(res.status);
-        })
-        .catch((error) => {
-          alert(error);
-        });
-
+      const res = await axios.post(
+        "http://localhost:5000/studentdata/upload",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      console.log(res.status);
       alert("Successfully uploaded");
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Upload error:", error.response?.data || error.message);
       alert("An error occurred while uploading files.");
     }
   };
 
-  const navigate = useNavigate();
-
   const goNext = async (event) => {
     event.preventDefault();
     try {
-      await axios
-        .get("http://localhost:5000/studentdata/requiredtablesexist")
-        .then((res) => {
-          if (res.status === 200) {
-            createNewSemReg();
-          }
-        })
-        .catch((error) => {
-          alert("please insert all excel sheets", error);
-        });
+      const res = await axios.get(
+        "http://localhost:5000/studentdata/requiredtablesexist"
+      );
+      if (res.status === 200) {
+        await createNewSemReg();
+      }
     } catch (error) {
-      console.error("Checking Exist Table Error:", error);
-      alert("Checking Exist Table Error");
+      console.error(
+        "Checking Exist Table Error:",
+        error.response?.data || error.message
+      );
+      alert("Please insert all Excel sheets.");
     }
   };
 
   const createNewSemReg = async () => {
     try {
       await axios.get("http://localhost:5000/studentdata/newsemreg");
-      console.log("Successfully newsemreg create");
+      console.log("Successfully created new sem reg.");
       navigate("/home");
     } catch (error) {
-      console.error("newsemreg error:", error);
-      alert("An error occurred while going next page.");
+      console.error(
+        "New sem reg error:",
+        error.response?.data || error.message
+      );
+      alert("An error occurred while navigating to the next page.");
     }
   };
 
@@ -98,51 +95,45 @@ function SheetUpload() {
           color: "white",
         }}
       >
-        <div>
-          <Form>
-            <Form.Group controlId="courses" className="mb-3">
-              <Form.Label>Insert Courses File</Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(event) => setCourse(event.target.files[0])}
-              />
-            </Form.Group>
-            <Form.Group controlId="mapping" className="mb-3">
-              <Form.Label>Insert Mapping File</Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(event) => setMapping(event.target.files[0])}
-              />
-            </Form.Group>
-            <Form.Group controlId="sem_reg" className="mb-3">
-              <Form.Label>Insert Semester Registration File</Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(event) => setSem_reg(event.target.files[0])}
-              />
-            </Form.Group>
-            <Form.Group controlId="offer_course_exm" className="mb-3">
-              <Form.Label>
-                Insert Offered Courses For Examination File
-              </Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(event) => setOffer_course_exm(event.target.files[0])}
-              />
-            </Form.Group>
-            <div className="button">
-              <Button variant="dark" type="submit" onClick={submit}>
-                Submit
-              </Button>
-              <Button variant="dark" type="submit" onClick={goNext}>
-                Next
-              </Button>
-            </div>
-          </Form>
-        </div>
+        <Form onSubmit={submit}>
+          <Form.Group controlId="courses" className="mb-3">
+            <Form.Label>Insert Courses File</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => setCourses(e.target.files[0])}
+            />
+          </Form.Group>
+          <Form.Group controlId="mapping" className="mb-3">
+            <Form.Label>Insert Mapping File</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => setMapping(e.target.files[0])}
+            />
+          </Form.Group>
+          <Form.Group controlId="semReg" className="mb-3">
+            <Form.Label>Insert Semester Registration File</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => setSemReg(e.target.files[0])}
+            />
+          </Form.Group>
+          <Form.Group controlId="offerCourseExam" className="mb-3">
+            <Form.Label>Insert Offered Courses for Examination File</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => setOfferCourseExam(e.target.files[0])}
+            />
+          </Form.Group>
+          <div className="button">
+            <Button variant="dark" type="submit">
+              Submit
+            </Button>
+            <Button variant="dark" onClick={goNext}>
+              Next
+            </Button>
+          </div>
+        </Form>
       </div>
     </div>
   );
 }
-
-export default SheetUpload;

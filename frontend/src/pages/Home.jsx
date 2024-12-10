@@ -35,6 +35,7 @@ export default function Home() {
       alert("An error occurred while loading data.");
     }
   };
+
   return (
     <div>
       <Navbar path="/home" />

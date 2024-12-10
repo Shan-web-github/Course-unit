@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
+import validator from 'validator';
+
+import { setSessionData } from "../utils/storage/sessionStorageUtils";
 
 import background from "../assets/background.jpg";
 
@@ -21,8 +24,7 @@ export default function SignIn() {
   const [check, setCheck] = useState(false);
 
   const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
+    return validator.isEmail(email);
   };
 
   const submit = async (event) => {
@@ -32,7 +34,7 @@ export default function SignIn() {
       return alert("Please insert email and password");
     }
 
-    if (!validateEmail(signUpEmail)) {
+    if (!validateEmail(logInEmail)) {
       return alert("Invalid email format");
     }
   
@@ -41,6 +43,7 @@ export default function SignIn() {
         email: logInEmail,
         password: logInPassword,
       });
+      setSessionData('jwt_token',response.data.token);
       alert(`Login successful! Status: ${response.status}`);
       window.location.href = "/sheetupload";
     } catch (error) {
