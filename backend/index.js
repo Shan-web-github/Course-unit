@@ -21,7 +21,7 @@ try {
   const studentData = require("./routes/files.routes.js");
   app.use("/studentdata", studentData);
 
-  const usersdata = require('./routes/users.routes.js');
+  const usersdata = require("./routes/users.routes.js");
   app.use("/usersdata",usersdata);
 
   // app.post("/studentdata/upload", fileUpload, filesController.uploadFile);

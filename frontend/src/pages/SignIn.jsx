@@ -1,10 +1,18 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 import background from "../assets/background.jpg";
 
 import { Modal, Button, Form } from "react-bootstrap";
 
-function SignIn() {
+export default function SignIn() {
+
+  const [logInEmail,setLogInEmail] = useState('');
+  const [logInPassword,setLogInPassword] = useState('');
+  const [signUpEmail,setSignUpEmail] = useState('');
+  const [signUpPassword,setSignUpPassword] = useState('');
+  const [signUpConPassword,setSignUpConPassword] = useState('');
+
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
@@ -12,10 +20,61 @@ function SignIn() {
 
   const [check, setCheck] = useState(false);
 
-  const submit = (event) => {
-    event.preventDefault();
-    window.location.href = "/sheetupload";
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
   };
+
+  const submit = async (event) => {
+    event.preventDefault();
+  
+    if (!logInEmail || !logInPassword) {
+      return alert("Please insert email and password");
+    }
+
+    if (!validateEmail(signUpEmail)) {
+      return alert("Invalid email format");
+    }
+  
+    try {
+      const response = await axios.post("http://localhost:5000/usersdata/login", {
+        email: logInEmail,
+        password: logInPassword,
+      });
+      alert(`Login successful! Status: ${response.status}`);
+      window.location.href = "/sheetupload";
+    } catch (error) {
+      alert(`Login failed: ${error.response?.data?.message || error.message}`);
+    }
+  };
+  
+  const save = async (event) => {
+    event.preventDefault();
+  
+    if (!signUpEmail || !signUpPassword) {
+      return alert("Please insert email and password");
+    }
+
+    if (!validateEmail(signUpEmail)) {
+      return alert("Invalid email format");
+    }
+    
+    if (signUpPassword !== signUpConPassword) {
+      return alert("Passwords do not match");
+    }
+  
+    try {
+      const response = await axios.post("http://localhost:5000/usersdata/signup", {
+        email: signUpEmail,
+        password: signUpPassword,
+      });
+      alert(`Signup successful! Status: ${response.status}`);
+      handleClose();
+    } catch (error) {
+      alert(`Signup failed: ${error.response?.data?.message || error.message}`);
+    }
+  };
+  
 
   const click = () => {
     setCheck(!check);
@@ -44,7 +103,7 @@ function SignIn() {
           <Form>
             <Form.Group className="mb-3" controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
-              <Form.Control type="email" placeholder="Enter email" />
+              <Form.Control type="email" placeholder="Enter email" onChange={(event)=>{setLogInEmail(event.target.value)}}/>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -52,6 +111,7 @@ function SignIn() {
               <Form.Control
                 type={check ? "text" : "password"}
                 placeholder="Password"
+                onChange={(event)=>{setLogInPassword(event.target.value)}}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="formBasicCheckbox">
@@ -62,7 +122,6 @@ function SignIn() {
               />
             </Form.Group>
             <Form.Group className="mb-3 d-flex justify-content-between align-items-center">
-              {/* Text opens the modal */}
               <span
                 style={{
                   color: "blue",
@@ -71,7 +130,7 @@ function SignIn() {
                 }}
                 onClick={handleShow}
               >
-                Create An Account
+                Create an account
               </span>
 
               <Button variant="dark" type="submit" onClick={submit}>
@@ -89,11 +148,15 @@ function SignIn() {
               <Form>
                 <Form.Group className="mb-3">
                   <Form.Label>Email address</Form.Label>
-                  <Form.Control type="email" placeholder="Enter email" />
+                  <Form.Control type="email" placeholder="Enter email" onChange={(event)=>{setSignUpEmail(event.target.value)}}/>
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Password</Form.Label>
-                  <Form.Control type="password" placeholder="Password" />
+                  <Form.Control type="password" placeholder="Password" onChange={(event)=>{setSignUpPassword(event.target.value)}}/>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>Conform Password</Form.Label>
+                  <Form.Control type="password" placeholder="Password" onChange={(event)=>{setSignUpConPassword(event.target.value)}}/>
                 </Form.Group>
               </Form>
             </Modal.Body>
@@ -101,8 +164,8 @@ function SignIn() {
               <Button variant="secondary" onClick={handleClose}>
                 Close
               </Button>
-              <Button variant="primary" onClick={handleClose}>
-                Save Changes
+              <Button variant="primary" onClick={save}>
+                Save 
               </Button>
             </Modal.Footer>
           </Modal>
@@ -112,4 +175,3 @@ function SignIn() {
   );
 }
 
-export default SignIn;
