@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import validator from 'validator';
+import { useNavigate } from "react-router-dom";
 
 import { setSessionData } from "../utils/storage/sessionStorageUtils";
 
@@ -27,6 +28,8 @@ export default function SignIn() {
     return validator.isEmail(email);
   };
 
+  const navigate = useNavigate();
+
   const submit = async (event) => {
     event.preventDefault();
   
@@ -45,7 +48,7 @@ export default function SignIn() {
       });
       setSessionData('jwt_token',response.data.token);
       alert(`Login successful! Status: ${response.status}`);
-      window.location.href = "/sheetupload";
+      navigate("/sheetupload");
     } catch (error) {
       alert(`Login failed: ${error.response?.data?.message || error.message}`);
     }

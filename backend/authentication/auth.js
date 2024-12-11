@@ -24,12 +24,11 @@ exports.eventAuth = (req, res, next) => {
 exports.pageAuth = (req, res) => {
     try {
       if (
-        req.headers.authorization &&
-        req.headers.authorization.startsWith("bearer")
+        req.headers.authorization
       ) {
         const token = req.headers.authorization.split(" ")[1];
         if (token == null) return res.status(401).send("Unauthorized");
-        jwt.verify(token, process.env.TOKEN_KEY, (err, user) => {
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
           if (err) return res.status(403).send("Authorization was expired");
           req.user = user;
           return res.status(200);
