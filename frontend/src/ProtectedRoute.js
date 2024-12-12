@@ -1,28 +1,45 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./Authcontext";
+import { getSessionData, removeSessionData } from "./utils/storage/sessionStorageUtils";
+import axios from "axios";
 
 const ProtectedRoute = ({ children }) => {
-  const { auth } = useContext(AuthContext);
+  const { auth, setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [isAuthenticated, setIsAuthenticated] = useState(null); // `null` indicates pending check
 
   useEffect(() => {
-    if (!auth.token) {
-      navigate("/"); // Redirect to sign-in page if no token
-    } else {
-      setIsAuthenticated(true); // User is authenticated
-    }
-  }, [auth.token, navigate]);
+    const storedToken = getSessionData("jwt_token");
+    const checkToken = async () => {
+      if (!storedToken) {
+        setAuth({ token: null, isAuthenticated: false });
+        navigate("/");
+        return;
+      } else {
+        try {
+          const headers = { authorization: `Bearer ${storedToken}` };
+          const response = await axios.get(
+            "http://localhost:5000/usersdata/access",
+            { headers }
+          );
 
-  // Avoid rendering until authentication check is complete
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>; 
-  }
+          if (response.status === 200) {
+            setAuth({ token: storedToken, isAuthenticated: true });
+          } else {
+            removeSessionData("jwt_token");
+            setAuth({ token: null, isAuthenticated: false });
+          }
+        } catch (error) {
+          console.error("Token validation error:", error);
+          removeSessionData("jwt_token");
+          setAuth({ token: null, isAuthenticated: false });
+        }
+      }
+    };
+    checkToken();
+  }, [auth, setAuth, navigate]);
 
   return children;
 };
 
 export default ProtectedRoute;
-
-

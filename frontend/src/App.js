@@ -19,9 +19,9 @@ function App() {
           <Route
             path="/sheetupload"
             element={
-              // <ProtectedRoute>
+              <ProtectedRoute>
                 <SheetUpload />
-              // </ProtectedRoute>
+              </ProtectedRoute>
             }
           />
           <Route

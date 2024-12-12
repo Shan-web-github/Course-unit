@@ -1,52 +1,61 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState} from "react";
 import {
-  getSessionData,
+  // getSessionData,
   removeSessionData,
 } from "./utils/storage/sessionStorageUtils";
 
-import axios from "axios";
+// import axios from "axios";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({ token: null, isAuthenticated: false });
+  // const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const validateToken = async(token) => {
-      try {
-        // Call API to validate token
-        const headers = { authorization: `Bearer ${token}` };
-        await axios.get(
-          "http://localhost:5000/usersdata/access",
-          { headers }
-        ).then((res) =>{
-            if (res.status === 200) {
-                setAuth({ token, isAuthenticated: true });
-              } else {
-                setAuth({ token: null, isAuthenticated: false });
-              }
-        }).catch((error) =>{
-            console.error("Token validation error:", error);
-        });
-      } catch (error) {
-        console.error("Token validation error:", error);
-        setAuth({ token: null, isAuthenticated: false });
-      }
-    };
-    // On app load, check if the token exists in localStorage/sessionStorage
-    const storedToken = getSessionData('jwt_token');
-    if (storedToken) {
-      validateToken(storedToken);
-    }
-  });
+  // useEffect(() => {
+  //   const validateToken = async () => {
+  //     const storedToken = getSessionData("jwt_token");
+
+  //     if (!storedToken) {
+  //       setAuth({ token: null, isAuthenticated: false });
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     try {
+  //       const headers = { authorization: `Bearer ${storedToken}` };
+  //       const response = await axios.get(
+  //         "http://localhost:5000/usersdata/access",
+  //         { headers }
+  //       );
+
+  //       if (response.status === 200) {
+  //         setAuth({ token: storedToken, isAuthenticated: true });
+  //       } else {
+  //         removeSessionData("jwt_token");
+  //         setAuth({ token: null, isAuthenticated: false });
+  //       }
+  //     } catch (error) {
+  //       console.error("Token validation error:", error);
+  //       removeSessionData("jwt_token");
+  //       setAuth({ token: null, isAuthenticated: false });
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   validateToken();
+  // }, []);
 
   const logout = () => {
-    removeSessionData('jwt_token');
+    removeSessionData("jwt_token");
     setAuth({ token: null, isAuthenticated: false });
   };
 
   return (
-    <AuthContext.Provider value={{ auth, logout }}>
+    <AuthContext.Provider value={{ auth, setAuth, logout, 
+    // loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );
