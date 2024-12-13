@@ -28,7 +28,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     rows.map(() => ({ morning: {}, evening: {} }))
   );
 
-  const [finalData, setFinalData] = useState([{ metadata: {}, data: {} }]);
+  const [finalData, setFinalData] = useState([]);
 
   const selectStartDate = async (event) => {
     const newStartDate = event.target.value;
@@ -44,6 +44,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       setCoursesData(courses.data.data);
       console.log("Courses data :", courses.data.data);
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
+      setResetKey((prevKey) => prevKey + 1);
     } catch (error) {
       console.error("Error fetching courses data:", error);
     }
@@ -54,8 +55,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     setTimeSlot(newTimeSlot);
     setDateAndTime(startDate && newTimeSlot);
     setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
-    // const courseCodes = coursesData.map((course) => course.CO_CODE);
-    // setColumns(coursesData);
+    setResetKey((prevKey) => prevKey + 1);
   };
 
   const isBoth = timeSlot === "Both";
@@ -116,6 +116,13 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       const newData = [...tableData, ...rowInputs];
       setTableData(newData);
       setGroupTabledata(groupData(newData, 4));
+      setFinalData((prev) => {
+        const updated= {
+          metadata: startDate,
+          data: rowInputs,
+        };
+        return [...prev, updated];
+      });
       console.log(typeof groupTableData);
       console.log(typeof tableData);
       console.log(typeof finalData);
@@ -135,7 +142,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   const saveAndFinish = (event) => {
     event.preventDefault();
     console.log("Final Data: ", tableData);
-    setSessionData(`${level}_level`,finalData);
+    setSessionData(`${level}_level`, finalData);
     console.log(finalData);
   };
 
@@ -143,17 +150,6 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     // setColumns([]);
     setResetKey(0);
   }, [buttonClick]);
-
-  useEffect(() => {
-    setFinalData((prev) => {
-      const updated = [...prev];
-      updated[resetKey] = {
-        metadata: startDate,
-        data: tableData,
-      };
-      return updated;
-    });
-  }, [tableData, startDate, resetKey]);
 
   return (
     <div>

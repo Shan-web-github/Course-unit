@@ -4,12 +4,11 @@ import axios from "axios";
 
 //components
 import TableTag from "../components/TableTag";
-import background from "../assets/Akbar_Bridge.jpg";
+import background from "../assets/background.jpg";
 
 //bootstrapt lib
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import InputGroup from "react-bootstrap/InputGroup";
 
 export default function Home() {
   const [columns, setColumns] = useState([]);
@@ -51,7 +50,7 @@ export default function Home() {
           <div
             className="card p-4 text-center d-flex align-items-center justify-content-center"
             style={{
-              width: viewTable ? '100%' : 'auto',
+              width: viewTable ? "100%" : "auto",
               background: "rgba(255, 255, 255, 0.1)",
               backdropFilter: "blur(10px)",
               borderRadius: "10px",
@@ -59,18 +58,19 @@ export default function Home() {
             }}
           >
             <div>
-              <InputGroup className="mb-3">
-                <InputGroup.Text id="inputGroup-sizing-default">
-                  Enter table name
-                </InputGroup.Text>
-                <Form.Control
-                  aria-label="Default"
-                  aria-describedby="inputGroup-sizing-default"
-                  type="text"
-                  placeholder="Enter table name"
+              <Form.Group className="mb-3"> 
+                <Form.Label>Select a table</Form.Label>
+                <Form.Select
+                  value={tableName}
                   onChange={(event) => setTableName(event.target.value)}
-                />
-              </InputGroup>
+                >
+                  <option value="">Select a table...</option>
+                  <option value="courses">Offered all courses</option>
+                  <option value="offer_course_exm">Offered courses for exam</option>
+                  <option value="sem_reg">Semester registrations</option>
+                  <option value=" mapping">Old courses mapping</option>
+                </Form.Select>
+              </Form.Group>
               <Button variant="dark" type="button" onClick={load}>
                 Submit
               </Button>

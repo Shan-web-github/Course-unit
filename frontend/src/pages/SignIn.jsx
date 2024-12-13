@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { setSessionData } from "../utils/storage/sessionStorageUtils";
 
-import background from "../assets/Akbar_Bridge.jpg";
+import background from "../assets/background.jpg";
 
 import { Modal, Button, Form } from "react-bootstrap";
 
