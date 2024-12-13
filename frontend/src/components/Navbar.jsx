@@ -2,6 +2,7 @@ import React from "react";
 import {
   getSessionData,
   removeSessionData,
+  clearSessionData
 } from "../utils/storage/sessionStorageUtils";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +20,7 @@ export default function NavigationBar(props) {
 
   const logout = () => {
     removeSessionData("jwt_token");
+    clearSessionData();
     navigate("/");
   };
   return (

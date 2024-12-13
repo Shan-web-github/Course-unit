@@ -4,7 +4,7 @@ import axios from "axios";
 
 //components
 import TableTag from "../components/TableTag";
-import background from "../assets/background.jpg";
+import background from "../assets/Akbar_Bridge.jpg";
 
 //bootstrapt lib
 import Form from "react-bootstrap/Form";

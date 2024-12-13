@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 
 import Dropdownstyle from "../components/Dropdownstyle";
+import { setSessionData } from "../utils/storage/sessionStorageUtils";
 
 import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
@@ -134,6 +135,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   const saveAndFinish = (event) => {
     event.preventDefault();
     console.log("Final Data: ", tableData);
+    setSessionData(`${level}_level`,finalData);
+    console.log(finalData);
   };
 
   useEffect(() => {

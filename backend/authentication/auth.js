@@ -10,7 +10,7 @@ exports.eventAuth = (req, res, next) => {
     ) {
       const token = req.headers.authorization.split(" ")[1];
       if (token == null) res.status(401).send("Unauthorized");
-      jwt.verify(token, process.env.TOKEN_KEY, (err, user) => {
+      jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
         if (err) res.status(403).send("Authorization was expired");
         req.user = user;
         next();
