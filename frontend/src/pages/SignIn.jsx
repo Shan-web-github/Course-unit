@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 
 import { setSessionData } from "../utils/storage/sessionStorageUtils";
 
-import background from "../assets/background.jpg";
+import CalendarIcon from "../assets/Icons/calendar-icon.jpg";
 
-import { Button, Form } from "react-bootstrap";
+import { Container, Card, Form, Button } from "react-bootstrap";
 import Signup from "../components/Signup";
 
 export const userReg = createContext();
@@ -60,76 +60,75 @@ export default function SignIn() {
   };
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center vh-100"
-      style={{
-        backgroundImage: `url(${background})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <div
-        className="card p-4"
-        style={{
-          width: "400px",
-          background: "rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(10px)",
-          borderRadius: "10px",
-          color: "white",
-        }}
+    <div className="main">
+      <Container
+        fluid
+        className="d-flex justify-content-center align-items-center min-vh-100 bg-light"
       >
-        <div>
-          <Form>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Email address</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter email"
-                onChange={(event) => {
-                  setLogInEmail(event.target.value);
-                }}
-              />
-            </Form.Group>
+        <Card className="p-4 shadow-sm" style={{ width: "24rem" }}>
+          <div className="text-center mb-4">
+            <h2 className="fw-bold d-flex justify-content-center align-items-center">
+              <img src={CalendarIcon} alt="Logo" className="me-2" width="30" />
+              Exam <span className="text-primary">TimeTable</span>
+            </h2>
+          </div>
+          <div>
+            <Form>
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label>Email address</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Enter email"
+                  className="border-bottom"
+                  onChange={(event) => {
+                    setLogInEmail(event.target.value);
+                  }}
+                />
+              </Form.Group>
 
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type={check ? "text" : "password"}
-                placeholder="Password"
-                onChange={(event) => {
-                  setLogInPassword(event.target.value);
-                }}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicCheckbox">
-              <Form.Check
-                type="checkbox"
-                label="Show password"
-                onChange={click}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3 d-flex justify-content-between align-items-center">
-              <span
-                style={{
-                  color: "blue",
-                  cursor: "pointer",
-                  textDecoration: "underline",
-                }}
-                onClick={handleShow}
-              >
-                Create an account
-              </span>
+              <Form.Group className="mb-3" controlId="formBasicPassword">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  type={check ? "text" : "password"}
+                  placeholder="Password"
+                  className="border-bottom"
+                  onChange={(event) => {
+                    setLogInPassword(event.target.value);
+                  }}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formBasicCheckbox">
+                <Form.Check
+                  type="checkbox"
+                  label="Show password"
+                  onChange={click}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3 d-flex justify-content-between align-items-center">
+                <span
+                  className="text-primary text-decoration-none"
+                  style={{ cursor: "pointer" }}
+                  onClick={handleShow}
+                >
+                  Create an account
+                </span>
 
-              <Button variant="dark" type="submit" onClick={submit}>
-                Submit
-              </Button>
-            </Form.Group>
-          </Form>
-        </div>
-        <userReg.Provider value={{show, setShow}}>
-          <Signup />
-        </userReg.Provider>
-      </div>
+                <Button
+                  variant="dark"
+                  type="submit"
+                  onClick={submit}
+                  className="w-40 fw-bold"
+                >
+                  Sign In
+                </Button>
+              </Form.Group>
+            </Form>
+          </div>
+          <userReg.Provider value={{ show, setShow }}>
+            <Signup />
+          </userReg.Provider>
+        </Card>
+      </Container>
     </div>
   );
 }

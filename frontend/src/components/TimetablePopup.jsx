@@ -30,7 +30,7 @@ export default function TimetablePopup({ timetableData = [], level, isShow }) {
             <div key={index} className="mb-4">
               {entry.metadata !== null && (
                 <div>
-                  <h5>Date: {entry.metadata}</h5>
+                  <h5>Date: {entry.metadata.startDate}</h5>
                   <Table striped bordered hover>
                     <thead>
                       <tr>
@@ -38,9 +38,35 @@ export default function TimetablePopup({ timetableData = [], level, isShow }) {
                         <th>Subject</th>
                       </tr>
                     </thead>
-                    {entry.data.length > 4 ? (
+                    {entry.metadata.timeSlot === "Both" ? (
                       <tbody>
-                        <span>Hi</span>
+                        {entry.data.map((session, index) => (
+                          <tr key={index - "morning"}>
+                            {index === 0 && (
+                              <td rowSpan={entry.data.length}>Morning</td>
+                            )}
+
+                            {session?.morning?.selectedOption && (
+                              <td>
+                                {session?.morning?.selectedOption} -{" "}
+                                {session?.morning?.inputTime}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                        {entry.data.map((session, index) => (
+                          <tr key={index - "evening"}>
+                            {index === 0 && (
+                              <td rowSpan={entry.data.length}>Evening</td>
+                            )}
+                            {session?.evening?.selectedOption && (
+                              <td>
+                                {session?.evening?.selectedOption} -{" "}
+                                {session?.evening?.inputTime}
+                              </td>
+                            )}
+                          </tr>
+                        ))}
                       </tbody>
                     ) : (
                       <tbody>

@@ -1,14 +1,12 @@
-import React,{useContext, useState} from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
-import validator from 'validator';
+import validator from "validator";
 
 import { Modal, Button, Form } from "react-bootstrap";
 import { userReg } from "../pages/SignIn";
 
-
 export default function Signup() {
-
-  const{show, setShow}  = useContext(userReg);
+  const { show, setShow } = useContext(userReg);
 
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
@@ -54,7 +52,7 @@ export default function Signup() {
     <div>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Sign Up</Modal.Title>
+          <Modal.Title className="fw-bold">Sign Up</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -91,10 +89,10 @@ export default function Signup() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="success" onClick={save}>
+          <Button variant="primary" className="w-40 fw-bold" onClick={save}>
             Save
           </Button>
-          <Button variant="warning" onClick={handleClose}>
+          <Button variant="secondary" className="w-40 fw-bold" onClick={handleClose}>
             Close
           </Button>
         </Modal.Footer>

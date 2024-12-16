@@ -4,11 +4,10 @@ import axios from "axios";
 
 //components
 import TableTag from "../components/TableTag";
-import background from "../assets/background.jpg";
+import CalendarIcon from "../assets/Icons/table_icon.png";
 
 //bootstrapt lib
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+import { Container, Card, Form, Button } from "react-bootstrap";
 
 export default function Home() {
   const [columns, setColumns] = useState([]);
@@ -36,37 +35,36 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className="main">
       <Navbar path="/home" />
       <div>
-        <div
-          className="d-flex align-items-center justify-content-center vh-100"
-          style={{
-            backgroundImage: `url(${background})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+        <Container
+          fluid
+          className="d-flex justify-content-center align-items-center min-vh-100 bg-light"
         >
-          <div
-            className="card p-4 text-center d-flex align-items-center justify-content-center"
-            style={{
-              width: viewTable ? "100%" : "auto",
-              background: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(10px)",
-              borderRadius: "10px",
-              color: "white",
-            }}
-          >
+          <Card className="p-4 shadow-sm" style={{ width:  viewTable ? "100%" : "24rem" }}>
+            <div className="text-center mb-4">
+              <h2 className="fw-bold d-flex justify-content-center align-items-center">
+                <img
+                  src={CalendarIcon}
+                  alt="Logo"
+                  className="me-2"
+                  width="30"
+                />
+                Check <span className="text-primary">YourTables</span>
+              </h2>
+            </div>
             <div>
-              <Form.Group className="mb-3"> 
-                <Form.Label>Select a table</Form.Label>
+              <Form.Group className="mb-3">
                 <Form.Select
                   value={tableName}
                   onChange={(event) => setTableName(event.target.value)}
                 >
                   <option value="">Select a table...</option>
                   <option value="courses">Offered all courses</option>
-                  <option value="offer_course_exm">Offered courses for exam</option>
+                  <option value="offer_course_exm">
+                    Offered courses for exam
+                  </option>
                   <option value="sem_reg">Semester registrations</option>
                   <option value=" mapping">Old courses mapping</option>
                 </Form.Select>
@@ -81,8 +79,8 @@ export default function Home() {
                 <TableTag columns={columns} rows={rows} />
               </div>
             )}
-          </div>
-        </div>
+          </Card>
+        </Container>
       </div>
     </div>
   );

@@ -117,8 +117,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       setTableData(newData);
       setGroupTabledata(groupData(newData, 4));
       setFinalData((prev) => {
-        const updated= {
-          metadata: startDate,
+        const updated = {
+          metadata: { startDate: startDate, timeSlot: timeSlot },
           data: rowInputs,
         };
         return [...prev, updated];
@@ -257,10 +257,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
             </tbody>
           </Table>
           <div className="manualtablebutton">
-            <Button variant="success" onClick={saveAndNext}>
+            <Button variant="primary" onClick={saveAndNext}>
               Save
             </Button>
-            <Button variant="danger" onClick={saveAndFinish}>
+            <Button variant="dark" onClick={saveAndFinish}>
               Finish
             </Button>
           </div>

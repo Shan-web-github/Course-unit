@@ -3,11 +3,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 // Components
-import background from "../assets/background.jpg";
+import CalendarIcon from "../assets/Icons/table_icon.png";
 
-// Bootstrap
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+//bootstrapt lib
+import { Container, Card, Form, Button } from "react-bootstrap";
 
 export default function SheetUpload() {
   const [courses, setCourses] = useState(null);
@@ -77,63 +76,65 @@ export default function SheetUpload() {
   };
 
   return (
-    <div
-      className="d-flex align-items-center justify-content-center vh-100"
-      style={{
-        backgroundImage: `url(${background})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <div
-        className="card p-4"
-        style={{
-          width: "500px",
-          background: "rgba(255, 255, 255, 0.1)",
-          backdropFilter: "blur(10px)",
-          borderRadius: "10px",
-          color: "white",
-        }}
+    <div className="main">
+      <Container
+        fluid
+        className="d-flex justify-content-center align-items-center min-vh-100 bg-light"
       >
-        <Form onSubmit={submit}>
-          <Form.Group controlId="courses" className="mb-3">
-            <Form.Label>Insert Courses File</Form.Label>
-            <Form.Control
-              type="file"
-              onChange={(e) => setCourses(e.target.files[0])}
-            />
-          </Form.Group>
-          <Form.Group controlId="mapping" className="mb-3">
-            <Form.Label>Insert Mapping File</Form.Label>
-            <Form.Control
-              type="file"
-              onChange={(e) => setMapping(e.target.files[0])}
-            />
-          </Form.Group>
-          <Form.Group controlId="semReg" className="mb-3">
-            <Form.Label>Insert Semester Registration File</Form.Label>
-            <Form.Control
-              type="file"
-              onChange={(e) => setSemReg(e.target.files[0])}
-            />
-          </Form.Group>
-          <Form.Group controlId="offerCourseExam" className="mb-3">
-            <Form.Label>Insert Offered Courses for Examination File</Form.Label>
-            <Form.Control
-              type="file"
-              onChange={(e) => setOfferCourseExam(e.target.files[0])}
-            />
-          </Form.Group>
+        <Card className="p-4 shadow-sm" style={{ width: "24rem" }}>
+          <div className="text-center mb-4">
+            <h2 className="fw-bold d-flex justify-content-center align-items-center">
+              <img src={CalendarIcon} alt="Logo" className="me-2" width="30" />
+              Insert <span className="text-primary">YourTables</span>
+            </h2>
+          </div>
+          <Form>
+            <Form.Group controlId="courses" className="mb-3">
+              <Form.Label>Insert Courses File</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(e) => setCourses(e.target.files[0])}
+              />
+            </Form.Group>
+            <Form.Group controlId="mapping" className="mb-3">
+              <Form.Label>Insert Mapping File</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(e) => setMapping(e.target.files[0])}
+              />
+            </Form.Group>
+            <Form.Group controlId="semReg" className="mb-3">
+              <Form.Label>Insert Semester Registration File</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(e) => setSemReg(e.target.files[0])}
+              />
+            </Form.Group>
+            <Form.Group controlId="offerCourseExam" className="mb-3">
+              <Form.Label>
+                Insert Offered Courses for Examination File
+              </Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(e) => setOfferCourseExam(e.target.files[0])}
+              />
+            </Form.Group>
+          </Form>
           <div className="button">
-            <Button variant="dark" type="submit">
+            <Button
+              variant="primary"
+              type="submit"
+              onClick={submit}
+              className="w-40 fw-bold"
+            >
               Submit
             </Button>
-            <Button variant="dark" onClick={goNext}>
+            <Button variant="dark" onClick={goNext} className="w-40 fw-bold">
               Next
             </Button>
           </div>
-        </Form>
-      </div>
+        </Card>
+      </Container>
     </div>
   );
 }

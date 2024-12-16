@@ -167,7 +167,6 @@ import React, { useState, useMemo } from "react";
 import axios from "axios";
 import { debounce } from "lodash";
 
-
 import Navbar from "../components/Navbar";
 import ManualTable from "../components/ManualTable";
 import TableTag from "../components/TableTag";
@@ -310,7 +309,7 @@ export default function CreateTimeTable() {
           </Form.Group>
           <br />
           <div className="button">
-            <Button variant={buttonClick ? "warning" : "primary"} type="submit">
+            <Button variant={buttonClick ? "dark" : "primary"} type="submit">
               {buttonName}
             </Button>
           </div>
@@ -346,14 +345,16 @@ export default function CreateTimeTable() {
           </div>
           <br />
           <div>
-            <h4>Saved Table Data</h4>
             {tableState.groupTableData.map((data, index) => (
-              <SampleTimeTable
-                key={index}
-                tableData={data}
-                startDate={tableState.startDateArray[index]}
-                timeSlot={tableState.timeSlotArray[index]}
-              />
+              <div>
+                {index ===0 && (<h5 className="fw-bold d-flex justify-content-center align-items-center"> {level}Level { semester } Semester <span className="text-primary">EndExamination </span></h5>)}
+                <SampleTimeTable
+                  key={index}
+                  tableData={data}
+                  startDate={tableState.startDateArray[index]}
+                  timeSlot={tableState.timeSlotArray[index]}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -367,7 +368,7 @@ export default function CreateTimeTable() {
   );
 
   return (
-    <div>
+    <div className="main">
       <Navbar path="/createtimetable" />
       <div className="createtimetable">
         <Container fluid className="mt-4">
