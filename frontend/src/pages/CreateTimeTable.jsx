@@ -188,22 +188,12 @@ export default function CreateTimeTable() {
 
   const [isSplit, setIsSplit] = useState(false);
 
-  // const [groupTableData, setGroupTableData] = useState([]);
-  // const [startDateArray, setStartDateArray] = useState([]);
-  // const [timeSlotArray, setTimeSlotArray] = useState([]);
-
-  // const handleSaveData = (groupData, startDates, timeSlots) => {
-  //   setGroupTableData(groupData);
-  //   setStartDateArray(startDates);
-  //   setTimeSlotArray(timeSlots);
-  // };
-
   const [tableState, setTableState] = useState({
     groupTableData: [],
     startDateArray: [],
     timeSlotArray: [],
   });
-  
+
   const debouncedSave = useMemo(() => {
     return debounce((groupData, startDates, timeSlots) => {
       setTableState({
@@ -213,8 +203,7 @@ export default function CreateTimeTable() {
       });
     }, 300);
   }, [setTableState]);
-  
-  
+
   const handleSaveData = (groupData, startDates, timeSlots) => {
     console.log("Saving data:", { groupData, startDates, timeSlots });
     setTableState({
@@ -224,8 +213,6 @@ export default function CreateTimeTable() {
     });
     debouncedSave(groupData, startDates, timeSlots);
   };
-  
-  
 
   const selectLevel = (event) => {
     const value = event.target.value;
@@ -323,7 +310,7 @@ export default function CreateTimeTable() {
           </Form.Group>
           <br />
           <div className="button">
-            <Button variant="dark" type="submit">
+            <Button variant={buttonClick ? "warning" : "primary"} type="submit">
               {buttonName}
             </Button>
           </div>
@@ -395,27 +382,10 @@ export default function CreateTimeTable() {
           <Row className="split-page" style={{ height: "80vh" }}>
             {isSplit ? (
               <>
-                <Col
-                  md={6}
-                  className="left-pane"
-                  // style={{
-                  //   overflowY: "auto", // Enables vertical scrolling
-                  //   borderRight: "1px solid #ddd",
-                  //   padding: "1rem",
-                  //   maxHeight: "100%", // Constrains height to the parent container
-                  // }}
-                >
+                <Col md={6} className="left-pane">
                   {mainContent}
                 </Col>
-                <Col
-                  md={6}
-                  className="right-pane"
-                  // style={{
-                  //   overflowY: "auto", // Enables vertical scrolling
-                  //   padding: "1rem",
-                  //   maxHeight: "100%", // Constrains height to the parent container
-                  // }}
-                >
+                <Col md={6} className="right-pane">
                   {rightContent}
                 </Col>
               </>

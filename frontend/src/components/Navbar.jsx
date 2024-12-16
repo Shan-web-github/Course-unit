@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   getSessionData,
   removeSessionData,
@@ -16,10 +16,20 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 export default function NavigationBar(props) {
   const navigate = useNavigate();
 
+  const [timeTable1, setTimeTable1] = useState([]);
+  const [timeTable2, setTimeTable2] = useState([]);
+  const [timeTable3, setTimeTable3] = useState([]);
+
   // Retrieve timetable data
-  const timeTable1 = getSessionData("1000_level");
-  const timeTable2 = getSessionData("2000_level");
-  const timeTable3 = getSessionData("3000_level");
+  const funcTimeTable1 = () => {
+    setTimeTable1(getSessionData("1000_level"));
+  };
+  const funcTimeTable2 = () => {
+    setTimeTable2(getSessionData("2000_level"));
+  };
+  const funcTimeTable3 = () => {
+    setTimeTable3(getSessionData("3000_level"));
+  };
 
   // State for showing timetable
   const [selectedTable, setSelectedTable] = useState(null);
@@ -29,6 +39,18 @@ export default function NavigationBar(props) {
     clearSessionData();
     navigate("/");
   };
+
+  const popUpTable = (event, tableData, level) => {
+    event.preventDefault();
+    setSelectedTable({ data: tableData, level });
+  };
+  
+
+  useEffect(() => {
+    funcTimeTable1();
+    funcTimeTable2();
+    funcTimeTable3();
+  }, [timeTable1, timeTable2, timeTable3]);
 
   return (
     <>
@@ -57,27 +79,23 @@ export default function NavigationBar(props) {
             <Nav>
               <NavDropdown title="User" id="collapsible-nav-dropdown">
                 {timeTable1 && (
-                  <NavDropdown.Item
-                    onClick={() => setSelectedTable({ data: timeTable1, level: 1000 })}
-                  >
+                  <NavDropdown.Item onClick={(event) => popUpTable(event, timeTable1, 1000)}>
                     1000 Level Timetable
                   </NavDropdown.Item>
                 )}
                 {timeTable2 && (
-                  <NavDropdown.Item
-                    onClick={() => setSelectedTable({ data: timeTable2, level: 2000 })}
-                  >
+                  <NavDropdown.Item onClick={(event) => popUpTable(event, timeTable2, 2000)}>
                     2000 Level Timetable
                   </NavDropdown.Item>
                 )}
                 {timeTable3 && (
-                  <NavDropdown.Item
-                    onClick={() => setSelectedTable({ data: timeTable3, level: 3000 })}
-                  >
+                  <NavDropdown.Item onClick={(event) => popUpTable(event, timeTable3, 3000)}>
                     3000 Level Timetable
                   </NavDropdown.Item>
                 )}
-                {(timeTable1 || timeTable2 || timeTable3) && <NavDropdown.Divider />}
+                {(timeTable1 || timeTable2 || timeTable3) && (
+                  <NavDropdown.Divider />
+                )}
                 <NavDropdown.Item onClick={logout}>Log out</NavDropdown.Item>
               </NavDropdown>
             </Nav>

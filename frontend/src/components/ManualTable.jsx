@@ -257,10 +257,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
             </tbody>
           </Table>
           <div className="manualtablebutton">
-            <Button variant="dark" onClick={saveAndNext}>
+            <Button variant="success" onClick={saveAndNext}>
               Save
             </Button>
-            <Button variant="dark" onClick={saveAndFinish}>
+            <Button variant="danger" onClick={saveAndFinish}>
               Finish
             </Button>
           </div>

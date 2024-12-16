@@ -48,14 +48,21 @@ export default function TimetablePopup({ timetableData = [], level, isShow }) {
                           <tr key={index}>
                             {index === 0 && (
                               <td rowSpan={entry.data.length}>
-                                {entry.data[0]?.morning ? "Morning" : "Evening"}
+                                {entry.data[0]?.morning?.selectedOption
+                                  ? "Morning"
+                                  : "Evening"}
                               </td>
                             )}
-                            <td>
-                              {session?.morning?.selectedOption ||
-                                session?.evening?.selectedOption ||
-                                "N/A"}
-                            </td>
+                            {(session?.morning?.selectedOption ||
+                              session?.evening?.selectedOption) && (
+                              <td>
+                                {session?.morning?.selectedOption ||
+                                  session?.evening?.selectedOption}{" "}
+                                -{" "}
+                                {session?.morning?.inputTime ||
+                                  session?.evening?.inputTime}
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>
