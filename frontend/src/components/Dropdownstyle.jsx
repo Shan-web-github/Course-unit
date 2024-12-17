@@ -151,7 +151,7 @@ function Dropdownstyle({
             {selectedOption}
           </Dropdown.Toggle>
 
-          <Dropdown.Menu>
+          <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto" }}>
             {/* Search Input */}
             <Form.Control
               type="text"

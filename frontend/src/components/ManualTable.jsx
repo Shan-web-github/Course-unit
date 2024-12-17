@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { MDBTable, MDBTableBody, MDBTableHead } from 'mdb-react-ui-kit';
 import axios from "axios";
 
 import Dropdownstyle from "../components/Dropdownstyle";
 import { setSessionData } from "../utils/storage/sessionStorageUtils";
 
-import Table from "react-bootstrap/Table";
+// import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
@@ -175,8 +176,21 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       {dateAndTime && (
         <div>
           <br />
-          <Table striped bordered hover responsive size="md" variant="light">
-            <thead>
+          <MDBTable bordered
+            hover
+            responsive
+            variant="light"
+            className="table table-bordered rounded overflow-hidden">
+          {/* <Table
+            bordered
+            hover
+            responsive
+            size="md"
+            variant="light"
+            className="table table-bordered rounded overflow-hidden"
+          > */}
+          <MDBTableHead>
+            {/* <thead> */}
               <tr>
                 <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
               </tr>
@@ -190,8 +204,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                   <th>{timeSlot}</th>
                 </tr>
               )}
-            </thead>
-            <tbody>
+            {/* </thead> */}
+            </MDBTableHead>
+            <MDBTableBody>
+            {/* <tbody> */}
               {rows.map((_, index) => (
                 <tr key={index}>
                   <td>
@@ -254,8 +270,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                   )}
                 </tr>
               ))}
-            </tbody>
-          </Table>
+            {/* </tbody> */}
+            </MDBTableBody>
+          {/* </Table> */}
+          </MDBTable>
           <div className="manualtablebutton">
             <Button variant="primary" onClick={saveAndNext}>
               Save

@@ -30,13 +30,13 @@
 
 /*createtimetable */
 .createtimetable {
-  height: 100vh;
+  height: 105vh;
 }
 .left-pane,
 .right-pane {
   overflow-y: auto;
-  max-height: 100%;
-  padding: 4rem;
+  max-height: 115%;
+  padding: 1rem;
 }
 
 .left-pane {

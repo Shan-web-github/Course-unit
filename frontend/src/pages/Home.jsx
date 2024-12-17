@@ -8,6 +8,7 @@ import CalendarIcon from "../assets/Icons/table_icon.png";
 
 //bootstrapt lib
 import { Container, Card, Form, Button } from "react-bootstrap";
+import Footer from "../components/Footer";
 
 export default function Home() {
   const [columns, setColumns] = useState([]);
@@ -82,6 +83,7 @@ export default function Home() {
           </Card>
         </Container>
       </div>
+      <Footer/>
     </div>
   );
 }

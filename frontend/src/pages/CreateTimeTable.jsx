@@ -176,6 +176,7 @@ import SampleTimeTable from "../components/SampleTimeTable";
 import Form from "react-bootstrap/Form";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Footer from "../components/Footer";
 
 export default function CreateTimeTable() {
   const [level, setLevel] = useState("");
@@ -338,10 +339,10 @@ export default function CreateTimeTable() {
       {isLevelSelected ? (
         <div>
           <br />
-          <Form.Label>{level} Level Clashes </Form.Label>
+          <Form.Label className="fw-bold d-flex justify-content-center align-items-center">{level} Level  <span className="text-primary ms-2"> Clashes</span></Form.Label>
           <br />
           <div className="scrollable-container">
-            <TableTag columns={columns} rows={rows} />
+            <TableTag columns={columns} rows={rows} hover responsive/>
           </div>
           <br />
           <div>
@@ -375,6 +376,7 @@ export default function CreateTimeTable() {
           <Button
             onClick={() => setIsSplit(!isSplit)}
             className="mb-3"
+            disabled = {level? false:true}
             variant={isSplit ? "danger" : "primary"}
           >
             {isSplit ? "Back to Single View" : "Clashes View"}
@@ -396,6 +398,7 @@ export default function CreateTimeTable() {
           </Row>
         </Container>
       </div>
+      <Footer/>
     </div>
   );
 }

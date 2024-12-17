@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Footer from '../components/Footer';
 
 export default function ChooseTimeTable() {
 
@@ -61,6 +62,7 @@ export default function ChooseTimeTable() {
         )}
       </Row>
     </Container>
+    <Footer/>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import React from "react";
+import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
 
-import Table from "react-bootstrap/Table";
+// import Table from "react-bootstrap/Table";
 
 export default function SampleTimeTable({ tableData, startDate, timeSlot }) {
   const rows = Array(4).fill(null);
@@ -21,8 +22,14 @@ export default function SampleTimeTable({ tableData, startDate, timeSlot }) {
 
   return (
     <div>
-      <Table striped bordered hover responsive size="md" variant="light">
-        <thead>
+      <MDBTable>
+        {/* <Table striped bordered hover responsive size="md" variant="light"> */}
+        <MDBTableHead bordered
+            hover
+            responsive
+            variant="light"
+            className="table table-bordered rounded overflow-hidden">
+          {/* <thead> */}
           <tr>
             <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
           </tr>
@@ -36,8 +43,10 @@ export default function SampleTimeTable({ tableData, startDate, timeSlot }) {
               <th>{timeSlot}</th>
             </tr>
           )}
-        </thead>
-        <tbody>
+          {/* </thead> */}
+        </MDBTableHead>
+        <MDBTableBody>
+          {/* <tbody> */}
           {rows.map(
             (_, index) =>
               (morningOptions[index] !== "N/A" ||
@@ -68,8 +77,10 @@ export default function SampleTimeTable({ tableData, startDate, timeSlot }) {
                 </tr>
               )
           )}
-        </tbody>
-      </Table>
+          {/* </tbody> */}
+        </MDBTableBody>
+        {/* </Table> */}
+      </MDBTable>
     </div>
   );
 }
