@@ -21,66 +21,66 @@ export default function SampleTimeTable({ tableData, startDate, timeSlot }) {
   const eveningTime = tableData.map((item) => item.evening?.inputTime || "N/A");
 
   return (
-    <div>
-      <MDBTable>
-        {/* <Table striped bordered hover responsive size="md" variant="light"> */}
-        <MDBTableHead bordered
-            hover
-            responsive
-            variant="light"
-            className="table table-bordered rounded overflow-hidden">
-          {/* <thead> */}
+    <MDBTable
+      bordered
+      hover
+      responsive
+      variant="light"
+      className="table table-bordered rounded overflow-hidden"
+    >
+      {/* <Table striped bordered hover responsive size="md" variant="light"> */}
+      <MDBTableHead>
+        {/* <thead> */}
+        <tr>
+          <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
+        </tr>
+        {isBoth ? (
           <tr>
-            <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
+            <th>Morning</th>
+            <th>Evening</th>
           </tr>
-          {isBoth ? (
-            <tr>
-              <th>Morning</th>
-              <th>Evening</th>
-            </tr>
-          ) : (
-            <tr>
-              <th>{timeSlot}</th>
-            </tr>
-          )}
-          {/* </thead> */}
-        </MDBTableHead>
-        <MDBTableBody>
-          {/* <tbody> */}
-          {rows.map(
-            (_, index) =>
-              (morningOptions[index] !== "N/A" ||
-                eveningOptions[index] !== "N/A") && (
-                <tr key={index}>
-                  <td>
-                    {isBoth ? (
-                      <span>
-                        {morningOptions[index]} -{morningTime[index]}
-                      </span>
-                    ) : timeSlot === "Morning" ? (
-                      <span>
-                        {morningOptions[index]} -{morningTime[index]}
-                      </span>
-                    ) : (
-                      <span>
-                        {eveningOptions[index]} -{eveningTime[index]}
-                      </span>
-                    )}
-                  </td>
-                  {isBoth && (
-                    <td>
-                      <span>
-                        {eveningOptions[index]} -{eveningTime[index]}
-                      </span>
-                    </td>
+        ) : (
+          <tr>
+            <th>{timeSlot}</th>
+          </tr>
+        )}
+        {/* </thead> */}
+      </MDBTableHead>
+      <MDBTableBody>
+        {/* <tbody> */}
+        {rows.map(
+          (_, index) =>
+            (morningOptions[index] !== "N/A" ||
+              eveningOptions[index] !== "N/A") && (
+              <tr key={index}>
+                <td>
+                  {isBoth ? (
+                    <span>
+                      {morningOptions[index]} -{morningTime[index]}
+                    </span>
+                  ) : timeSlot === "Morning" ? (
+                    <span>
+                      {morningOptions[index]} -{morningTime[index]}
+                    </span>
+                  ) : (
+                    <span>
+                      {eveningOptions[index]} -{eveningTime[index]}
+                    </span>
                   )}
-                </tr>
-              )
-          )}
-          {/* </tbody> */}
-        </MDBTableBody>
-        {/* </Table> */}
-      </MDBTable>
-    </div>
+                </td>
+                {isBoth && (
+                  <td>
+                    <span>
+                      {eveningOptions[index]} -{eveningTime[index]}
+                    </span>
+                  </td>
+                )}
+              </tr>
+            )
+        )}
+        {/* </tbody> */}
+      </MDBTableBody>
+      {/* </Table> */}
+    </MDBTable>
   );
 }

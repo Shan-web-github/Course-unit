@@ -63,8 +63,12 @@ export default function SheetUpload() {
 
   const createNewSemReg = async () => {
     try {
-      await axios.get("http://localhost:5000/studentdata/newsemreg");
-      console.log("Successfully created new sem reg.");
+      await Promise.all([
+        axios.get("http://localhost:5000/studentdata/newsemreg"),
+        axios.get("http://localhost:5000/studentdata/createRepeatClashes"),
+      ]);
+
+      console.log("Successfully created new_sem_reg & repeatclahes.");
       navigate("/home");
     } catch (error) {
       console.error(

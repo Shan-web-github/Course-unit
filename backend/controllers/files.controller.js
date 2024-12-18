@@ -9,6 +9,7 @@ const {
   existTableDrop,
   createSpecialTable,
   checkTableExistence,
+  createRepeatClashTable
 } = require("./files.functions");
 
 exports.uploadFile = (req, res) => {
@@ -128,6 +129,17 @@ exports.getFiles = async (req, res) => {
   //   });
   // });
 };
+
+exports.createRepeatClashes = async(req,res) => {
+  try {
+    await existTableDrop("repeatClashes");
+    await createRepeatClashTable();
+    return res.status(201).send("Table created successfully.");
+  } catch (error) {
+    console.error("Error table creation:", error);
+    return res.status(501).send(error.message);
+  }
+}
 
 exports.getClashes = async (req, res) => {
   const level = req.params.level;

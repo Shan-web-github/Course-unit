@@ -347,7 +347,7 @@ export default function CreateTimeTable() {
           <br />
           <div>
             {tableState.groupTableData.map((data, index) => (
-              <div>
+              <div key={index}>
                 {index ===0 && (<h5 className="fw-bold d-flex justify-content-center align-items-center"> {level}Level { semester } Semester <span className="text-primary">EndExamination </span></h5>)}
                 <SampleTimeTable
                   key={index}

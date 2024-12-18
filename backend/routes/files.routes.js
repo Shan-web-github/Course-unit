@@ -12,6 +12,7 @@ router.get("/data/:table", filesController.getFiles);
 
 router.get("/clashes/:level",filesController.getClashes);
 router.post("/uploadClashes/:level",filesController.uploadClashes);
+router.get("/createRepeatClashes",filesController.createRepeatClashes);
 
 router.get("/courses/:coursesAttribute",filesController.getCourses);
 router.get("/notclashes1/:coursesList",filesController.getNotClashes1);

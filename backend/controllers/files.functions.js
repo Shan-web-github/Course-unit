@@ -243,3 +243,20 @@ exports.createSpecialTable = async () => {
     connection.release();
   }
 };
+
+exports.createRepeatClashTable = async () => {
+  const connection = await DBpool.getConnection();
+  try {
+
+    // Proceed with your update logic if the table exists
+    const createTableSQL = `CREATE TABLE repeatClashes AS SELECT r1.CO_CODE AS course1, r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM new_sem_reg r1 JOIN new_sem_reg r2 ON r1.REG_NO= r2.REG_NO AND r1.CO_CODE < r2.CO_CODE AND (r1.REMARK IN ("R", "MP") OR r2.REMARK IN ("R", "MP")) GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
+    await connection.query(createTableSQL);
+
+    console.log(`Table created successfully.`);
+  } catch (error) {
+    console.error("Error creating table:", error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
