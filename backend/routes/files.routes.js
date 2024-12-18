@@ -10,6 +10,8 @@ router.get("/requiredtablesexist",filesController.requiredTablesExist);
 router.get("/newsemreg",filesController.createNewSemReg);
 router.get("/data/:table", filesController.getFiles);
 
+router.get("/generate-timetable",filesController.setupExam);
+
 router.get("/clashes/:level",filesController.getClashes);
 router.post("/uploadClashes/:level",filesController.uploadClashes);
 router.get("/createRepeatClashes",filesController.createRepeatClashes);

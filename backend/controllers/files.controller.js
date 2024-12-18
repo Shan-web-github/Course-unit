@@ -274,3 +274,56 @@ exports.getNotClashes2 = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+//*************************************************************************************************************** */
+
+const graphColoring = (conflicts, numSubjects) => {
+  const graph = Array.from({ length: numSubjects }, () => []);
+
+  // Build the graph
+  conflicts.forEach(({ subject1, subject2 }) => {
+    if (!graph[subject1]) graph[subject1] = [];
+    if (!graph[subject2]) graph[subject2] = [];
+    graph[subject1].push(subject2);
+    graph[subject2].push(subject1);
+  });
+
+  const colors = Array(numSubjects).fill(-1); // -1 means no color assigned
+  for (let subject = 0; subject < numSubjects; subject++) {
+    const usedColors = new Set(graph[subject].map(neighbor => colors[neighbor]));
+    colors[subject] = [...Array(numSubjects).keys()].find(c => !usedColors.has(c));
+  }
+
+  return colors;
+};
+
+
+exports.setupExam = async (req, res) => {
+  try {
+      // Step 1: Fetch conflict matrix
+      const clashesQuery = `SELECT r1.CO_CODE AS course1,r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM new_sem_reg r1 JOIN new_sem_reg r2 ON r1.REG_NO = r2.REG_NO AND r1.CO_CODE < r2.CO_CODE GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
+      const [conflicts] = await DBpool.query(clashesQuery);
+
+      const subjectCount = (await DBpool.query("SELECT COUNT(*) AS count FROM courses"))[0][0].count;
+
+      // Step 2: Apply graph coloring
+      const colors = graphColoring(conflicts, subjectCount);
+
+      // Step 3: Map colors to time slots
+      const timeSlots = ["Day1_Morning", "Day1_Evening", "Day2_Morning", "Day2_Evening", "Day3_Morning", "Day3_Evening", "Day4_Morning", "Day4_Evening", "Day5_Morning", "Day5_Evening", "Day6_Morning", "Day6_Evening", "Day7_Morning", "Day7_Evening", "Day8_Morning", "Day8_Evening", "Day9_Morning", "Day9_Evening", "Day10_Morning", "Day10_Evening", "Day11_Morning", "Day11_Evening", "Day12_Morning", "Day12_Evening", "Day13_Morning", "Day13_Evening", "Day14_Morning", "Day14_Evening", "Day15_Morning", "Day15_Evening", "Day16_Morning", "Day16_Evening"];
+      const timetable = colors.map((color, subjectId) => ({
+          subject_id: subjectId + 1, // Assuming subjects are indexed 1-N
+          time_slot: timeSlots[color % timeSlots.length]
+      }));
+
+      // Step 4: Save timetable to database
+      // await DBpool.query("DELETE FROM timetable"); // Clear old timetable
+      // const insertValues = timetable.map(({ subject_id, time_slot }) => [subject_id, time_slot]);
+      // await DBpool.query("INSERT INTO timetable (subject_id, time_slot) VALUES ?", [insertValues]);
+
+      res.json({ success: true, timetable });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, error: error.message });
+  }
+};
