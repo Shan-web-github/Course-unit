@@ -9,24 +9,24 @@ import Footer from "../components/Footer";
 
 export default function ChooseTimeTable() {
   const [isSplit, setIsSplit] = useState(false);
-  // const [timetable, setTimetable] = useState([]);
+  const [timetable, setTimetable] = useState([]);
 
-  // const fetchTimetable = async () => {
-  //   setIsSplit(!isSplit);
-  //   try {
-  //     const response = await axios.get(
-  //       "http://localhost:5000/studentdata/generate-timetable"
-  //     );
-  //     if (response.data.success) {
-  //       console.log(response.data.timetable);
-  //       setTimetable(response.data.timetable);
-  //     } else {
-  //       console.error("Failed to fetch timetable:", response.data.error);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // };
+  const fetchTimetable = async () => {
+    setIsSplit(!isSplit);
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/studentdata/generate-timetable"
+      );
+      if (response.data.success) {
+        console.log(response.data.output);
+        setTimetable(response.data.output);
+      } else {
+        console.error("Failed to fetch timetable:", response.data.error);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const content = (
     <div>
@@ -92,6 +92,7 @@ export default function ChooseTimeTable() {
                     ))}
                   </tbody>
                 </table> */}
+                {timetable}
               </Col>
             </>
           ) : (

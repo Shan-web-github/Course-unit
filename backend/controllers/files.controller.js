@@ -9,7 +9,7 @@ const {
   existTableDrop,
   createSpecialTable,
   checkTableExistence,
-  createRepeatClashTable
+  createRepeatClashTable,
 } = require("./files.functions");
 
 exports.uploadFile = (req, res) => {
@@ -130,7 +130,7 @@ exports.getFiles = async (req, res) => {
   // });
 };
 
-exports.createRepeatClashes = async(req,res) => {
+exports.createRepeatClashes = async (req, res) => {
   try {
     await existTableDrop("repeatClashes");
     await createRepeatClashTable();
@@ -139,7 +139,7 @@ exports.createRepeatClashes = async(req,res) => {
     console.error("Error table creation:", error);
     return res.status(501).send(error.message);
   }
-}
+};
 
 exports.getClashes = async (req, res) => {
   const level = req.params.level;
@@ -277,53 +277,108 @@ exports.getNotClashes2 = async (req, res) => {
 
 //*************************************************************************************************************** */
 
-const graphColoring = (conflicts, numSubjects) => {
-  const graph = Array.from({ length: numSubjects }, () => []);
+const generateConflictArray = (sqlResult) => {
+  const conflictMap = new Map();
 
-  // Build the graph
-  conflicts.forEach(({ subject1, subject2 }) => {
-    if (!graph[subject1]) graph[subject1] = [];
-    if (!graph[subject2]) graph[subject2] = [];
-    graph[subject1].push(subject2);
-    graph[subject2].push(subject1);
+  // Process each row from the SQL query result
+  sqlResult.forEach(({ course1, course2 }) => {
+    // Add course2 to course1's conflict list
+    if (!conflictMap.has(course1)) {
+      conflictMap.set(course1, new Set());
+    }
+    conflictMap.get(course1).add(course2);
+
+    // Add course1 to course2's conflict list
+    if (!conflictMap.has(course2)) {
+      conflictMap.set(course2, new Set());
+    }
+    conflictMap.get(course2).add(course1);
   });
 
-  const colors = Array(numSubjects).fill(-1); // -1 means no color assigned
-  for (let subject = 0; subject < numSubjects; subject++) {
-    const usedColors = new Set(graph[subject].map(neighbor => colors[neighbor]));
-    colors[subject] = [...Array(numSubjects).keys()].find(c => !usedColors.has(c));
-  }
+  // Convert the conflict map to the desired array format
+  const conflictArray = Array.from(conflictMap.entries()).map(
+    ([course, conflicts]) => [course, Array.from(conflicts)]
+  );
 
-  return colors;
+  return conflictArray;
 };
 
+const arrangeConflictSets = (conflictArray) => {
+  const result = [];
+
+  while (conflictArray.length > 0) {
+    const noConflictSet = [];
+    const selectedSubjects = new Set(); // Track subjects added to this set in the current loop
+
+    while (true) {
+      // Find the subject with the maximum conflicts
+      let maxConflictSubject = null;
+      let maxConflicts = -1;
+
+      for (const [subject, conflicts] of conflictArray) {
+        // Skip subjects already selected in this noConflictSet
+        if (selectedSubjects.has(subject)) continue;
+
+        // Check if this subject conflicts with any in the current noConflictSet
+        const conflictsWithCurrentSet = noConflictSet.some((setSubject) =>
+          conflicts.includes(setSubject)
+        );
+
+        if (!conflictsWithCurrentSet && conflicts.length > maxConflicts) {
+          maxConflictSubject = subject;
+          maxConflicts = conflicts.length;
+        }
+      }
+
+      // If no valid subject is found, break out of the loop
+      if (!maxConflictSubject) break;
+
+      // Add the subject with max conflicts to the noConflictSet
+      noConflictSet.push(maxConflictSubject);
+      selectedSubjects.add(maxConflictSubject);
+    }
+
+    // Add the current noConflictSet to the result
+    result.push(noConflictSet);
+
+    // Remove all subjects in the current noConflictSet from conflictArray
+    conflictArray = conflictArray.filter(
+      ([subject]) => !noConflictSet.includes(subject)
+    );
+
+    // Update remaining conflicts for subjects still in conflictArray
+    conflictArray = conflictArray.map(([subject, conflicts]) => [
+      subject,
+      conflicts.filter((conflict) => !noConflictSet.includes(conflict)),
+    ]);
+  }
+
+  return result;
+};
 
 exports.setupExam = async (req, res) => {
   try {
-      // Step 1: Fetch conflict matrix
-      const clashesQuery = `SELECT r1.CO_CODE AS course1,r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM new_sem_reg r1 JOIN new_sem_reg r2 ON r1.REG_NO = r2.REG_NO AND r1.CO_CODE < r2.CO_CODE GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
-      const [conflicts] = await DBpool.query(clashesQuery);
+    // Step 1: Fetch conflict matrix
+    const clashesQuery = `SELECT r1.CO_CODE AS course1,r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM new_sem_reg r1 JOIN new_sem_reg r2 ON r1.REG_NO = r2.REG_NO AND r1.CO_CODE < r2.CO_CODE GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
+    const [conflicts] = await DBpool.query(clashesQuery);
 
-      const subjectCount = (await DBpool.query("SELECT COUNT(*) AS count FROM courses"))[0][0].count;
+    const conflictArray = generateConflictArray(conflicts);
 
-      // Step 2: Apply graph coloring
-      const colors = graphColoring(conflicts, subjectCount);
+    // Step 2: Apply graph coloring
+    const output = arrangeConflictSets(conflictArray);
 
-      // Step 3: Map colors to time slots
-      const timeSlots = ["Day1_Morning", "Day1_Evening", "Day2_Morning", "Day2_Evening", "Day3_Morning", "Day3_Evening", "Day4_Morning", "Day4_Evening", "Day5_Morning", "Day5_Evening", "Day6_Morning", "Day6_Evening", "Day7_Morning", "Day7_Evening", "Day8_Morning", "Day8_Evening", "Day9_Morning", "Day9_Evening", "Day10_Morning", "Day10_Evening", "Day11_Morning", "Day11_Evening", "Day12_Morning", "Day12_Evening", "Day13_Morning", "Day13_Evening", "Day14_Morning", "Day14_Evening", "Day15_Morning", "Day15_Evening", "Day16_Morning", "Day16_Evening"];
-      const timetable = colors.map((color, subjectId) => ({
-          subject_id: subjectId + 1, // Assuming subjects are indexed 1-N
-          time_slot: timeSlots[color % timeSlots.length]
-      }));
+    // Step 3: Map colors to time slots
+    console.log(output);
+    console.log(conflictArray);
 
-      // Step 4: Save timetable to database
-      // await DBpool.query("DELETE FROM timetable"); // Clear old timetable
-      // const insertValues = timetable.map(({ subject_id, time_slot }) => [subject_id, time_slot]);
-      // await DBpool.query("INSERT INTO timetable (subject_id, time_slot) VALUES ?", [insertValues]);
+    // Step 4: Save timetable to database
+    // await DBpool.query("DELETE FROM timetable"); // Clear old timetable
+    // const insertValues = timetable.map(({ subject_id, time_slot }) => [subject_id, time_slot]);
+    // await DBpool.query("INSERT INTO timetable (subject_id, time_slot) VALUES ?", [insertValues]);
 
-      res.json({ success: true, timetable });
+    res.json({ success: true, output });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: error.message });
+    console.error(error);
+    res.status(500).json({ success: false, error: error.message });
   }
 };

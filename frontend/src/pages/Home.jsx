@@ -66,7 +66,7 @@ export default function Home() {
                   <option value="offer_course_exm">
                     Offered courses for exam
                   </option>
-                  <option value="sem_reg">Semester registrations</option>
+                  <option value="new_sem_reg">Semester registrations</option>
                   <option value=" mapping">Old courses mapping</option>
                 </Form.Select>
               </Form.Group>
