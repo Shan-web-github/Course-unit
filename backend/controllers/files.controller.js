@@ -9,7 +9,7 @@ const {
   existTableDrop,
   createSpecialTable,
   checkTableExistence,
-  createRepeatClashTable,
+  createClashesTable,
 } = require("./files.functions");
 
 exports.uploadFile = (req, res) => {
@@ -130,10 +130,10 @@ exports.getFiles = async (req, res) => {
   // });
 };
 
-exports.createRepeatClashes = async (req, res) => {
+exports.createClashes = async (req, res) => {
   try {
-    await existTableDrop("repeatClashes");
-    await createRepeatClashTable();
+    await existTableDrop("clashesTable");
+    await createClashesTable();
     return res.status(201).send("Table created successfully.");
   } catch (error) {
     console.error("Error table creation:", error);
@@ -213,7 +213,7 @@ exports.getNotClashes1 = async (req, res) => {
   }
 
   try {
-    const coursesQuery = `SELECT DISTINCT CO_CODE FROM new_sem_reg WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM ${level}_level WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders})) AND CO_CODE NOT IN (${placeholders}) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
+    const coursesQuery = `SELECT DISTINCT CO_CODE FROM new_sem_reg WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM clashesTable WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders})) AND CO_CODE NOT IN (${placeholders}) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
 
     const queryParams = [
       ...selectedSubjects,
@@ -253,7 +253,7 @@ exports.getNotClashes2 = async (req, res) => {
   }
 
   try {
-    const coursesQuery = `SELECT DISTINCT CO_CODE FROM new_sem_reg WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM ${level}_level WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders})) AND CO_CODE NOT IN (${placeholders}) AND CO_CODE NOT IN (${preSelectedSubjectArray}) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
+    const coursesQuery = `SELECT DISTINCT CO_CODE FROM new_sem_reg WHERE CO_CODE NOT IN ( SELECT CASE WHEN course1 IN (${placeholders}) THEN course2 ELSE course1 END AS clash_subject FROM clashesTable WHERE course1 IN (${placeholders}) OR course2 IN (${placeholders})) AND CO_CODE NOT IN (${placeholders}) AND CO_CODE NOT IN (${preSelectedSubjectArray}) AND SEMESTER = '${semester}' AND LEVEL = ${level}`;
 
     const queryParams = [
       ...selectedSubjects,

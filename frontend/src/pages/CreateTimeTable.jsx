@@ -223,6 +223,7 @@ export default function CreateTimeTable() {
 
   const selectSemester = (event) => {
     setSemester(event.target.value);
+    createClashes();
   };
 
   const [columns, setColumns] = useState([]);
@@ -241,6 +242,19 @@ export default function CreateTimeTable() {
       setRows(clashdata.data.data);
     } catch (error) {
       console.error("get clashes file error:", error);
+    }
+  };
+
+  const createClashes = async () => {
+    try {
+      await axios.get("http://localhost:5000/studentdata/createClashes");
+      console.log("Successfully created clashes table.");
+    } catch (error) {
+      console.error(
+        "repeatclahes error:",
+        error.response?.data || error.message
+      );
+      alert("An error occurred while creating clashes table.");
     }
   };
 

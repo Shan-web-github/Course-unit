@@ -14,7 +14,7 @@ router.get("/generate-timetable",filesController.setupExam);
 
 router.get("/clashes/:level",filesController.getClashes);
 router.post("/uploadClashes/:level",filesController.uploadClashes);
-router.get("/createRepeatClashes",filesController.createRepeatClashes);
+router.get("/createClashes",filesController.createClashes);
 
 router.get("/courses/:coursesAttribute",filesController.getCourses);
 router.get("/notclashes1/:coursesList",filesController.getNotClashes1);

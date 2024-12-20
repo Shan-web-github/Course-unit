@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { MDBTable, MDBTableBody, MDBTableHead } from 'mdb-react-ui-kit';
+import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
 import axios from "axios";
 
 import Dropdownstyle from "../components/Dropdownstyle";
-import { setSessionData } from "../utils/storage/sessionStorageUtils";
+import {
+  setSessionData,
+  getSessionData,
+} from "../utils/storage/sessionStorageUtils";
 
 // import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
@@ -57,7 +60,77 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     setDateAndTime(startDate && newTimeSlot);
     setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
     setResetKey((prevKey) => prevKey + 1);
+    console.log(tTarr);
   };
+
+  //************************************************************************************************** */
+  const tT1000 = getSessionData(`1000_level`);
+  const tT2000 = getSessionData(`2000_level`);
+  const tT3000 = getSessionData(`3000_level`);
+
+  const tTarr = [tT1000, tT2000, tT3000];
+
+  const checkStartDateAndTimeSlot = (data, startDate, timeSlot) => {
+    // Iterate through the main array
+    for (let entry of data) {
+      if (entry && entry.metadata) {
+        // Check if the metadata contains the startDate and timeSlot
+        if (
+          entry.metadata.startDate === startDate &&
+          entry.metadata.timeSlot === timeSlot
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  const processTimetables = (arr, level, startDate, timeSlot, rowInputs) => {
+    const newArr = [];
+    const coCodes = [];
+  
+    // Remove `tT${level}` if it exists in the array and create newArr
+    arr = arr.filter((entry) => {
+      if (entry?.level === `${level}_level`) {
+        newArr.push(entry);
+        return false;
+      }
+      return true;
+    });
+  
+    // Check if newArr has elements
+    if (newArr.length > 0) {
+      for (const entry of newArr) {
+        // Check if the startDate and timeSlot match in the current entry
+        if (checkStartDateAndTimeSlot(entry.data, startDate, timeSlot)) {
+          // Collect coCodes from morning and evening schedules
+          for (let schedule of entry.data) {
+            if (schedule.morning?.selectedOption) {
+              coCodes.push(schedule.morning.selectedOption);
+            }
+            if (schedule.evening?.selectedOption) {
+              coCodes.push(schedule.evening.selectedOption);
+            }
+          }
+        }
+      }
+    }
+  
+    // // Concatenate options from rowInputs
+    // const concatenatedOptions = rowInputs
+    //   .flatMap((item) => [
+    //     item.morning?.selectedOption || "N/A",
+    //     item.evening?.selectedOption || "N/A",
+    //   ])
+    //   .filter((item) => item !== "N/A")
+    //   .join(",");
+  
+    // Return concatenated options with coCodes
+    return [...coCodes, concatenatedOptions].join(",");
+  };
+  
+  //************************************************************************************************** */
 
   const isBoth = timeSlot === "Both";
 
@@ -78,6 +151,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       return updated;
     });
   };
+
+  const newConcatenatedOptions = processTimetables(tTarr, level, startDate, timeSlot)
 
   /*************************************************
 
@@ -176,12 +251,14 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       {dateAndTime && (
         <div>
           <br />
-          <MDBTable bordered
+          <MDBTable
+            bordered
             hover
             responsive
             variant="light"
-            className="table table-bordered rounded overflow-hidden">
-          {/* <Table
+            className="table table-bordered rounded overflow-hidden"
+          >
+            {/* <Table
             bordered
             hover
             responsive
@@ -189,8 +266,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
             variant="light"
             className="table table-bordered rounded overflow-hidden"
           > */}
-          <MDBTableHead>
-            {/* <thead> */}
+            <MDBTableHead>
+              {/* <thead> */}
               <tr>
                 <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
               </tr>
@@ -204,10 +281,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                   <th>{timeSlot}</th>
                 </tr>
               )}
-            {/* </thead> */}
+              {/* </thead> */}
             </MDBTableHead>
             <MDBTableBody>
-            {/* <tbody> */}
+              {/* <tbody> */}
               {rows.map((_, index) => (
                 <tr key={index}>
                   <td>
@@ -216,7 +293,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions}
+                        concatenatedOptions={newConcatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -229,7 +306,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions}
+                        concatenatedOptions={newConcatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -242,7 +319,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions}
+                        concatenatedOptions={newConcatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -258,7 +335,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={concatenatedOptions}
+                        concatenatedOptions={newConcatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -270,9 +347,9 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                   )}
                 </tr>
               ))}
-            {/* </tbody> */}
+              {/* </tbody> */}
             </MDBTableBody>
-          {/* </Table> */}
+            {/* </Table> */}
           </MDBTable>
           <div className="manualtablebutton">
             <Button variant="primary" onClick={saveAndNext}>
