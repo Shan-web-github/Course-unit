@@ -276,6 +276,7 @@ exports.getNotClashes2 = async (req, res) => {
 };
 
 //*************************************************************************************************************** */
+//choose timetable
 
 const generateConflictArray = (sqlResult) => {
   const conflictMap = new Map();
@@ -302,8 +303,8 @@ const generateConflictArray = (sqlResult) => {
 
   return conflictArray;
 };
-
-const arrangeConflictSets = (conflictArray) => {
+//************************ */
+const arrangeNoConflictSets1 = (conflictArray) => {
   const result = [];
 
   while (conflictArray.length > 0) {
@@ -355,7 +356,150 @@ const arrangeConflictSets = (conflictArray) => {
 
   return result;
 };
+//************************ */
+const arrangeNoConflictSets2 = (conflictArray) => {
+  const noConflictSets = [];
 
+  while (conflictArray.length > 0) {
+    // Step 1: Arrange conflicts by number of conflicts (ascending order)
+    conflictArray.sort((a, b) => a[1].length - b[1].length);
+
+    const noConflictSet = [];
+    const usedSubjects = new Set();
+
+    // Step 2: Find the subject with the minimum conflicts as arr1
+    const arr1 = conflictArray.shift(); // The first item is the one with minimum conflicts
+    noConflictSet.push(arr1[0]);
+    usedSubjects.add(arr1[0]);
+
+    let potentialSubjects = conflictArray.filter(
+      (subject) => !arr1[1].includes(subject[0])
+    );
+
+    while (potentialSubjects.length > 0) {
+      // Step 3: Among non-conflicting subjects, pick the one with minimum conflicts
+      potentialSubjects.sort((a, b) => a[1].length - b[1].length);
+      const nextSubject = potentialSubjects.shift();
+
+      noConflictSet.push(nextSubject[0]);
+      usedSubjects.add(nextSubject[0]);
+
+      // Step 4: Filter remaining subjects that are not in conflict with the current noConflictSet
+      potentialSubjects = potentialSubjects.filter(
+        (subject) =>
+          !noConflictSet.some((addedSubject) =>
+            subject[1].includes(addedSubject)
+          )
+      );
+    }
+
+    // Step 5: Add the current noConflictSet to the result and remove used subjects from the input
+    noConflictSets.push(noConflictSet);
+    conflictArray = conflictArray.filter(
+      (subject) => !usedSubjects.has(subject[0])
+    );
+  }
+
+  return noConflictSets;
+}
+//************************ */
+const arrangeNoConflictSets3 = (conflictArray) => {
+  const conflictSets = [];
+
+  while (conflictArray.length > 0) {
+    // Step 1: Sort conflicts in descending order of the number of conflicts
+    conflictArray.sort((a, b) => b[1].length - a[1].length);
+
+    const noConflictSet = [];
+    const usedSubjects = new Set();
+
+    // Step 2: Pick the subject with the maximum conflicts as arr1
+    const arr1 = conflictArray.shift(); // The first item is the one with maximum conflicts
+    noConflictSet.push(arr1[0]);
+    usedSubjects.add(arr1[0]);
+
+    // Step 3: Find subjects that do not conflict with arr1
+    let potentialSubjects = conflictArray.filter(
+      (subject) => !arr1[1].includes(subject[0])
+    );
+
+    while (potentialSubjects.length > 0) {
+      // Step 4: Among non-conflicting subjects, pick the one with minimum conflicts
+      potentialSubjects.sort((a, b) => a[1].length - b[1].length);
+      const nextSubject = potentialSubjects.shift();
+
+      noConflictSet.push(nextSubject[0]);
+      usedSubjects.add(nextSubject[0]);
+
+      // Step 5: Filter remaining subjects that are not in conflict with the current noConflictSet
+      potentialSubjects = potentialSubjects.filter(
+        (subject) =>
+          !noConflictSet.some((addedSubject) =>
+            subject[1].includes(addedSubject)
+          )
+      );
+    }
+
+    // Step 6: Add the current noConflictSet to the result and remove used subjects from the input
+    conflictSets.push(noConflictSet);
+    conflictArray = conflictArray.filter(
+      (subject) => !usedSubjects.has(subject[0])
+    );
+  }
+
+  return conflictSets;
+}
+//************************ */
+const arrangeNoConflictSets4 = (conflictArray) => {
+  const conflictSets = [];
+
+  while (conflictArray.length > 0) {
+    // Sort the array by the number of conflicts in descending order
+    conflictArray.sort((a, b) => b[1].length - a[1].length);
+
+    const noConflictSet = [];
+    const usedSubjects = new Set();
+
+    // Step 1: Pick the subject with the max conflicts (arr1)
+    const arr1 = conflictArray.shift();
+    noConflictSet.push(arr1[0]);
+    usedSubjects.add(arr1[0]);
+
+    // Step 2: Find subjects that do not conflict with the current set
+    let potentialSubjects = conflictArray.filter(
+      (subject) => !arr1[1].includes(subject[0])
+    );
+
+    while (potentialSubjects.length > 0) {
+      // Sort potential subjects by the number of conflicts (ascending)
+      potentialSubjects.sort((a, b) => a[1].length - b[1].length);
+
+      // Step 3: Pick the subject with the least conflicts (arr2, arr3, ...)
+      const nextSubject = potentialSubjects.shift();
+      noConflictSet.push(nextSubject[0]);
+      usedSubjects.add(nextSubject[0]);
+
+      // Step 4: Update potential subjects to exclude conflicts with the current set
+      potentialSubjects = potentialSubjects.filter(
+        (subject) =>
+          !noConflictSet.some((addedSubject) =>
+            subject[1].includes(addedSubject)
+          )
+      );
+    }
+
+    // Add the current non-conflicting set to the result
+    conflictSets.push(noConflictSet);
+
+    // Remove used subjects from the input array
+    conflictArray = conflictArray.filter(
+      (subject) => !usedSubjects.has(subject[0])
+    );
+  }
+
+  return conflictSets;
+}
+//************************ */
 exports.setupExam = async (req, res) => {
   try {
     // Step 1: Fetch conflict matrix
@@ -365,11 +509,16 @@ exports.setupExam = async (req, res) => {
     const conflictArray = generateConflictArray(conflicts);
 
     // Step 2: Apply graph coloring
-    const output = arrangeConflictSets(conflictArray);
+    const output1 = arrangeNoConflictSets1(conflictArray);
+    const output2 = arrangeNoConflictSets2(conflictArray);
+    const output3 = arrangeNoConflictSets3(conflictArray);
+    const output4 = arrangeNoConflictSets4(conflictArray);
+
+    const output = [output1,output2,output3,output4]
 
     // Step 3: Map colors to time slots
-    console.log(output);
-    console.log(conflictArray);
+    // console.log(output);
+    // console.log(conflictArray);
 
     // Step 4: Save timetable to database
     // await DBpool.query("DELETE FROM timetable"); // Clear old timetable

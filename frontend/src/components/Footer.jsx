@@ -5,7 +5,7 @@ import CalendarIcon from "../assets/Icons/calendar-icon.jpg";
 
 export default function Footer() {
   return (
-    <MDBFooter className="bg-light text-center text-muted d-flex justify-content-center align-items-center">
+    <MDBFooter className="bg-light text-center text-muted d-flex justify-content-center align-items-center mt-auto">
       <div className="text-center p-3 fw-semibold">
         <span>© 2024 Copyright:</span>
         <a className="text-black align-items-center ms-2" href="/home">

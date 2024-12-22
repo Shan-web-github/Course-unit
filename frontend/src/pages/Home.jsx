@@ -38,7 +38,7 @@ export default function Home() {
   return (
     <div className="main">
       <Navbar path="/home" />
-      <div>
+      <div className="main-pane">
         <Container
           fluid
           className="d-flex justify-content-center align-items-center min-vh-100 bg-light"

@@ -385,7 +385,7 @@ export default function CreateTimeTable() {
   return (
     <div className="main">
       <Navbar path="/createtimetable" />
-      <div className="createtimetable">
+      <div className="main-pane" style={{ minHeight: isSplit && "105vh"}}>
         <Container fluid className="mt-4">
           <Button
             onClick={() => setIsSplit(!isSplit)}

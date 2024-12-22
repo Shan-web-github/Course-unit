@@ -1,5 +1,8 @@
 .main{
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 .label {
   padding: 20px;
@@ -29,8 +32,9 @@
 }
 
 /*createtimetable */
-.createtimetable {
+.main-pane {
   height: 105vh;
+  flex: 1;
 }
 .left-pane,
 .right-pane {
