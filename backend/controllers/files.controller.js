@@ -276,7 +276,8 @@ exports.getNotClashes2 = async (req, res) => {
 };
 
 //*************************************************************************************************************** */
-//choose timetable
+//choose timetable 
+// Below part is most important part in this Backend
 
 const generateConflictArray = (sqlResult) => {
   const conflictMap = new Map();
@@ -303,13 +304,14 @@ const generateConflictArray = (sqlResult) => {
 
   return conflictArray;
 };
-//************************ */
-const arrangeNoConflictSets1 = (conflictArray) => {
+
+const arrangeNoConflictSets1 = async (conflictArray) => {
   const result = [];
 
   while (conflictArray.length > 0) {
     const noConflictSet = [];
     const selectedSubjects = new Set(); // Track subjects added to this set in the current loop
+    let totalStudents = 0; // Keep track of the total students in the current set
 
     while (true) {
       // Find the subject with the maximum conflicts
@@ -332,11 +334,28 @@ const arrangeNoConflictSets1 = (conflictArray) => {
       }
 
       // If no valid subject is found, break out of the loop
-      if (!maxConflictSubject) break;
+      // if (!maxConflictSubject) break;
+
+      const subjectArray = [...noConflictSet, maxConflictSubject];
+      const formattedSubjects = subjectArray
+        .map((subject) => `'${subject}'`)
+        .join(", ");
+
+      const numOfStudentQuery = `SELECT COUNT(DISTINCT REG_NO) AS studentCount FROM new_sem_reg WHERE CO_CODE IN (${formattedSubjects})`;
+
+      // Check if adding this subject will exceed the student count constraint
+      const [rows] = await DBpool.query(numOfStudentQuery);
+      if (rows.length > 0) {
+        const count = rows[0].studentCount; // Assuming 'studentCount' is the column name
+        if (count > 800 || !maxConflictSubject) break;
+      } else {
+        console.log("No data returned from query");
+      }
 
       // Add the subject with max conflicts to the noConflictSet
       noConflictSet.push(maxConflictSubject);
       selectedSubjects.add(maxConflictSubject);
+      totalStudents = rows[0].studentCount; // Update total students in the set
     }
 
     // Add the current noConflictSet to the result
@@ -401,7 +420,7 @@ const arrangeNoConflictSets2 = (conflictArray) => {
   }
 
   return noConflictSets;
-}
+};
 //************************ */
 const arrangeNoConflictSets3 = (conflictArray) => {
   const conflictSets = [];
@@ -448,7 +467,7 @@ const arrangeNoConflictSets3 = (conflictArray) => {
   }
 
   return conflictSets;
-}
+};
 //************************ */
 const arrangeNoConflictSets4 = (conflictArray) => {
   const conflictSets = [];
@@ -498,8 +517,82 @@ const arrangeNoConflictSets4 = (conflictArray) => {
   }
 
   return conflictSets;
-}
-//************************ */
+};
+//***************************************************************************** */
+const processInputArray = async (inputArray, conflictArray) => {
+  // Get the input array length
+  const j = inputArray.length;
+
+  // Loop through the input array in reverse order
+  for (let index = j - 1; index >= 0; index--) {
+    // Step 1: Create arr1 by excluding the current element (inputArray[index])
+    let arr1 = inputArray.filter((_, i) => i !== index);
+
+    // Step 2: Sort arr1 based on descending order of element lengths
+    arr1.sort((a, b) => b.length - a.length);
+
+    // Step 3: Get the current element of inputArray
+    const lastElement = inputArray[index];
+
+    // Function to check if two sets are in conflict
+    const isConflict = (set1, set2, conflictArray) => {
+      // Create a map from conflictArray for quick lookup
+      const conflictMap = new Map(conflictArray);
+    
+      for (let subject of set1) {
+        // Get the list of conflicts for the current subject
+        const conflicts = conflictMap.get(subject) || [];
+    
+        // Check if any subject in set2 is in the conflicts list
+        for (let otherSubject of set2) {
+          if (conflicts.includes(otherSubject)) {
+            return true; // Conflict found
+          }
+        }
+      }
+    
+      return false; // No conflict
+    };
+    
+
+    // Step 4: Loop through arr1's elements and check conflicts
+    for (let i = 0; i < arr1.length; i++) {
+      const currentSet = arr1[i];
+
+      // Check for conflicts and student count
+      if (!isConflict(lastElement, currentSet, conflictArray)) {
+        // Combine sets and check student count
+        const combinedSet = [...new Set([...lastElement, ...currentSet])];
+
+        const formattedSubjects = combinedSet
+          .map((subject) => `'${subject}'`)
+          .join(", ");
+
+        const numOfStudentQuery = `SELECT COUNT(DISTINCT REG_NO) AS studentCount FROM new_sem_reg WHERE CO_CODE IN (${formattedSubjects})`;
+
+        // Check if adding this subject will exceed the student count constraint
+        const [rows] = await DBpool.query(numOfStudentQuery);
+
+        if (rows[0].studentCount <= 800) {
+          // Create a new input array with the combined set
+          const newInputArray = [
+            ...arr1.slice(0, i),
+            combinedSet,
+            ...arr1.slice(i + 1),
+          ];
+
+          // Process the new array recursively
+          return await processInputArray(newInputArray);
+        }
+      }
+    }
+  }
+
+  // Base case: Return the current input array if no valid combination is found
+  return inputArray;
+};
+
+//**************************************************************************** */
 exports.setupExam = async (req, res) => {
   try {
     // Step 1: Fetch conflict matrix
@@ -509,15 +602,23 @@ exports.setupExam = async (req, res) => {
     const conflictArray = generateConflictArray(conflicts);
 
     // Step 2: Apply graph coloring
-    const output1 = arrangeNoConflictSets1(conflictArray);
-    const output2 = arrangeNoConflictSets2(conflictArray);
-    const output3 = arrangeNoConflictSets3(conflictArray);
-    const output4 = arrangeNoConflictSets4(conflictArray);
+    const output1 = await arrangeNoConflictSets1(conflictArray);
+    const output_1 = await processInputArray(output1, conflictArray);
 
-    const output = [output1,output2,output3,output4]
+    const output2 = arrangeNoConflictSets2(conflictArray);
+    const output_2 = await processInputArray(output2, conflictArray);
+
+    const output3 = arrangeNoConflictSets3(conflictArray);
+    const output_3 = await processInputArray(output3, conflictArray);
+    
+    const output4 = arrangeNoConflictSets4(conflictArray);
+    const output_4 = await processInputArray(output4, conflictArray);
+
+
+    const output = [output_1, output_2, output_3, output_4];
 
     // Step 3: Map colors to time slots
-    // console.log(output);
+    console.log(output_1);
     // console.log(conflictArray);
 
     // Step 4: Save timetable to database
