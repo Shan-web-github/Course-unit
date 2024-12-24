@@ -347,7 +347,7 @@ const arrangeNoConflictSets1 = async (conflictArray) => {
       const [rows] = await DBpool.query(numOfStudentQuery);
       if (rows.length > 0) {
         const count = rows[0].studentCount; // Assuming 'studentCount' is the column name
-        if (count > 800 || !maxConflictSubject) break;
+        if (count > 1000 || !maxConflictSubject) break;
       } else {
         console.log("No data returned from query");
       }
@@ -519,76 +519,129 @@ const arrangeNoConflictSets4 = (conflictArray) => {
   return conflictSets;
 };
 //***************************************************************************** */
+// const processInputArray = async (inputArray, conflictArray) => {
+//   // Get the input array length
+//   const j = inputArray.length;
+
+//   // Loop through the input array in reverse order
+//   for (let index = j - 1; index >= 0; index--) {
+//     // Step 1: Create arr1 by excluding the current element (inputArray[index])
+//     let arr1 = inputArray.filter((_, i) => i !== index);
+
+//     // Step 2: Sort arr1 based on descending order of element lengths
+//     arr1.sort((a, b) => b.length - a.length);
+
+//     // Step 3: Get the current element of inputArray
+//     const lastElement = inputArray[index];
+
+//     // Function to check if two sets are in conflict
+//     const isConflict = (set1, set2, conflictArray) => {
+//       // Create a map from conflictArray for quick lookup
+//       const conflictMap = new Map(conflictArray);
+    
+//       for (let subject of set1) {
+//         // Get the list of conflicts for the current subject
+//         const conflicts = conflictMap.get(subject) || [];
+    
+//         // Check if any subject in set2 is in the conflicts list
+//         for (let otherSubject of set2) {
+//           if (conflicts.includes(otherSubject)) {
+//             return true; // Conflict found
+//           }
+//         }
+//       }
+    
+//       return false; // No conflict
+//     };
+    
+
+//     // Step 4: Loop through arr1's elements and check conflicts
+//     for (let i = 0; i < arr1.length; i++) {
+//       const currentSet = arr1[i];
+
+//       // Check for conflicts and student count
+//       if (!isConflict(lastElement, currentSet, conflictArray)) {
+//         // Combine sets and check student count
+//         const combinedSet = [...new Set([...lastElement, ...currentSet])];
+
+//         const formattedSubjects = combinedSet
+//           .map((subject) => `'${subject}'`)
+//           .join(", ");
+
+//         const numOfStudentQuery = `SELECT COUNT(DISTINCT REG_NO) AS studentCount FROM new_sem_reg WHERE CO_CODE IN (${formattedSubjects})`;
+
+//         // Check if adding this subject will exceed the student count constraint
+//         const [rows] = await DBpool.query(numOfStudentQuery);
+
+//         if (rows[0].studentCount <= 1000) {
+//           // Create a new input array with the combined set
+//           const newInputArray = [
+//             ...arr1.slice(0, i),
+//             combinedSet,
+//             ...arr1.slice(i + 1),
+//           ];
+
+//           // Process the new array recursively
+//           return await processInputArray(newInputArray, conflictArray);
+//         }
+//       }
+//     }
+//   }
+
+//   // Base case: Return the current input array if no valid combination is found
+//   return inputArray;
+// };
+
 const processInputArray = async (inputArray, conflictArray) => {
-  // Get the input array length
-  const j = inputArray.length;
+  const conflictMap = new Map(conflictArray); // Cache conflict data
+  const studentCounts = new Map(); // Cache student count results
 
-  // Loop through the input array in reverse order
-  for (let index = j - 1; index >= 0; index--) {
-    // Step 1: Create arr1 by excluding the current element (inputArray[index])
+  const isConflict = (set1, set2) => {
+    for (let subject of set1) {
+      const conflicts = conflictMap.get(subject) || [];
+      if (set2.some(otherSubject => conflicts.includes(otherSubject))) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const getStudentCount = async (subjects) => {
+    const key = subjects.sort().join(",");
+    if (!studentCounts.has(key)) {
+      const formattedSubjects = subjects
+        .map((subject) => `'${subject}'`)
+        .join(", ");
+      const query = `SELECT COUNT(DISTINCT REG_NO) AS studentCount FROM new_sem_reg WHERE CO_CODE IN (${formattedSubjects})`;
+      const [rows] = await DBpool.query(query);
+      studentCounts.set(key, rows[0].studentCount);
+    }
+    return studentCounts.get(key);
+  };
+
+  for (let index = inputArray.length - 1; index >= 0; index--) {
     let arr1 = inputArray.filter((_, i) => i !== index);
-
-    // Step 2: Sort arr1 based on descending order of element lengths
     arr1.sort((a, b) => b.length - a.length);
 
-    // Step 3: Get the current element of inputArray
     const lastElement = inputArray[index];
 
-    // Function to check if two sets are in conflict
-    const isConflict = (set1, set2, conflictArray) => {
-      // Create a map from conflictArray for quick lookup
-      const conflictMap = new Map(conflictArray);
-    
-      for (let subject of set1) {
-        // Get the list of conflicts for the current subject
-        const conflicts = conflictMap.get(subject) || [];
-    
-        // Check if any subject in set2 is in the conflicts list
-        for (let otherSubject of set2) {
-          if (conflicts.includes(otherSubject)) {
-            return true; // Conflict found
-          }
-        }
-      }
-    
-      return false; // No conflict
-    };
-    
-
-    // Step 4: Loop through arr1's elements and check conflicts
     for (let i = 0; i < arr1.length; i++) {
       const currentSet = arr1[i];
-
-      // Check for conflicts and student count
-      if (!isConflict(lastElement, currentSet, conflictArray)) {
-        // Combine sets and check student count
+      if (!isConflict(lastElement, currentSet)) {
         const combinedSet = [...new Set([...lastElement, ...currentSet])];
+        const studentCount = await getStudentCount(combinedSet);
 
-        const formattedSubjects = combinedSet
-          .map((subject) => `'${subject}'`)
-          .join(", ");
-
-        const numOfStudentQuery = `SELECT COUNT(DISTINCT REG_NO) AS studentCount FROM new_sem_reg WHERE CO_CODE IN (${formattedSubjects})`;
-
-        // Check if adding this subject will exceed the student count constraint
-        const [rows] = await DBpool.query(numOfStudentQuery);
-
-        if (rows[0].studentCount <= 800) {
-          // Create a new input array with the combined set
+        if (studentCount <= 800) {
           const newInputArray = [
             ...arr1.slice(0, i),
             combinedSet,
             ...arr1.slice(i + 1),
           ];
-
-          // Process the new array recursively
-          return await processInputArray(newInputArray);
+          return await processInputArray(newInputArray, conflictArray);
         }
       }
     }
   }
-
-  // Base case: Return the current input array if no valid combination is found
   return inputArray;
 };
 

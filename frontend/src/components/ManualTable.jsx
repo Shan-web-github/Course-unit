@@ -86,50 +86,41 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     return false;
   };
 
-  const processTimetables = (arr, level, startDate, timeSlot, rowInputs) => {
-    const newArr = [];
-    const coCodes = [];
-  
-    // Remove `tT${level}` if it exists in the array and create newArr
-    arr = arr.filter((entry) => {
-      if (entry?.level === `${level}_level`) {
-        newArr.push(entry);
-        return false;
-      }
-      return true;
-    });
-  
-    // Check if newArr has elements
-    if (newArr.length > 0) {
-      for (const entry of newArr) {
-        // Check if the startDate and timeSlot match in the current entry
-        if (checkStartDateAndTimeSlot(entry.data, startDate, timeSlot)) {
-          // Collect coCodes from morning and evening schedules
-          for (let schedule of entry.data) {
-            if (schedule.morning?.selectedOption) {
-              coCodes.push(schedule.morning.selectedOption);
-            }
-            if (schedule.evening?.selectedOption) {
-              coCodes.push(schedule.evening.selectedOption);
+  const processTimetables = (arr, level, startDate, timeSlot) => {
+    if (arr && Array.isArray(arr)) {
+      const coCodes = [];
+
+      // Remove `tT${level}` if it exists in the array and create newArr
+      const newArr = arr.filter(
+        (entry) => !(entry?.level === `${level}_level`)
+      );
+
+      // Check if newArr has elements
+      if (newArr.length > 0) {
+        for (const entry of newArr) {
+          // Check if the startDate and timeSlot match in the current entry
+          if (
+            entry?.data &&
+            checkStartDateAndTimeSlot(entry.data, startDate, timeSlot)
+          ) {
+            // Collect coCodes from morning and evening schedules
+            for (let schedule of entry.data) {
+              if (schedule.morning?.selectedOption) {
+                coCodes.push(schedule.morning.selectedOption);
+              }
+              if (schedule.evening?.selectedOption) {
+                coCodes.push(schedule.evening.selectedOption);
+              }
             }
           }
         }
       }
+
+      // Return concatenated options with coCodes
+      return [...coCodes].join(",");
     }
-  
-    // // Concatenate options from rowInputs
-    // const concatenatedOptions = rowInputs
-    //   .flatMap((item) => [
-    //     item.morning?.selectedOption || "N/A",
-    //     item.evening?.selectedOption || "N/A",
-    //   ])
-    //   .filter((item) => item !== "N/A")
-    //   .join(",");
-  
-    // Return concatenated options with coCodes
-    return [...coCodes, concatenatedOptions].join(",");
   };
-  
+
   //************************************************************************************************** */
 
   const isBoth = timeSlot === "Both";
@@ -152,7 +143,11 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     });
   };
 
-  const newConcatenatedOptions = processTimetables(tTarr, level, startDate, timeSlot)
+  let newConcatenatedOptions= [];
+
+  useEffect(() => {
+    newConcatenatedOptions = processTimetables(tTarr, level, startDate, timeSlot);
+  }, [tTarr, level, startDate, timeSlot]);
 
   /*************************************************
 
