@@ -383,7 +383,7 @@ export default function CreateTimeTable() {
   );
 
   return (
-    <div className="main" style={{ minHeight: buttonClick && "125vh"}}>
+    <div className="main" style={{ minHeight: buttonClick && !isSplit && "155vh"}}>
       <Navbar path="/createtimetable" />
       <div className="main-pane" style={{ minHeight: isSplit && "105vh"}}>
         <Container fluid className="mt-4">

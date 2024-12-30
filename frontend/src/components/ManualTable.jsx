@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
 import axios from "axios";
 
@@ -16,8 +22,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   const [dateAndTime, setDateAndTime] = useState(false);
 
   const [startDate, setStartDate] = useState("");
+  const startDateRef = useRef("");
   const [startDateArray, setStartDateArray] = useState([]);
   const [timeSlot, setTimeSlot] = useState("");
+  const timeSlotRef = useRef("");
   const [timeSlotArray, setTimeSlotArray] = useState([]);
   //************************************ */
   const [coursesData, setCoursesData] = useState([]);
@@ -38,6 +46,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     const newStartDate = event.target.value;
     setStartDate(newStartDate);
     setDateAndTime(newStartDate && timeSlot);
+    startDateRef.current = newStartDate;
+    // console.log(startDate);
     try {
       const coursesAttribute = `${level}-${semester}`;
       const courses = await axios.get(
@@ -60,36 +70,40 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     setDateAndTime(startDate && newTimeSlot);
     setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
     setResetKey((prevKey) => prevKey + 1);
-    console.log(tTarr);
+    timeSlotRef.current = newTimeSlot;
+    // console.log( timeSlotRef.current, startDateRef.current );
+    // console.log(timeSlot);
   };
 
   //************************************************************************************************** */
-  const tT1000 = getSessionData(`1000_level`);
-  const tT2000 = getSessionData(`2000_level`);
-  const tT3000 = getSessionData(`3000_level`);
+  const tTarr = useMemo(() => {
+    const tT1000 = getSessionData("1000_level");
+    const tT2000 = getSessionData("2000_level");
+    const tT3000 = getSessionData("3000_level");
 
-  const tTarr = [tT1000, tT2000, tT3000];
+    return [tT1000, tT2000, tT3000].filter(
+      (entry) => entry !== null && entry !== undefined
+    );
+  }, []);
 
-  const checkStartDateAndTimeSlot = (data, startDate, timeSlot) => {
+  const checkStartDateAndTimeSlot = (metadata, startDateRef, timeSlotRef) => {
+    // Extract the current values from the references
+    const startDate = startDateRef?.current;
+    const timeSlot = timeSlotRef?.current;
+
     // Iterate through the main array
-    for (let entry of data) {
-      if (entry && entry.metadata) {
-        // Check if the metadata contains the startDate and timeSlot
-        if (
-          entry.metadata.startDate === startDate &&
-          entry.metadata.timeSlot === timeSlot
-        ) {
-          return true;
-        }
+    if (metadata.startDate && metadata.timeSlot) {
+      // Check if the metadata contains the startDate and timeSlot
+      if (metadata.startDate === startDate && metadata.timeSlot === timeSlot) {
+        return true;
       }
     }
     return false;
   };
 
-  const processTimetables = (arr, level, startDate, timeSlot) => {
+  const processTimetables = useCallback((arr, level, startDate, timeSlot) => {
+    let coCodes = [];
     if (arr && Array.isArray(arr)) {
-      const coCodes = [];
-
       // Remove `tT${level}` if it exists in the array and create newArr
       const newArr = arr.filter(
         (entry) => !(entry?.level === `${level}_level`)
@@ -97,12 +111,15 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
 
       // Check if newArr has elements
       if (newArr.length > 0) {
-        for (const entry of newArr) {
+        for (let i = 0; i < newArr.length; i++) {
           // Check if the startDate and timeSlot match in the current entry
+          let entry = newArr[i][0];
+          // console.log(entry.metadata.startDate);
           if (
-            entry?.data &&
-            checkStartDateAndTimeSlot(entry.data, startDate, timeSlot)
+            entry.data &&
+            checkStartDateAndTimeSlot(entry.metadata, startDate, timeSlot)
           ) {
+            console.log(entry.metadata.startDate, entry.metadata.timeSlot);
             // Collect coCodes from morning and evening schedules
             for (let schedule of entry.data) {
               if (schedule.morning?.selectedOption) {
@@ -115,25 +132,29 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
           }
         }
       }
-
-      // Return concatenated options with coCodes
-      return [...coCodes].join(",");
     }
-  };
+    return coCodes;
+  }, []);
 
   //************************************************************************************************** */
 
   const isBoth = timeSlot === "Both";
 
   const concatenatedOptions = useMemo(() => {
-    return rowInputs
+    // Get the coCodes from processTimetables
+    const coCodes = processTimetables(tTarr, level, startDateRef, timeSlotRef);
+
+    // Concatenate coCodes with rowInputs
+    const rowInputOptions = rowInputs
       .flatMap((item) => [
         item.morning?.selectedOption || "N/A",
         item.evening?.selectedOption || "N/A",
       ])
-      .filter((item) => item !== "N/A")
-      .join(",");
-  }, [rowInputs]);
+      .filter((item) => item !== "N/A");
+
+    // Combine and return as a single string
+    return [...rowInputOptions, ...coCodes].join(",");
+  }, [tTarr, level, rowInputs, processTimetables]);
 
   const handleRowChange = (rowIndex, time, field, value) => {
     setRowInputs((prev) => {
@@ -142,24 +163,6 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       return updated;
     });
   };
-
-  let newConcatenatedOptions= [];
-
-  useEffect(() => {
-    newConcatenatedOptions = processTimetables(tTarr, level, startDate, timeSlot);
-  }, [tTarr, level, startDate, timeSlot]);
-
-  /*************************************************
-
-  const morningOptions = rowInputs.map(
-    (item) => item.morning?.selectedOption || "N/A"
-  );
-
-  const eveningOptions = rowInputs.map(
-    (item) => item.evening?.selectedOption || "N/A"
-  );
-
-  /************************************************* */
 
   const groupData = (data, batchSize) => {
     const result = [];
@@ -200,7 +203,6 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
 
       if (typeof onSave === "function") {
-        // onSave(groupTableData, startDateArray, timeSlotArray);
         onSave(newGroupTableData, newStartDateArray, newTimeSlotArray);
       }
 
@@ -253,16 +255,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
             variant="light"
             className="table table-bordered rounded overflow-hidden"
           >
-            {/* <Table
-            bordered
-            hover
-            responsive
-            size="md"
-            variant="light"
-            className="table table-bordered rounded overflow-hidden"
-          > */}
             <MDBTableHead>
-              {/* <thead> */}
               <tr>
                 <th colSpan={isBoth ? 2 : 1}>{startDate}</th>
               </tr>
@@ -276,10 +269,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                   <th>{timeSlot}</th>
                 </tr>
               )}
-              {/* </thead> */}
             </MDBTableHead>
             <MDBTableBody>
-              {/* <tbody> */}
               {rows.map((_, index) => (
                 <tr key={index}>
                   <td>
@@ -288,7 +279,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={newConcatenatedOptions}
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -301,7 +292,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-morning-${index}`}
                         id={`morning-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={newConcatenatedOptions}
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -314,7 +305,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={newConcatenatedOptions}
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -330,7 +321,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                         key={`${resetKey}-evening-${index}`}
                         id={`evening-${index}`}
                         courseList={coursesData}
-                        concatenatedOptions={newConcatenatedOptions}
+                        concatenatedOptions={concatenatedOptions}
                         selectedSubjects={tableData}
                         semester={semester}
                         level={level}
@@ -342,9 +333,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
                   )}
                 </tr>
               ))}
-              {/* </tbody> */}
             </MDBTableBody>
-            {/* </Table> */}
           </MDBTable>
           <div className="manualtablebutton">
             <Button variant="primary" onClick={saveAndNext}>

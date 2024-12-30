@@ -70,7 +70,7 @@ export default function ChooseTimeTable() {
               <>
                 <Col md={6} className="left-pane">
                   {leftTimetables.map((timetable, timetableIndex) => (
-                    <div>
+                    <div key={timetableIndex}>
                       <h5 className="fw-semibold">Time Table {timetableIndex+1}</h5>
                       <br />
                       <ChooseTables
@@ -82,7 +82,7 @@ export default function ChooseTimeTable() {
                 </Col>
                 <Col md={6} className="right-pane">
                   {rightTimetables.map((timetable, timetableIndex) => (
-                    <div>
+                    <div key={timetableIndex}>
                       <h5 className="fw-semibold">Time Table {timetableIndex+3}</h5>
                       <br />
                       <ChooseTables
