@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import axios from "axios";
 
 import { Dropdown, Form } from "react-bootstrap";
@@ -12,16 +12,18 @@ function Dropdownstyle({
   onChange,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedOption, setSelectedOption] = useState("Select an option");
-  const [inputTime, setInputTime] = useState("");
 
+  const [selectedOption, setSelectedOption] = useState("Select an option");
+  const selectedOptionRef = useRef("");
+
+  const [inputTime, setInputTime] = useState("");
 
   const selectedSubjectArray = useMemo(() => {
     return Array.isArray(selectedSubjects)
       ? selectedSubjects.flatMap((obj) =>
           ["morning", "evening"]
             .map((time) => obj[time]?.selectedOption)
-            .filter(Boolean)
+            .filter((value) => value && value !== "N/A" && value !== "NULL")
         )
       : [];
   }, [selectedSubjects]);
@@ -29,9 +31,8 @@ function Dropdownstyle({
   const filteredColumns = courseList.filter(
     (list) => !selectedSubjectArray.includes(list)
   );
-  
-  const [columns, setColumns] = useState(filteredColumns);
 
+  const [columns, setColumns] = useState(filteredColumns);
 
   useEffect(() => {
     const dynamicOptions = async () => {
@@ -49,20 +50,20 @@ function Dropdownstyle({
           //     .map((time) => obj[time]?.selectedOption)
           //     .filter(Boolean)
           // );
-  
+
           response = await axios.get(
             `http://localhost:5000/studentdata/notclashes2/${concatenatedOptions}?selectedSubjects=${selectedSubjectArray}&semester=${semester}&level=${level}`
           );
           // setColumns(response.data.data);
           // console.log(response.data.data);
-        } 
+        }
         // else if (!concatenatedOptions && selectedSubjects) {
         //   // const selectedSubjectArray = selectedSubjects.flatMap((obj) =>
         //   //   ["morning", "evening"]
         //   //     .map((time) => obj[time]?.selectedOption)
         //   //     .filter(Boolean)
         //   // );
-  
+
         //   const filteredColumns = courseList.filter(
         //     (list) => !selectedSubjectArray.includes(list)
         //   );
@@ -73,15 +74,20 @@ function Dropdownstyle({
         if (response?.data?.data) {
           setColumns(response.data.data);
         }
-
       } catch (error) {
         console.error("Error fetching not clash courses data:", error);
       }
     };
 
     dynamicOptions();
-
-  }, [concatenatedOptions, selectedSubjects, selectedSubjectArray, courseList, level, semester]);
+  }, [
+    concatenatedOptions,
+    selectedSubjects,
+    selectedSubjectArray,
+    courseList,
+    level,
+    semester,
+  ]);
 
   // const dynamicOptions = async () => {
   //   if (concatenatedOptions && !selectedSubjects) {
@@ -144,11 +150,11 @@ function Dropdownstyle({
   return (
     <div className="dropdownstyle">
       <div>
-        <Dropdown 
-          // onClick={dynamicOptions}
-          >
+        <Dropdown
+        // onClick={dynamicOptions}
+        >
           <Dropdown.Toggle variant="primary" id="dropdown-basic">
-            {selectedOption}
+          {selectedOption || "Select an option"}
           </Dropdown.Toggle>
 
           <Dropdown.Menu style={{ maxHeight: "200px", overflowY: "auto" }}>
@@ -161,13 +167,30 @@ function Dropdownstyle({
               style={{ margin: "0.5rem" }}
             />
 
+            {/* Clear Selection */}
+            {selectedOptionRef.current && (
+              <Dropdown.Item
+                onClick={() => {
+                  setSelectedOption(null);
+                  selectedOptionRef.current = null;
+                  setSearchTerm("");
+                  if (onChange) onChange("selectedOption", "NULL");
+                }}
+                style={{ fontStyle: "italic", color: "red" }}
+              >
+                Clear selection
+              </Dropdown.Item>
+            )}
+
             {/* Dropdown Items */}
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <Dropdown.Item
                   key={index}
+                  value={option}
                   onClick={() => {
                     setSelectedOption(option);
+                    selectedOptionRef.current = option;
                     setSearchTerm("");
                     if (onChange) onChange("selectedOption", option);
                   }}

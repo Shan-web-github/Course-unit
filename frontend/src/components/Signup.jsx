@@ -35,7 +35,7 @@ export default function Signup() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/usersdata/signup",
+        "http://10.40.48.115:5000/usersdata/signup",
         {
           email: signUpEmail,
           password: signUpPassword,

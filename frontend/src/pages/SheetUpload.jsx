@@ -14,6 +14,8 @@ export default function SheetUpload() {
   const [semReg, setSemReg] = useState(null);
   const [offerCourseExam, setOfferCourseExam] = useState(null);
 
+  const ipAddress = "10.40.48.115";
+
   const navigate = useNavigate();
 
   const submit = async (event) => {
@@ -29,7 +31,7 @@ export default function SheetUpload() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/studentdata/upload",
+        `http://${ipAddress}:5000/studentdata/upload`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -47,7 +49,7 @@ export default function SheetUpload() {
     event.preventDefault();
     try {
       const res = await axios.get(
-        "http://localhost:5000/studentdata/requiredtablesexist"
+        `http://${ipAddress}:5000/studentdata/requiredtablesexist`
       );
       if (res.status === 200) {
         await createNewSemReg();
@@ -63,7 +65,7 @@ export default function SheetUpload() {
 
   const createNewSemReg = async () => {
     try {
-      await axios.get("http://localhost:5000/studentdata/newsemreg");
+      await axios.get(`http://${ipAddress}:5000/studentdata/newsemreg`);
       console.log("Successfully created new_sem_reg");
       navigate("/home");
     } catch (error) {

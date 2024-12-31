@@ -1,4 +1,5 @@
 {
+  "proxy": "http://10.40.48.115:5000",
   "name": "forntend",
   "version": "0.1.0",
   "private": true,
