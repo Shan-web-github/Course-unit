@@ -1,168 +1,3 @@
-// import React, { useState } from "react";
-// import axios from "axios";
-
-// import Navbar from "../components/Navbar";
-// import TableTag from "../components/TableTag";
-
-// //bootstrapt lib
-// import Form from "react-bootstrap/Form";
-// import Button from "react-bootstrap/Button";
-// import ManualTable from "../components/ManualTable";
-
-// export default function CreateTimeTable() {
-//   const [level, setLevel] = useState("");
-//   const [semester, setSemester] = useState("");
-//   const [isLevelSelected, setIsLevelSelected] = useState(false);
-
-//   const [buttonClick, setButtonClick] = useState(false);
-//   const [buttonName, setButtonName] = useState("Continue");
-
-//   const selectLevel = (event) => {
-//     const value = event.target.value;
-//     setLevel(value);
-//     setIsLevelSelected(value !== "");
-//     findClashes(value);
-//   };
-
-//   const selectSemester = (event) => {
-//     setSemester(event.target.value);
-//   };
-
-//   const [columns, setColumns] = useState([]);
-//   const [rows, setRows] = useState([]);
-
-//   const findClashes = async (level) => {
-//     if (level === "") {
-//       return alert("Select Level");
-//     }
-
-//     try {
-//       const clashdata = await axios.get(
-//         `http://localhost:5000/studentdata/clashes/${level}`
-//       );
-//       setColumns(clashdata.data.columns);
-//       setRows(clashdata.data.data);
-//     } catch (error) {
-//       console.error("get clashes file error:", error);
-//     }
-//   };
-
-//   const pressContinue = async (event) => {
-//     event.preventDefault();
-//     if (level === "" || semester === "") {
-//       return alert("Select Level and Semester");
-//     } else if (buttonClick === false) {
-//       try {
-//         await axios.post(
-//           `http://localhost:5000/studentdata/uploadClashes/${level}`,
-//           {
-//             headers: columns,
-//             rows: rows,
-//           }
-//         );
-
-//         setButtonClick((prevState) => {
-//           const newState = !prevState;
-//           console.log("Button click state:", newState);
-//           setButtonName(newState ? "Edit" : "Update");
-//           return newState;
-//         });
-//       } catch (error) {
-//         console.error("Error upload clash courses data:", error);
-//       }
-//     } else {
-//       setButtonClick((prevState) => {
-//         const newState = !prevState;
-//         console.log("Button click state:", newState);
-//         setButtonName(newState ? "Edit" : "Update");
-//         return newState;
-//       });
-//     }
-//   };
-
-//   // const courseCodes = coursesData.map((course) => course.CO_CODE);
-
-//   return (
-//     <div>
-//       <Navbar path="/createtimetable" />
-//       <div className="createtimetable">
-//         <div className="leftdiv">
-//           <div>
-//             <Form onSubmit={pressContinue}>
-//               <Form.Group>
-//                 <Form.Label>Level</Form.Label>
-//                 <Form.Select
-//                   value={level}
-//                   autoFocus
-//                   onChange={selectLevel}
-//                   disabled={buttonClick}
-//                 >
-//                   <option value="">Select...</option>
-//                   <option value="1000">1000</option>
-//                   <option value="2000">2000</option>
-//                   <option value="3000">3000</option>
-//                 </Form.Select>
-//               </Form.Group>
-//               <br />
-//               <Form.Group>
-//                 <Form.Label>Semester</Form.Label>
-//                 <Form.Select
-//                   value={semester}
-//                   onChange={selectSemester}
-//                   disabled={buttonClick}
-//                 >
-//                   <option value="">Select...</option>
-//                   <option value="I">1st Semester</option>
-//                   <option value="II">2nd Semester</option>
-//                 </Form.Select>
-//               </Form.Group>
-//               <br />
-//               <div className="button">
-//                 <Button variant="dark" type="submit">
-//                   {buttonName}
-//                 </Button>
-//               </div>
-//             </Form>
-//           </div>
-//           <div>
-//             {buttonClick && (
-//               <div>
-//                 <hr />
-//                 {level} Level {semester} Semester End Examination
-//                 <hr />
-//                 <ManualTable
-//                   level={level}
-//                   semester={semester}
-//                   buttonClick={buttonClick}
-//                 />
-//               </div>
-//             )}
-//           </div>
-//         </div>
-
-//         <div className="rightdiv">
-//             {isLevelSelected ? (
-//               <div>
-//                 <br />
-//                 <Form.Label>{level} Level Clashes </Form.Label>
-//                 <br />
-//                 <div
-//                   className="scrollable-container">
-//                   <TableTag columns={columns} rows={rows} />
-//                 </div>
-//               </div>
-//             ) : (
-//               <div>
-//                 <br />
-//                 <Form.Label>Select Level To Find Clashes </Form.Label>
-//               </div>
-//             )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 import React, { useState, useMemo } from "react";
 import axios from "axios";
 import { debounce } from "lodash";
@@ -193,6 +28,8 @@ export default function CreateTimeTable() {
     startDateArray: [],
     timeSlotArray: [],
   });
+
+  const ipAddress = "10.40.48.115";
 
   const debouncedSave = useMemo(() => {
     return debounce((groupData, startDates, timeSlots) => {
@@ -236,7 +73,7 @@ export default function CreateTimeTable() {
 
     try {
       const clashdata = await axios.get(
-        `http://localhost:5000/studentdata/clashes/${level}`
+        `http://${ipAddress}:5000/studentdata/clashes/${level}`
       );
       setColumns(clashdata.data.columns);
       setRows(clashdata.data.data);
@@ -247,7 +84,7 @@ export default function CreateTimeTable() {
 
   const createClashes = async () => {
     try {
-      await axios.get("http://localhost:5000/studentdata/createClashes");
+      await axios.get(`http://${ipAddress}:5000/studentdata/createClashes`);
       console.log("Successfully created clashes table.");
     } catch (error) {
       console.error(
@@ -265,7 +102,7 @@ export default function CreateTimeTable() {
     } else if (buttonClick === false) {
       try {
         await axios.post(
-          `http://localhost:5000/studentdata/uploadClashes/${level}`,
+          `http://${ipAddress}:5000/studentdata/uploadClashes/${level}`,
           {
             headers: columns,
             rows: rows,
@@ -353,16 +190,24 @@ export default function CreateTimeTable() {
       {isLevelSelected ? (
         <div>
           <br />
-          <Form.Label className="fw-bold d-flex justify-content-center align-items-center">{level} Level  <span className="text-primary ms-2"> Clashes</span></Form.Label>
+          <Form.Label className="fw-bold d-flex justify-content-center align-items-center">
+            {level} Level <span className="text-primary ms-2"> Clashes</span>
+          </Form.Label>
           <br />
           <div className="scrollable-container">
-            <TableTag columns={columns} rows={rows} hover responsive/>
+            <TableTag columns={columns} rows={rows} hover responsive />
           </div>
           <br />
           <div>
             {tableState.groupTableData.map((data, index) => (
               <div key={index}>
-                {index ===0 && (<h5 className="fw-bold d-flex justify-content-center align-items-center"> {level}Level { semester } Semester <span className="text-primary">EndExamination </span></h5>)}
+                {index === 0 && (
+                  <h5 className="fw-bold d-flex justify-content-center align-items-center">
+                    {" "}
+                    {level}Level {semester} Semester{" "}
+                    <span className="text-primary">EndExamination </span>
+                  </h5>
+                )}
                 <SampleTimeTable
                   key={index}
                   tableData={data}
@@ -383,14 +228,17 @@ export default function CreateTimeTable() {
   );
 
   return (
-    <div className="main" style={{ minHeight: buttonClick && !isSplit && "155vh"}}>
+    <div
+      className="main"
+      style={{ minHeight: buttonClick && !isSplit && "155vh" }}
+    >
       <Navbar path="/createtimetable" />
-      <div className="main-pane" style={{ minHeight: isSplit && "105vh"}}>
+      <div className="main-pane" style={{ minHeight: isSplit && "105vh" }}>
         <Container fluid className="mt-4">
           <Button
             onClick={() => setIsSplit(!isSplit)}
             className="mb-3"
-            disabled = {level? false:true}
+            disabled={level ? false : true}
             variant={isSplit ? "danger" : "primary"}
           >
             {isSplit ? "Back to Single View" : "Clashes View"}
@@ -412,7 +260,7 @@ export default function CreateTimeTable() {
           </Row>
         </Container>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

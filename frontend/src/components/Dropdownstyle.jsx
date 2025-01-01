@@ -23,7 +23,7 @@ function Dropdownstyle({
       ? selectedSubjects.flatMap((obj) =>
           ["morning", "evening"]
             .map((time) => obj[time]?.selectedOption)
-            .filter((value) => value && value !== "N/A" && value !== "NULL")
+            .filter(Boolean)
         )
       : [];
   }, [selectedSubjects]);
@@ -34,13 +34,15 @@ function Dropdownstyle({
 
   const [columns, setColumns] = useState(filteredColumns);
 
+  const ipAddress = "10.40.48.115";
+
   useEffect(() => {
     const dynamicOptions = async () => {
       try {
         let response;
         if (concatenatedOptions && !selectedSubjects) {
           response = await axios.get(
-            `http://localhost:5000/studentdata/notclashes1/${concatenatedOptions}?semester=${semester}&level=${level}`
+            `http://${ipAddress}:5000/studentdata/notclashes1/${concatenatedOptions}?semester=${semester}&level=${level}`
           );
           // setColumns(response.data.data);
           // console.log(response.data.data);
@@ -52,7 +54,7 @@ function Dropdownstyle({
           // );
 
           response = await axios.get(
-            `http://localhost:5000/studentdata/notclashes2/${concatenatedOptions}?selectedSubjects=${selectedSubjectArray}&semester=${semester}&level=${level}`
+            `http://${ipAddress}:5000/studentdata/notclashes2/${concatenatedOptions}?selectedSubjects=${selectedSubjectArray}&semester=${semester}&level=${level}`
           );
           // setColumns(response.data.data);
           // console.log(response.data.data);
@@ -93,7 +95,7 @@ function Dropdownstyle({
   //   if (concatenatedOptions && !selectedSubjects) {
   //     try {
   //       const response = await axios.get(
-  //         `http://localhost:5000/studentdata/notclashes1/${concatenatedOptions}?semester=${semester}&level=${level}`
+  //         `http://${ipAddress}:5000/studentdata/notclashes1/${concatenatedOptions}?semester=${semester}&level=${level}`
   //       );
   //       setColumns(response.data.data);
   //       console.log(response.data.data);
@@ -110,7 +112,7 @@ function Dropdownstyle({
 
   //     try {
   //       const response = await axios.get(
-  //         `http://localhost:5000/studentdata/notclashes2/${concatenatedOptions}?selectedSubjects=${selectedSubjectArray}&semester=${semester}&level=${level}`
+  //         `http://${ipAddress}:5000/studentdata/notclashes2/${concatenatedOptions}?selectedSubjects=${selectedSubjectArray}&semester=${semester}&level=${level}`
   //       );
   //       setColumns(response.data.data);
   //       console.log(response.data.data);

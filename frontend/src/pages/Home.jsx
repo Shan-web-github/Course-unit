@@ -17,6 +17,8 @@ export default function Home() {
 
   const [tableName, setTableName] = useState("");
 
+  const ipAddress = "10.40.48.115";
+
   const load = async (event) => {
     event.preventDefault();
     if (!tableName) {
@@ -24,7 +26,7 @@ export default function Home() {
     }
     try {
       const loadData = await axios.get(
-        `http://localhost:5000/studentdata/data/${tableName}`
+        `http://${ipAddress}:5000/studentdata/data/${tableName}`
       );
       setColumns(loadData.data.columns);
       setRows(loadData.data.data);

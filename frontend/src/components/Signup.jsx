@@ -12,6 +12,8 @@ export default function Signup() {
   const [signUpPassword, setSignUpPassword] = useState("");
   const [signUpConPassword, setSignUpConPassword] = useState("");
 
+  const ipAddress = "10.40.48.115";
+
   const handleClose = () => setShow(false);
 
   const validateEmail = (email) => {
@@ -35,7 +37,7 @@ export default function Signup() {
 
     try {
       const response = await axios.post(
-        "http://10.40.48.115:5000/usersdata/signup",
+        `http://${ipAddress}:5000/usersdata/signup`,
         {
           email: signUpEmail,
           password: signUpPassword,

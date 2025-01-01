@@ -34,6 +34,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
 
+  const ipAddress = "10.40.48.115";
+
   const rows = Array(4).fill(null);
 
   const [rowInputs, setRowInputs] = useState(
@@ -51,7 +53,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     try {
       const coursesAttribute = `${level}-${semester}`;
       const courses = await axios.get(
-        `http://localhost:5000/studentdata/courses/${coursesAttribute}`
+        `http://${ipAddress}:5000/studentdata/courses/${coursesAttribute}`
       );
       alert("Successfully continued");
 
@@ -150,11 +152,23 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
         item.morning?.selectedOption || "N/A",
         item.evening?.selectedOption || "N/A",
       ])
-      .filter((item) => item !== "N/A");
+      .filter((item) => item !== "N/A" && item !=="NULL");
 
     // Combine and return as a single string
     return [...rowInputOptions, ...coCodes].join(",");
   }, [tTarr, level, rowInputs, processTimetables]);
+
+  const cleanRowInputs = (inputs) =>
+    inputs.map((row) => ({
+      morning: {
+        ...row.morning,
+        selectedOption: row.morning?.selectedOption === "NULL" ? null : row.morning?.selectedOption,
+      },
+      evening: {
+        ...row.evening,
+        selectedOption: row.evening?.selectedOption === "NULL" ? null : row.evening?.selectedOption,
+      },
+    }));
 
   const handleRowChange = (rowIndex, time, field, value) => {
     setRowInputs((prev) => {
@@ -178,22 +192,23 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     } else {
       setStartDateArray((pre) => [...pre, startDate]);
       setTimeSlotArray((pre) => [...pre, timeSlot]);
+      const updatedRowInputs = cleanRowInputs(rowInputs);
 
       //************************************************ */
       const newStartDateArray = [...startDateArray, startDate];
       const newTimeSlotArray = [...timeSlotArray, timeSlot];
-      const newTableData = [...tableData, ...rowInputs];
+      const newTableData = [...tableData, ...updatedRowInputs];
       const newGroupTableData = groupData(newTableData, 4);
       //*************************************************/
 
       //these function must be run sequentially
-      const newData = [...tableData, ...rowInputs];
+      const newData = [...tableData, ...updatedRowInputs];
       setTableData(newData);
       setGroupTabledata(groupData(newData, 4));
       setFinalData((prev) => {
         const updated = {
           metadata: { startDate: startDate, timeSlot: timeSlot },
-          data: rowInputs,
+          data: updatedRowInputs,
         };
         return [...prev, updated];
       });

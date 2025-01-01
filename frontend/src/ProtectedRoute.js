@@ -8,6 +8,8 @@ const ProtectedRoute = ({ children }) => {
   const { auth, setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const ipAddress = "10.40.48.115";
+
   useEffect(() => {
     const storedToken = getSessionData("jwt_token");
     const checkToken = async () => {
@@ -19,9 +21,10 @@ const ProtectedRoute = ({ children }) => {
         try {
           const headers = { authorization: `Bearer ${storedToken}` };
           const response = await axios.get(
-            "http://localhost:5000/usersdata/access",
-            { headers }
-          );
+            `http://${ipAddress}:5000/usersdata/access`,
+            {
+              headers
+            });
 
           if (response.status === 200) {
             setAuth({ token: storedToken, isAuthenticated: true });
@@ -30,7 +33,7 @@ const ProtectedRoute = ({ children }) => {
             setAuth({ token: null, isAuthenticated: false });
           }
         } catch (error) {
-          console.error("Token validation error:", error);
+          console.error("Token validation error:", error,storedToken);
           removeSessionData("jwt_token");
           setAuth({ token: null, isAuthenticated: false });
         }

@@ -22,6 +22,8 @@ export default function SignIn() {
 
   const [check, setCheck] = useState(false);
 
+  const ipAddress = "10.40.48.115";
+
   const validateEmail = (email) => {
     return validator.isEmail(email);
   };
@@ -41,7 +43,7 @@ export default function SignIn() {
 
     try {
       const response = await axios.post(
-        "http://10.40.48.115:5000/usersdata/login",
+        `http://${ipAddress}:5000/usersdata/login`,
         {
           email: logInEmail,
           password: logInPassword,

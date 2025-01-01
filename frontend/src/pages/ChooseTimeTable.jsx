@@ -12,11 +12,13 @@ export default function ChooseTimeTable() {
   const [isSplit, setIsSplit] = useState(false);
   const [timetables, setTimetables] = useState([]);
 
+  const ipAddress = "10.40.48.115";
+
   const fetchTimetable = async () => {
     setIsSplit(!isSplit);
     try {
       const response = await axios.get(
-        "http://localhost:5000/studentdata/generate-timetable"
+        `http://${ipAddress}:5000/studentdata/generate-timetable`
       );
       if (response.data.success) {
         console.log(response.data.output);
