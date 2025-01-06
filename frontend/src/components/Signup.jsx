@@ -12,7 +12,7 @@ export default function Signup() {
   const [signUpPassword, setSignUpPassword] = useState("");
   const [signUpConPassword, setSignUpConPassword] = useState("");
 
-  const ipAddress = "10.40.48.115";
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   const handleClose = () => setShow(false);
 

@@ -22,7 +22,7 @@ export default function SignIn() {
 
   const [check, setCheck] = useState(false);
 
-  const ipAddress = "10.40.48.115";
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   const validateEmail = (email) => {
     return validator.isEmail(email);
@@ -40,6 +40,8 @@ export default function SignIn() {
     if (!validateEmail(logInEmail)) {
       return alert("Invalid email format");
     }
+
+    console.log(ipAddress);
 
     try {
       const response = await axios.post(

@@ -17,7 +17,7 @@ export default function Home() {
 
   const [tableName, setTableName] = useState("");
 
-  const ipAddress = "10.40.48.115";
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   const load = async (event) => {
     event.preventDefault();

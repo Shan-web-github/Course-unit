@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
   const { auth, setAuth } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const ipAddress = "10.40.48.115";
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   useEffect(() => {
     const storedToken = getSessionData("jwt_token");
@@ -40,7 +40,7 @@ const ProtectedRoute = ({ children }) => {
       }
     };
     checkToken();
-  }, [auth, setAuth, navigate]);
+  }, [auth, setAuth, ipAddress, navigate]);
 
   return children;
 };

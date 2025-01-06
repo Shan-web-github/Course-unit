@@ -14,7 +14,7 @@ export default function SheetUpload() {
   const [semReg, setSemReg] = useState(null);
   const [offerCourseExam, setOfferCourseExam] = useState(null);
 
-  const ipAddress = "10.40.48.115";
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   const navigate = useNavigate();
 

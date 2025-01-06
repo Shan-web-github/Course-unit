@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-const ipAddress = '10.40.48.115';
+// const ipAddress = '10.40.48.115';
 
 // const filesController = require('./controllers/files.controller');
 // const {fileUpload} = require('./config/multer.config');

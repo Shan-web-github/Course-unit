@@ -34,7 +34,7 @@ function Dropdownstyle({
 
   const [columns, setColumns] = useState(filteredColumns);
 
-  const ipAddress = "10.40.48.115";
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   useEffect(() => {
     const dynamicOptions = async () => {
@@ -89,6 +89,7 @@ function Dropdownstyle({
     courseList,
     level,
     semester,
+    ipAddress
   ]);
 
   // const dynamicOptions = async () => {

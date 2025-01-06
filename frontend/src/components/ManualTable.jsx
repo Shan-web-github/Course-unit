@@ -34,7 +34,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
 
-  const ipAddress = "10.40.48.115";
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   const rows = Array(4).fill(null);
 
