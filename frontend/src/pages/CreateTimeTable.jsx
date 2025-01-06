@@ -12,6 +12,7 @@ import Form from "react-bootstrap/Form";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Footer from "../components/Footer";
+import CloseButton from "react-bootstrap/CloseButton";
 
 export default function CreateTimeTable() {
   const [level, setLevel] = useState("");
@@ -50,6 +51,21 @@ export default function CreateTimeTable() {
     });
     debouncedSave(groupData, startDates, timeSlots);
   };
+
+  const handleCloseTable = (indexToRemove) => {
+    setTableState((prevState) => ({
+      ...prevState,
+      groupTableData: prevState.groupTableData.filter(
+        (_, index) => index !== indexToRemove
+      ),
+      startDateArray: prevState.startDateArray.filter(
+        (_, index) => index !== indexToRemove
+      ),
+      timeSlotArray: prevState.timeSlotArray.filter(
+        (_, index) => index !== indexToRemove
+      ),
+    }));
+  };  
 
   const selectLevel = (event) => {
     const value = event.target.value;
@@ -208,6 +224,14 @@ export default function CreateTimeTable() {
                     <span className="text-primary">EndExamination </span>
                   </h5>
                 )}
+                <div className="mb-1 d-flex justify-content-end p-2 bg-dark bg-gradient rounded-1 bg-opacity-50">
+                  <CloseButton
+                    variant="white"
+                    aria-label="Hide"
+                    className="align-items-right"
+                    onClick={() => handleCloseTable(index)} 
+                  />
+                </div>
                 <SampleTimeTable
                   key={index}
                   tableData={data}
