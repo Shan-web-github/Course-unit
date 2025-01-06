@@ -216,7 +216,7 @@ export default function CreateTimeTable() {
           <br />
           <div>
             {tableState.groupTableData.map((data, index) => (
-              <div key={index}>
+              <div key={index} className="mb-3">
                 {index === 0 && (
                   <h5 className="fw-bold d-flex justify-content-center align-items-center">
                     {" "}
@@ -224,7 +224,7 @@ export default function CreateTimeTable() {
                     <span className="text-primary">EndExamination </span>
                   </h5>
                 )}
-                <div className="mb-1 d-flex justify-content-end p-2 bg-dark bg-gradient rounded-1 bg-opacity-50">
+                <div className="d-flex justify-content-end p-2 bg-dark bg-gradient rounded-top bg-opacity-50">
                   <CloseButton
                     variant="white"
                     aria-label="Hide"
