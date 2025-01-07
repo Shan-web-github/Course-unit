@@ -177,7 +177,7 @@ function Dropdownstyle({
                   setSelectedOption(null);
                   selectedOptionRef.current = null;
                   setSearchTerm("");
-                  if (onChange) onChange("selectedOption", "NULL");
+                  if (onChange) onChange("selectedOption", "NUL");
                 }}
                 style={{ fontStyle: "italic", color: "red" }}
               >

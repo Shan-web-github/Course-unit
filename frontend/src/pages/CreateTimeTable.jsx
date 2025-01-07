@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useContext } from "react";
 import axios from "axios";
 import { debounce } from "lodash";
 
@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar";
 import ManualTable from "../components/ManualTable";
 import TableTag from "../components/TableTag";
 import SampleTimeTable from "../components/SampleTimeTable";
+import { TableContext } from "../utils/Tablecontext";
 
 //bootstrapt lib
 import Form from "react-bootstrap/Form";
@@ -15,6 +16,7 @@ import Footer from "../components/Footer";
 import CloseButton from "react-bootstrap/CloseButton";
 
 export default function CreateTimeTable() {
+  const{ setTableData} = useContext(TableContext);
   const [level, setLevel] = useState("");
   const [semester, setSemester] = useState("");
   const [isLevelSelected, setIsLevelSelected] = useState(false);

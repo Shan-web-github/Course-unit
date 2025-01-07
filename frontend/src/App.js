@@ -9,6 +9,7 @@ import ChooseTimeTable from "./pages/ChooseTimeTable";
 import CreateTimeTable from "./pages/CreateTimeTable";
 import { AuthProvider } from "./Authcontext";
 import ProtectedRoute from "./ProtectedRoute";
+import { TableProvider } from "./utils/Tablecontext";
 
 function App() {
   return (
@@ -36,7 +37,9 @@ function App() {
             path="/createTimetable"
             element={
               <ProtectedRoute>
-                <CreateTimeTable />
+                <TableProvider>
+                  <CreateTimeTable />
+                </TableProvider>
               </ProtectedRoute>
             }
           />

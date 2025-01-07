@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useCallback,
   useRef,
+  useContext,
 } from "react";
 import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
 import axios from "axios";
@@ -13,12 +14,14 @@ import {
   setSessionData,
   getSessionData,
 } from "../utils/storage/sessionStorageUtils";
+import { TableContext } from "../utils/Tablecontext";
 
 // import Table from "react-bootstrap/Table";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
 export default function ManualTable({ level, semester, buttonClick, onSave }) {
+  const{tableData, setTableData} = useContext(TableContext);
   const [dateAndTime, setDateAndTime] = useState(false);
 
   const [startDate, setStartDate] = useState("");
@@ -30,7 +33,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   //************************************ */
   const [coursesData, setCoursesData] = useState([]);
   //************************************ */
-  const [tableData, setTableData] = useState("");
+  // const [tableData, setTableData] = useState("");
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
 
@@ -162,11 +165,11 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     inputs.map((row) => ({
       morning: {
         ...row.morning,
-        selectedOption: row.morning?.selectedOption === "NULL" ? null : row.morning?.selectedOption,
+        selectedOption: row.morning?.selectedOption === "NUL" ? null : row.morning?.selectedOption,
       },
       evening: {
         ...row.evening,
-        selectedOption: row.evening?.selectedOption === "NULL" ? null : row.evening?.selectedOption,
+        selectedOption: row.evening?.selectedOption === "NUL" ? null : row.evening?.selectedOption,
       },
     }));
 
@@ -229,9 +232,8 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
 
   const saveAndFinish = (event) => {
     event.preventDefault();
-    console.log("Final Data: ", tableData);
     setSessionData(`${level}_level`, finalData);
-    console.log(finalData);
+    console.log("Final Data: ", finalData);
   };
 
   useEffect(() => {
