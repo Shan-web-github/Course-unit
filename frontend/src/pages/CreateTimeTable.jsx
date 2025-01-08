@@ -16,7 +16,7 @@ import Footer from "../components/Footer";
 import CloseButton from "react-bootstrap/CloseButton";
 
 export default function CreateTimeTable() {
-  const{ setTableData} = useContext(TableContext);
+  const{ setTableData, startDateArray, setStartDateArray, timeSlotArray, setTimeSlotArray, setFinalData} = useContext(TableContext);
   const [level, setLevel] = useState("");
   const [semester, setSemester] = useState("");
   const [isLevelSelected, setIsLevelSelected] = useState(false);
@@ -55,6 +55,23 @@ export default function CreateTimeTable() {
   };
 
   const handleCloseTable = (indexToRemove) => {
+    setStartDateArray(startDateArray.filter(startDate => startDate !== tableState.startDateArray[indexToRemove]));
+    setTimeSlotArray(timeSlotArray.filter(timeSlot => timeSlot !== tableState.timeSlotArray[indexToRemove]));
+    setTableData((prevState) => {
+      const targetValue = tableState.groupTableData[indexToRemove];
+      console.log(targetValue);
+      // Filter out the matching value from tableData
+      return Object.fromEntries(
+        Object.entries(prevState).filter(([_, value]) => value !== targetValue)
+      );
+    });
+    // setFinalData((prev) =>
+    //   prev.filter(
+    //     (entry) =>
+    //       entry.metadata.startDate !== tableState.startDateArray[indexToRemove] ||
+    //       entry.metadata.timeSlot !== tableState.timeSlotArray[indexToRemove]
+    //   )
+    // );
     setTableState((prevState) => ({
       ...prevState,
       groupTableData: prevState.groupTableData.filter(

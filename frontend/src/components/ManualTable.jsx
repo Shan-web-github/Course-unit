@@ -21,15 +21,15 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
 export default function ManualTable({ level, semester, buttonClick, onSave }) {
-  const{tableData, setTableData} = useContext(TableContext);
+  const{tableData, setTableData, startDateArray, setStartDateArray, timeSlotArray, setTimeSlotArray, finalData, setFinalData} = useContext(TableContext);
   const [dateAndTime, setDateAndTime] = useState(false);
 
   const [startDate, setStartDate] = useState("");
   const startDateRef = useRef("");
-  const [startDateArray, setStartDateArray] = useState([]);
+  // const [startDateArray, setStartDateArray] = useState([]);
   const [timeSlot, setTimeSlot] = useState("");
   const timeSlotRef = useRef("");
-  const [timeSlotArray, setTimeSlotArray] = useState([]);
+  // const [timeSlotArray, setTimeSlotArray] = useState([]);
   //************************************ */
   const [coursesData, setCoursesData] = useState([]);
   //************************************ */
@@ -45,7 +45,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     rows.map(() => ({ morning: {}, evening: {} }))
   );
 
-  const [finalData, setFinalData] = useState([]);
+  // const [finalData, setFinalData] = useState([]);
 
   const selectStartDate = async (event) => {
     const newStartDate = event.target.value;
@@ -87,7 +87,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     const tT3000 = getSessionData("3000_level");
 
     return [tT1000, tT2000, tT3000].filter(
-      (entry) => entry !== null && entry !== undefined
+      (entry) => entry !== null && entry !== undefined && !(Array.isArray(entry) && entry.length === 0)
     );
   }, []);
 
@@ -200,14 +200,18 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       //************************************************ */
       const newStartDateArray = [...startDateArray, startDate];
       const newTimeSlotArray = [...timeSlotArray, timeSlot];
-      const newTableData = [...tableData, ...updatedRowInputs];
+      // const newTableData = [...tableData, ...updatedRowInputs];
+      const newTableData = [
+        ...(Array.isArray(tableData) ? tableData : []),
+        ...updatedRowInputs,
+      ];
       const newGroupTableData = groupData(newTableData, 4);
       //*************************************************/
 
       //these function must be run sequentially
-      const newData = [...tableData, ...updatedRowInputs];
-      setTableData(newData);
-      setGroupTabledata(groupData(newData, 4));
+      // const newData = [...tableData, ...updatedRowInputs];
+      setTableData(newTableData);
+      setGroupTabledata(groupData(newTableData, 4));
       setFinalData((prev) => {
         const updated = {
           metadata: { startDate: startDate, timeSlot: timeSlot },
@@ -232,8 +236,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
 
   const saveAndFinish = (event) => {
     event.preventDefault();
-    setSessionData(`${level}_level`, finalData);
-    console.log("Final Data: ", finalData);
+    if (Array.isArray(finalData) && finalData.length > 0) {
+      setSessionData(`${level}_level`, finalData);
+      console.log("Final Data: ", finalData);
+    }
   };
 
   useEffect(() => {
