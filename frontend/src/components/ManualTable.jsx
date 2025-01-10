@@ -21,19 +21,17 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 
 export default function ManualTable({ level, semester, buttonClick, onSave }) {
-  const{tableData, setTableData, startDateArray, setStartDateArray, timeSlotArray, setTimeSlotArray, finalData, setFinalData} = useContext(TableContext);
+  const { tableData, startDateArray, timeSlotArray, finalData, setFinalData } =
+    useContext(TableContext);
   const [dateAndTime, setDateAndTime] = useState(false);
 
   const [startDate, setStartDate] = useState("");
   const startDateRef = useRef("");
-  // const [startDateArray, setStartDateArray] = useState([]);
   const [timeSlot, setTimeSlot] = useState("");
   const timeSlotRef = useRef("");
-  // const [timeSlotArray, setTimeSlotArray] = useState([]);
   //************************************ */
   const [coursesData, setCoursesData] = useState([]);
   //************************************ */
-  // const [tableData, setTableData] = useState("");
   const [groupTableData, setGroupTabledata] = useState([]);
   const [resetKey, setResetKey] = useState(0);
 
@@ -45,28 +43,32 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     rows.map(() => ({ morning: {}, evening: {} }))
   );
 
-  // const [finalData, setFinalData] = useState([]);
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const coursesAttribute = `${level}-${semester}`;
+        const response = await axios.get(
+          `http://${ipAddress}:5000/studentdata/courses/${coursesAttribute}`
+        );
+        setCoursesData(response.data.data);
+      } catch (error) {
+        console.error("Error fetching courses data:", error);
+      }
+    };
 
-  const selectStartDate = async (event) => {
+    if (level && semester && ipAddress) {
+      fetchCourses();
+    }
+  }, [level, semester, ipAddress]);
+
+  const selectStartDate = (event) => {
     const newStartDate = event.target.value;
     setStartDate(newStartDate);
     setDateAndTime(newStartDate && timeSlot);
     startDateRef.current = newStartDate;
     // console.log(startDate);
-    try {
-      const coursesAttribute = `${level}-${semester}`;
-      const courses = await axios.get(
-        `http://${ipAddress}:5000/studentdata/courses/${coursesAttribute}`
-      );
-      alert("Successfully continued");
-
-      setCoursesData(courses.data.data);
-      console.log("Courses data :", courses.data.data);
-      setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
-      setResetKey((prevKey) => prevKey + 1);
-    } catch (error) {
-      console.error("Error fetching courses data:", error);
-    }
+    setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
+    setResetKey((prevKey) => prevKey + 1);
   };
 
   const selectTimeSlot = (event) => {
@@ -87,7 +89,10 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     const tT3000 = getSessionData("3000_level");
 
     return [tT1000, tT2000, tT3000].filter(
-      (entry) => entry !== null && entry !== undefined && !(Array.isArray(entry) && entry.length === 0)
+      (entry) =>
+        entry !== null &&
+        entry !== undefined &&
+        !(Array.isArray(entry) && entry.length === 0)
     );
   }, []);
 
@@ -155,7 +160,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
         item.morning?.selectedOption || "N/A",
         item.evening?.selectedOption || "N/A",
       ])
-      .filter((item) => item !== "N/A" && item !=="NULL");
+      .filter((item) => item !== "N/A" && item !== "NULL");
 
     // Combine and return as a single string
     return [...rowInputOptions, ...coCodes].join(",");
@@ -165,11 +170,17 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     inputs.map((row) => ({
       morning: {
         ...row.morning,
-        selectedOption: row.morning?.selectedOption === "NUL" ? null : row.morning?.selectedOption,
+        selectedOption:
+          row.morning?.selectedOption === "NUL"
+            ? null
+            : row.morning?.selectedOption,
       },
       evening: {
         ...row.evening,
-        selectedOption: row.evening?.selectedOption === "NUL" ? null : row.evening?.selectedOption,
+        selectedOption:
+          row.evening?.selectedOption === "NUL"
+            ? null
+            : row.evening?.selectedOption,
       },
     }));
 
@@ -193,14 +204,11 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     if (concatenatedOptions.length === 0) {
       alert("Select subjects");
     } else {
-      setStartDateArray((pre) => [...pre, startDate]);
-      setTimeSlotArray((pre) => [...pre, timeSlot]);
       const updatedRowInputs = cleanRowInputs(rowInputs);
 
       //************************************************ */
       const newStartDateArray = [...startDateArray, startDate];
       const newTimeSlotArray = [...timeSlotArray, timeSlot];
-      // const newTableData = [...tableData, ...updatedRowInputs];
       const newTableData = [
         ...(Array.isArray(tableData) ? tableData : []),
         ...updatedRowInputs,
@@ -209,8 +217,6 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
       //*************************************************/
 
       //these function must be run sequentially
-      // const newData = [...tableData, ...updatedRowInputs];
-      setTableData(newTableData);
       setGroupTabledata(groupData(newTableData, 4));
       setFinalData((prev) => {
         const updated = {
@@ -220,8 +226,6 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
         return [...prev, updated];
       });
       console.log(typeof groupTableData);
-      console.log(typeof tableData);
-      console.log(typeof finalData);
       setRowInputs(rows.map(() => ({ morning: {}, evening: {} })));
 
       if (typeof onSave === "function") {
@@ -243,7 +247,6 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
   };
 
   useEffect(() => {
-    // setColumns([]);
     setResetKey(0);
   }, [buttonClick]);
 
@@ -264,7 +267,7 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
             <option value="">Select...</option>
             <option value="Morning">Morning</option>
             <option value="Evening">Evening</option>
-            <option value="Both">Both</option>
+            {/* <option value="Both">Both</option> */}
           </Form.Select>
         </Form.Group>
       </div>
