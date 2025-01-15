@@ -10,6 +10,7 @@ import CreateTimeTable from "./pages/CreateTimeTable";
 import { AuthProvider } from "./Authcontext";
 import ProtectedRoute from "./ProtectedRoute";
 import { TableProvider } from "./utils/Tablecontext";
+import ClashCheck from "./pages/ClashCheck";
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ChooseTimeTable />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clashcheck"
+            element={
+              <ProtectedRoute>
+                <ClashCheck />
               </ProtectedRoute>
             }
           />

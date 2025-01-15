@@ -6,13 +6,13 @@ import Navbar from "../components/Navbar";
 import ManualTable from "../components/ManualTable";
 import TableTag from "../components/TableTag";
 import SampleTimeTable from "../components/SampleTimeTable";
+import Footer from "../components/Footer";
 import { TableContext } from "../utils/Tablecontext";
 
 //bootstrapt lib
 import Form from "react-bootstrap/Form";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Footer from "../components/Footer";
 import CloseButton from "react-bootstrap/CloseButton";
 
 export default function CreateTimeTable() {

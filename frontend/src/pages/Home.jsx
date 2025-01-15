@@ -1,14 +1,14 @@
 import { React, useState } from "react";
-import Navbar from "../components/Navbar";
 import axios from "axios";
 
 //components
+import Navbar from "../components/Navbar";
 import TableTag from "../components/TableTag";
 import CalendarIcon from "../assets/Icons/table_icon.png";
+import Footer from "../components/Footer";
 
 //bootstrapt lib
 import { Container, Card, Form, Button } from "react-bootstrap";
-import Footer from "../components/Footer";
 
 export default function Home() {
   const [columns, setColumns] = useState([]);

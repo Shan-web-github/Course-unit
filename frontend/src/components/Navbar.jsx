@@ -74,15 +74,29 @@ export default function NavigationBar(props) {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
-            <Nav className="me-auto gap-3 ps-md-5 ps-sm-0 ps-xs-0" defaultActiveKey={props.path}>
+            <Nav
+              className="me-auto gap-3 ps-md-5 ps-sm-0 ps-xs-0"
+              defaultActiveKey={props.path}
+            >
               <Nav.Item>
-                <Nav.Link href="/home" className="me-3 fw-semibold">Home</Nav.Link>
+                <Nav.Link href="/home" className="me-3 fw-semibold">
+                  Home
+                </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href="/choosetimetable" className="me-3 fw-semibold">Choose TimeTable</Nav.Link>
+                <Nav.Link href="/choosetimetable" className="me-3 fw-semibold">
+                  Choose TimeTable
+                </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href="/createtimetable" className="fw-semibold">Create TimeTable</Nav.Link>
+                <Nav.Link href="/createtimetable" className="me-3 fw-semibold">
+                  Create TimeTable
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="/clashcheck" className="fw-semibold">
+                  Clash Check
+                </Nav.Link>
               </Nav.Item>
             </Nav>
             <Nav>

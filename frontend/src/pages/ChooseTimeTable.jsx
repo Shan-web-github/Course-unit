@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import ChooseTables from "../components/ChooseTables";
 
 import { Button, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Footer from "../components/Footer";
-import ChooseTables from "../components/ChooseTables";
 
 export default function ChooseTimeTable() {
   const [isSplit, setIsSplit] = useState(false);
