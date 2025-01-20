@@ -9,7 +9,7 @@ import React, {
 import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
 import axios from "axios";
 
-import Dropdownstyle from "../components/Dropdownstyle";
+import Dropdownstyle from "./Dropdownstyle1";
 import {
   setSessionData,
   getSessionData,

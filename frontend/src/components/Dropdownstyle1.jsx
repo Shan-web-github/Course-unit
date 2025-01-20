@@ -3,7 +3,7 @@ import axios from "axios";
 
 import { Dropdown, Form } from "react-bootstrap";
 
-function Dropdownstyle({
+export default function Dropdownstyle1({
   courseList,
   concatenatedOptions,
   selectedSubjects,
@@ -219,6 +219,4 @@ function Dropdownstyle({
       </div>
     </div>
   );
-}
-
-export default Dropdownstyle;
+};

@@ -200,6 +200,22 @@ exports.getCourses = async (req, res) => {
   }
 };
 
+exports.getAllCourses = async (req, res) => {
+  try {
+    const coursesQuery = `SELECT DISTINCT CO_CODE FROM courses`;
+    const [result, fields] = await DBpool.query(coursesQuery);
+    const columnNames = fields.map((field) => field.name);
+    // console.log(result);
+    return res.json({
+      columns: columnNames,
+      data: result,
+    });
+  } catch (error) {
+    res.status(501).send(error);
+    return;
+  }
+};
+
 exports.getNotClashes1 = async (req, res) => {
   const coursesList = req.params.coursesList;
   const selectedSubjects = coursesList.split(",");
@@ -274,6 +290,18 @@ exports.getNotClashes2 = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+exports.checkClashes= async(req,res) => {
+  const selectedCourses = req.params.coursesList;
+
+  if (selectedCourses) {
+    try {
+      const coursesQuery = `SELECT num_students FROM clashestable `;
+    } catch (error) {
+      
+    }
+  }
+}
 
 //*************************************************************************************************************** */
 //choose timetable 

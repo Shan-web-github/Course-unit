@@ -1,5 +1,5 @@
 {
-  "proxy": "http://10.40.48.117:5000",
+  "proxy": "http://localhost:5000",
   "name": "forntend",
   "version": "0.1.0",
   "private": true,
