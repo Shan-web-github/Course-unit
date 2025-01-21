@@ -293,12 +293,26 @@ exports.getNotClashes2 = async (req, res) => {
 
 exports.checkClashes= async(req,res) => {
   const selectedCourses = req.params.coursesList;
+  const selectedCourseArray = selectedCourses.split(",");
+  const placeholders = selectedCourseArray.map(() => "?").join(", ");
 
   if (selectedCourses) {
     try {
-      const coursesQuery = `SELECT num_students FROM clashestable `;
+      const coursesQuery = `SELECT num_students FROM clashestable WHERE (course1 IN (${placeholders}) AND course2 IN (${placeholders})) OR (course1 IN (${placeholders}) AND course2 IN (${placeholders}))`;
+      const queryParams = [
+        ...selectedCourseArray,
+        ...selectedCourseArray,
+        ...selectedCourseArray,
+        ...selectedCourseArray,
+      ];
+
+      const [result] = await DBpool.query(coursesQuery, queryParams);
+      return res.json({
+        data: result,
+      });
     } catch (error) {
-      
+      console.error("Error in getClashes:", error);
+      res.status(500).send("Internal Server Error");
     }
   }
 }
