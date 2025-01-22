@@ -4,18 +4,16 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Dropdownstyle from "../components/Dropdownstyle2";
+import Clashlogo from "../assets/Icons/clashlogo.png";
 
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import { Container, Card, Form, Button, Row, Col } from "react-bootstrap";
 
 export default function ClashCheck() {
   const [allCourses, setAllCourses] = useState([]);
   const [rowInputs, setRowInputs] = useState("");
   const [checkResults, setCheckResults] = useState([]);
   const [checkResult, setCheckResult] = useState(0);
+  const [resetKey, setResetKey] = useState(0);
 
   const ipAddress = process.env.REACT_APP_IPADDRESS;
 
@@ -42,6 +40,11 @@ export default function ClashCheck() {
       fetchCourses();
     }
   }, [ipAddress]);
+
+  useEffect(() => {
+    setCheckResult(0);
+    setResetKey(0);
+  }, []);
 
   const handleRowChange = (rowIndex, value) => {
     setRowInputs((prev) => {
@@ -70,74 +73,106 @@ export default function ClashCheck() {
     }
   };
 
+  const resetClashes = () => {
+    setCheckResults([]);
+    setCheckResult(0);
+    setResetKey((prevKey) => prevKey + 1);
+  };
+
   return (
-    <div>
+    <div className="main">
       <div>
         <Navbar path="/clashcheck" />
       </div>
-      <div className="h-100vh">
-        <Container>
-          <Row>
-            <Col>
-              <Form>
-                <h5>
-                  Select courses , you need to check conflict
+      <div className="main-pane">
+        <Container
+          fluid
+          className="d-flex justify-content-center align-items-center min-vh-100 bg-light"
+        >
+          <Card className="p-4 shadow-sm" style={{ width: "50rem" }}>
+            <Row>
+              <h2 className="fw-bold d-flex justify-content-center align-items-center mb-4">
+                <img src={Clashlogo} alt="Logo" className="me-2" width="40" />
+                Check<span className="text-primary">Conflict</span>
+              </h2>
+              <Col className="border-end border-1 border-secondary">
+                <Form>
+                  <Row className="mb-2 align-items-center">
+                    <Col md="auto">
+                      <Dropdownstyle
+                        key={resetKey}
+                        courseList={allCourses}
+                        selectedCourses={rowInputs}
+                        onChange={(value) => handleRowChange(0, value)}
+                      />
+                    </Col>
+                    <Col md="auto">
+                      <Dropdownstyle
+                        key={resetKey}
+                        courseList={allCourses}
+                        selectedCourses={rowInputs}
+                        onChange={(value) => handleRowChange(1, value)}
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mb-2 align-items-center">
+                    <Col md="auto">
+                      <Dropdownstyle
+                        key={resetKey}
+                        courseList={allCourses}
+                        selectedCourses={rowInputs}
+                        onChange={(value) => handleRowChange(2, value)}
+                      />
+                    </Col>
+                    <Col md="auto">
+                      <Dropdownstyle
+                        key={resetKey}
+                        courseList={allCourses}
+                        selectedCourses={rowInputs}
+                        onChange={(value) => handleRowChange(3, value)}
+                      />
+                    </Col>
+                  </Row>
+                  <Row className="mb-2 align-items-center">
+                    <Col md="auto">
+                      <Dropdownstyle
+                        key={resetKey}
+                        courseList={allCourses}
+                        selectedCourses={rowInputs}
+                        onChange={(value) => handleRowChange(4, value)}
+                      />
+                    </Col>
+                  </Row>
+                </Form>
+              </Col>
+              <Col className="d-flex justify-content-center align-items-center">
+                <h5 className="fw-bold">
+                  {checkResult === 1 && (
+                    <span className="text-danger">CONFLICTS ! </span>
+                  )}
+                  {checkResult === 2 && (
+                    <span className="text-success">NO CONFLICTS</span>
+                  )}
                 </h5>
-                <Row className="mb-2 align-items-center">
-                  <Col md="auto">
-                    <Dropdownstyle
-                      courseList={allCourses}
-                      selectedCourses={rowInputs}
-                      onChange={(value) => handleRowChange(0, value)}
-                    />
-                  </Col>
-                  <Col md="auto">
-                    <Dropdownstyle
-                      courseList={allCourses}
-                      selectedCourses={rowInputs}
-                      onChange={(value) => handleRowChange(1, value)}
-                    />
-                  </Col>
-                </Row>
-                <Row className="mb-2 align-items-center">
-                  <Col md="auto">
-                    <Dropdownstyle
-                      courseList={allCourses}
-                      selectedCourses={rowInputs}
-                      onChange={(value) => handleRowChange(2, value)}
-                    />
-                  </Col>
-                  <Col md="auto">
-                    <Dropdownstyle
-                      courseList={allCourses}
-                      selectedCourses={rowInputs}
-                      onChange={(value) => handleRowChange(3, value)}
-                    />
-                  </Col>
-                </Row>
-                <Row className="mb-2 align-items-center">
-                  <Col md="auto">
-                    <Dropdownstyle
-                      courseList={allCourses}
-                      selectedCourses={rowInputs}
-                      onChange={(value) => handleRowChange(4, value)}
-                    />
-                  </Col>
-                </Row>
-                <Row className="align-items-center">
-                  <Col md="auto">
-                    <Button onClick={checkClashes}>Check</Button>
-                  </Col>
-                </Row>
-              </Form>
-            </Col>
-            <Col>
-              <h5>
-                {checkResult === 1 && <span>! CONFLICTS</span>}
-                {checkResult === 2 && <span>NO CONFLICTS</span>}
-              </h5>
-            </Col>
-          </Row>
+              </Col>
+            </Row>
+            <Row className="d-flex justify-content-between mt-4">
+              <Col md="auto">
+                <Button variant="dark" onClick={resetClashes} className="mt-2">
+                  Reset
+                </Button>
+              </Col>
+              <Col md="auto">
+                <Button
+                  variant="primary"
+                  onClick={checkClashes}
+                  className="mt-2"
+                >
+                  Check
+                </Button>
+              </Col>
+            </Row>
+          </Card>
         </Container>
       </div>
       <div>

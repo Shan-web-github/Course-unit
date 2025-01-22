@@ -25,7 +25,7 @@ export default function Dropdownstyle2({courseList, selectedCourses, onChange}) 
   return (
       <div>
         <Dropdown>
-          <Dropdown.Toggle variant="outline-dark" id="dropdown-basic">
+          <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic">
           {selectedCourse || "Select a Courses"}
           </Dropdown.Toggle>
 
