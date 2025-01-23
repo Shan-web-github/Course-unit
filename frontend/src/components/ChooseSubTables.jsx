@@ -1,20 +1,25 @@
-import React, { createContext, useState } from "react";
-
-import ChooseSubTables from "./ChooseSubTables";
+import React, { useContext } from "react";
 
 import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
-import { Button } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 
-export const timeTableCom = createContext();
+import { timeTableCom } from "./ChooseTables";
 
-export default function ChooseTables({ timetable, timetableIndex }) {
-  const [showComponent, setShowComponent] = useState(false);
+export default function ChooseSubTables({ timetable }) {
+  const { showComponent, setShowComponent } = useContext(timeTableCom);
+
+  const handleClose = () => {
+    setShowComponent(false);
+  };
+
   return (
-    <div>
-      <div>
+    <Modal show={showComponent} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title className="fw-bold">Time Table</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
         <MDBTable
-          key={timetableIndex}
-          className="mb-2 table table-bordered rounded overflow-hidden"
+          className="mb-4 table table-bordered rounded overflow-hidden"
           bordered
           hover
           responsive
@@ -42,17 +47,7 @@ export default function ChooseTables({ timetable, timetableIndex }) {
             ))}
           </MDBTableBody>
         </MDBTable>
-      </div>
-      <div className="d-flex justify-content-end">
-        <Button onClick={() => setShowComponent(true)}>Continue</Button>
-      </div>
-      <div>
-        <timeTableCom.Provider
-          value={{ showComponent, setShowComponent }}
-        >
-          <ChooseSubTables timetable={timetable}/>
-        </timeTableCom.Provider>
-      </div>
-    </div>
+      </Modal.Body>
+    </Modal>
   );
 }

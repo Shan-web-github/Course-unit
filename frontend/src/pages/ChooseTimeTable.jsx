@@ -72,25 +72,27 @@ export default function ChooseTimeTable() {
               <>
                 <Col md={6} className="left-pane">
                   {leftTimetables.map((timetable, timetableIndex) => (
-                    <div key={timetableIndex}>
+                    <div key={timetableIndex} className="mb-4">  
                       <h5 className="fw-semibold">Time Table {timetableIndex+1}</h5>
                       <br />
                       <ChooseTables
                         timetable={timetable}
                         timetableIndex={timetableIndex}
                       />
+                     {timetableIndex < leftTimetables.length - 1 && <hr />}
                     </div>
                   ))}
                 </Col>
                 <Col md={6} className="right-pane">
                   {rightTimetables.map((timetable, timetableIndex) => (
-                    <div key={timetableIndex}>
+                    <div key={timetableIndex} className="mb-4">
                       <h5 className="fw-semibold">Time Table {timetableIndex+3}</h5>
                       <br />
                       <ChooseTables
                         timetable={timetable}
                         timetableIndex={timetableIndex}
                       />
+                      {timetableIndex < leftTimetables.length - 1 && <hr />}
                     </div>
                   ))}
                 </Col>
