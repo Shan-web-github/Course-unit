@@ -1,5 +1,7 @@
 import React, { createContext, useState } from "react";
 
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import ChooseSubTables from "./ChooseSubTables";
 
 import { MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
@@ -47,10 +49,10 @@ export default function ChooseTables({ timetable, timetableIndex }) {
         <Button onClick={() => setShowComponent(true)}>Continue</Button>
       </div>
       <div>
-        <timeTableCom.Provider
-          value={{ showComponent, setShowComponent }}
-        >
-          <ChooseSubTables timetable={timetable}/>
+        <timeTableCom.Provider value={{ showComponent, setShowComponent }}>
+          <DndProvider backend={HTML5Backend}>
+            <ChooseSubTables timetable={timetable} />
+          </DndProvider>
         </timeTableCom.Provider>
       </div>
     </div>
