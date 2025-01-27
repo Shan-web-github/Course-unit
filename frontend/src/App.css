@@ -66,3 +66,21 @@
   gap: 20px;
 }
 
+/*Model*/
+.custom-modal .modal-dialog {
+  max-width: 90%;
+  width: auto; 
+}
+
+.custom-modal .modal-body {
+  max-height: 80vh; 
+  overflow-y: auto; 
+}
+
+.table-responsive table {
+  width: 100%;  /* Ensures the table expands fully inside its container */
+  table-layout: fixed; 
+  word-wrap: break-word;
+}
+
+
