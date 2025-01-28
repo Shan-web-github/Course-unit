@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import TableRow from "../components/TableRow";
 
 export default function CustomizeTable({ rows }) {
   const [data, setData] = useState(rows);
+  const [subjectsCollection, setSubjectsCollection] = useState({});
 
   const moveRow = (dragIndex, hoverIndex) => {
     setData((prevData) => {
@@ -13,12 +14,20 @@ export default function CustomizeTable({ rows }) {
       return newData; 
     });
   };
-  
+
+  const collectSubjects = useCallback((date, subjects) => {
+    setSubjectsCollection((prev) => ({
+      ...prev,
+      [date]: subjects,
+    }));
+  }, []);
+
+  console.log("Subjects Collection:", subjectsCollection);
 
   return (
     <div>
       {data.map((row, index) => (
-        <TableRow key={row.id} index={index} {...row} moveRow={moveRow} />
+        <TableRow key={row.id} index={index} {...row} moveRow={moveRow} collectSubjects={collectSubjects} />
       ))}
     </div>
   );
