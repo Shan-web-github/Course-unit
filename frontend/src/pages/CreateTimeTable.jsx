@@ -16,7 +16,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import CloseButton from "react-bootstrap/CloseButton";
 
 export default function CreateTimeTable() {
-  const{ setFinalData} = useContext(TableContext);
+  const { setFinalData } = useContext(TableContext);
   const [level, setLevel] = useState("");
   const [semester, setSemester] = useState("");
   const [isLevelSelected, setIsLevelSelected] = useState(false);
@@ -58,7 +58,8 @@ export default function CreateTimeTable() {
     setFinalData((prev) =>
       prev.filter(
         (entry) =>
-          entry.metadata.startDate !== tableState.startDateArray[indexToRemove] ||
+          entry.metadata.startDate !==
+            tableState.startDateArray[indexToRemove] ||
           entry.metadata.timeSlot !== tableState.timeSlotArray[indexToRemove]
       )
     );
@@ -74,7 +75,7 @@ export default function CreateTimeTable() {
         (_, index) => index !== indexToRemove
       ),
     }));
-  };  
+  };
 
   const selectLevel = (event) => {
     const value = event.target.value;
@@ -239,7 +240,7 @@ export default function CreateTimeTable() {
                     variant="white"
                     aria-label="Hide"
                     className="align-items-right"
-                    onClick={() => handleCloseTable(index)} 
+                    onClick={() => handleCloseTable(index)}
                   />
                 </div>
                 <SampleTimeTable
@@ -266,7 +267,9 @@ export default function CreateTimeTable() {
       className="main"
       style={{ minHeight: buttonClick && !isSplit && "155vh" }}
     >
-      <Navbar path="/createtimetable" />
+      <div>
+        <Navbar path="/createtimetable" />
+      </div>
       <div className="main-pane" style={{ minHeight: isSplit && "105vh" }}>
         <Container fluid className="mt-4">
           <Button
@@ -294,7 +297,9 @@ export default function CreateTimeTable() {
           </Row>
         </Container>
       </div>
-      <Footer />
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }

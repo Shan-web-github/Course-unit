@@ -39,13 +39,19 @@ export default function Home() {
 
   return (
     <div className="main">
-      <Navbar path="/home" />
+      <div>
+        <Navbar path="/home" />
+      </div>
+
       <div className="main-pane">
         <Container
           fluid
           className="d-flex justify-content-center align-items-center min-vh-100 bg-light"
         >
-          <Card className="p-4 shadow-sm" style={{ width:  viewTable ? "100%" : "24rem" }}>
+          <Card
+            className="p-4 shadow-sm"
+            style={{ width: viewTable ? "100%" : "24rem" }}
+          >
             <div className="text-center mb-4">
               <h2 className="fw-bold d-flex justify-content-center align-items-center">
                 <img
@@ -85,7 +91,9 @@ export default function Home() {
           </Card>
         </Container>
       </div>
-      <Footer/>
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }

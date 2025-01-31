@@ -4,6 +4,7 @@ import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ChooseTables from "../components/ChooseTables";
+import BGimage1 from "../assets/Images/ChooseTable2.jpg";
 
 import { Button, Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -33,9 +34,10 @@ export default function ChooseTimeTable() {
 
   const content = (
     <div>
-      <h1>Main Content</h1>
-      <p className="text-justify">
-        The conflict resolution method implemented for the "Choose Timetable"
+      <h1>Method Description</h1>
+      <p style={{ textAlign: "justify" }}>
+        The conflict resolution method implemented for the{" "}
+        <b>"Choose Timetable" </b>
         page organizes subjects into non-conflicting sets to ensure efficient
         scheduling. It takes an input array of subjects and their respective
         conflicts and outputs groups of subjects that can be scheduled together
@@ -47,6 +49,9 @@ export default function ChooseTimeTable() {
         creation and enhancing user clarity by clearly displaying subject groups
         that can coexist without overlaps.
       </p>
+      <div className="text-center">
+        <img src={BGimage1} alt="bgimage1" className="img-fluid" />
+      </div>
     </div>
   );
 
@@ -56,7 +61,10 @@ export default function ChooseTimeTable() {
 
   return (
     <div className="main">
-      <Navbar path="/choosetimetable" />
+      <div>
+        <Navbar path="/choosetimetable" />
+      </div>
+
       <div className="main-pane" style={{ minHeight: isSplit && "105vh" }}>
         <Container fluid className="mt-4">
           <Button
@@ -72,21 +80,25 @@ export default function ChooseTimeTable() {
               <>
                 <Col md={6} className="left-pane">
                   {leftTimetables.map((timetable, timetableIndex) => (
-                    <div key={timetableIndex} className="mb-4">  
-                      <h5 className="fw-semibold">Time Table {timetableIndex+1}</h5>
+                    <div key={timetableIndex} className="mb-4">
+                      <h5 className="fw-semibold">
+                        Time Table {timetableIndex + 1}
+                      </h5>
                       <br />
                       <ChooseTables
                         timetable={timetable}
                         timetableIndex={timetableIndex}
                       />
-                     {timetableIndex < leftTimetables.length - 1 && <hr />}
+                      {timetableIndex < leftTimetables.length - 1 && <hr />}
                     </div>
                   ))}
                 </Col>
                 <Col md={6} className="right-pane">
                   {rightTimetables.map((timetable, timetableIndex) => (
                     <div key={timetableIndex} className="mb-4">
-                      <h5 className="fw-semibold">Time Table {timetableIndex+3}</h5>
+                      <h5 className="fw-semibold">
+                        Time Table {timetableIndex + 3}
+                      </h5>
                       <br />
                       <ChooseTables
                         timetable={timetable}
@@ -103,7 +115,9 @@ export default function ChooseTimeTable() {
           </Row>
         </Container>
       </div>
-      <Footer />
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 }
