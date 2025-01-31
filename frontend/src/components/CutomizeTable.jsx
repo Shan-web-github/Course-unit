@@ -25,6 +25,10 @@ export default function CustomizeTable({ rows }) {
 
   console.log("Subjects Collection:", subjectsCollection);
 
+  const fixTimeTable = () =>{
+    
+  }
+
   return (
     <div>
       <div>
@@ -39,7 +43,7 @@ export default function CustomizeTable({ rows }) {
         ))}
       </div>
       <div className="d-flex justify-content-end me-2">
-        <Button variant="secondary">Save</Button>
+        <Button variant="secondary" onClick={fixTimeTable}>Save</Button>
       </div>
     </div>
   );
