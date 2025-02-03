@@ -710,7 +710,7 @@ exports.setupExam = async (req, res) => {
     const output_4 = await processInputArray(output4, conflictArray);
 
 
-    const output = [output_1, output_2, output_3, output_4];
+    const output = [output1, output2, output3, output4];
 
     // Step 3: Map colors to time slots
     console.log(output_1);
