@@ -12,6 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 export default function ChooseTimeTable() {
   const [isSplit, setIsSplit] = useState(false);
   const [timetables, setTimetables] = useState([]);
+  const [combinedTimetable, setCombinedTimetable] = useState([]);
 
   const ipAddress = process.env.REACT_APP_IPADDRESS;
 
@@ -24,6 +25,7 @@ export default function ChooseTimeTable() {
       if (response.data.success) {
         console.log(response.data.output);
         setTimetables(response.data.output);
+        setCombinedTimetable(response.data.combinedOutput);
       } else {
         console.error("Failed to fetch timetable:", response.data.error);
       }
@@ -88,6 +90,7 @@ export default function ChooseTimeTable() {
                       <ChooseTables
                         timetable={timetable}
                         timetableIndex={timetableIndex}
+                        originalTable={combinedTimetable[timetableIndex]}
                       />
                       {timetableIndex < leftTimetables.length - 1 && <hr />}
                     </div>
@@ -103,6 +106,7 @@ export default function ChooseTimeTable() {
                       <ChooseTables
                         timetable={timetable}
                         timetableIndex={timetableIndex}
+                        originalTable={combinedTimetable[timetableIndex+2]}
                       />
                       {timetableIndex < leftTimetables.length - 1 && <hr />}
                     </div>

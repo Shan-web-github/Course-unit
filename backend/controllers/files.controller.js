@@ -687,6 +687,23 @@ const processInputArray = async (inputArray, conflictArray) => {
   return inputArray;
 };
 
+// Function to classify subjects
+const filterSubjects = (subjects) => {
+  const level1000_3000 = [];
+  const level2000 = [];
+
+  subjects.forEach(row => {
+    const row1000_3000 = row.filter(sub => /^(?:1|3)\d{3}/.test(sub.slice(3, 7)));
+    const row2000 = row.filter(sub => /^2\d{3}/.test(sub.slice(3, 7)));
+
+    if (row1000_3000.length > 0) level1000_3000.push(row1000_3000);
+    if (row2000.length > 0) level2000.push(row2000);
+  });
+
+  return { level1000_3000, level2000 };
+};
+
+
 //**************************************************************************** */
 exports.setupExam = async (req, res) => {
   try {
@@ -698,22 +715,43 @@ exports.setupExam = async (req, res) => {
 
     // Step 2: Apply graph coloring
     const output1 = await arrangeNoConflictSets1(conflictArray);
-    const output_1 = await processInputArray(output1, conflictArray);
+    const output1Sub = filterSubjects(output1);
+    const output1_1_3 = await processInputArray(output1Sub.level1000_3000, conflictArray);
+    const output1_2 = await processInputArray(output1Sub.level2000, conflictArray);
+    const combinedOutput1 = output1_1_3.map((row, index) => 
+      row.concat(output1_2[index] || []) 
+    );
 
     const output2 = arrangeNoConflictSets2(conflictArray);
-    const output_2 = await processInputArray(output2, conflictArray);
+    const output2Sub = filterSubjects(output2);
+    const output2_1_3 = await processInputArray(output2Sub.level1000_3000, conflictArray);
+    const output2_2 = await processInputArray(output2Sub.level2000, conflictArray);
+    const combinedOutput2 = output2_1_3.map((row, index) => 
+      row.concat(output2_2[index] || []) 
+    );
 
     const output3 = arrangeNoConflictSets3(conflictArray);
-    const output_3 = await processInputArray(output3, conflictArray);
+    const output3Sub = filterSubjects(output3);
+    const output3_1_3 = await processInputArray(output3Sub.level1000_3000, conflictArray);
+    const output3_2 = await processInputArray(output3Sub.level2000, conflictArray);
+    const combinedOutput3 = output3_1_3.map((row, index) => 
+      row.concat(output3_2[index] || []) 
+    );
     
     const output4 = arrangeNoConflictSets4(conflictArray);
-    const output_4 = await processInputArray(output4, conflictArray);
+    const output4Sub = filterSubjects(output4);
+    const output4_1_3 = await processInputArray(output4Sub.level1000_3000, conflictArray);
+    const output4_2 = await processInputArray(output4Sub.level2000, conflictArray);
+    const combinedOutput4 = output4_1_3.map((row, index) => 
+      row.concat(output4_2[index] || []) 
+    );
 
 
     const output = [output1, output2, output3, output4];
+    const combinedOutput = [combinedOutput1, combinedOutput2, combinedOutput3, combinedOutput4];
 
     // Step 3: Map colors to time slots
-    console.log(output_1);
+    console.log(output1_2);
     // console.log(conflictArray);
 
     // Step 4: Save timetable to database
@@ -721,7 +759,7 @@ exports.setupExam = async (req, res) => {
     // const insertValues = timetable.map(({ subject_id, time_slot }) => [subject_id, time_slot]);
     // await DBpool.query("INSERT INTO timetable (subject_id, time_slot) VALUES ?", [insertValues]);
 
-    res.json({ success: true, output });
+    res.json({ success: true, output, combinedOutput });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });

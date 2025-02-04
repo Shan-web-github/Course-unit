@@ -9,7 +9,7 @@ import { Button } from "react-bootstrap";
 
 export const timeTableCom = createContext();
 
-export default function ChooseTables({ timetable, timetableIndex }) {
+export default function ChooseTables({ timetable, timetableIndex, originalTable }) {
   const [showComponent, setShowComponent] = useState(false);
   return (
     <div>
@@ -51,7 +51,7 @@ export default function ChooseTables({ timetable, timetableIndex }) {
       <div>
         <timeTableCom.Provider value={{ showComponent, setShowComponent }}>
           <DndProvider backend={HTML5Backend}>
-            <ChooseSubTables timetable={timetable} />
+            <ChooseSubTables timetable={originalTable} />
           </DndProvider>
         </timeTableCom.Provider>
       </div>
