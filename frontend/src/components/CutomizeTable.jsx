@@ -1,4 +1,6 @@
 import { useState, useCallback } from "react";
+import axios from "axios";
+
 import { Button } from "react-bootstrap";
 
 import TableRow from "../components/TableRow";
@@ -24,37 +26,22 @@ export default function CustomizeTable({ rows }) {
   }, []);
 
   console.log("Subjects Collection:", subjectsCollection);
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
 
-  const fixTimeTable = (schedule) => {
-    let validDatesSet1 = [];
-    let validDatesSet2 = [];
-
-    for (let date in schedule) {
-      let day = schedule[date];
-
-      // Ensure both morning and evening sessions exist
-      if (!day.morning || !day.evening) continue;
-
-      let level1 = day.morning.level1 || day.evening.level1 || [];
-      let level2 = day.evening.level2 || day.morning.level2 || [];
-      let level3 = day.morning.level3 || day.evening.level3 || [];
-
-      if (0 < level1.length + level3.length && level1.length + level3.length < 4) {
-        validDatesSet1.push({ date, level1, level3 });
+  const fixTimeTable = async () => {
+    try {
+      for (const [date, schedule] of Object.entries(subjectsCollection)) {
+        await axios.post(`http://${ipAddress}:5000/studentdata/save-schedule`, {
+          date,
+          schedule,
+        });
       }
-
-      if (0 < level2.length && level2.length < 4) {
-        validDatesSet2.push({ date, level2 });
-      }
+      alert("Timetable saved successfully!");
+    } catch (error) {
+      console.error("Error saving schedule:", error);
     }
+  }
 
-    return { validDatesSet1, validDatesSet2 };
-  };
-
-  console.log(
-    "Selected subjects Collection:",
-    fixTimeTable(subjectsCollection)
-  );
 
   return (
     <div>
