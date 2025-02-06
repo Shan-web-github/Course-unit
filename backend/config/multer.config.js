@@ -30,9 +30,10 @@ const storage = multer.diskStorage({
   const upload = multer({ storage });
    module.exports.fileUpload = upload.fields([
     { name: "courses", maxCount: 1 },
-    { name: "mapping", maxCount: 1 },
     { name: "sem_reg", maxCount: 1 },
-    { name: "offer_course_exm", maxCount: 1 }
+    { name: "offer_course_exm", maxCount: 1 },
+    { name: "mapping", maxCount: 1 },
+    { name: "equivalent", maxCount: 1 },
   ]);
 
 

@@ -18,6 +18,23 @@ export default function ClashCheck() {
   const ipAddress = process.env.REACT_APP_IPADDRESS;
 
   useEffect(() => {
+    const createClashes = async () => {
+      try {
+        await axios.get(`http://${ipAddress}:5000/studentdata/clashesForCheck`);
+        console.log("Successfully created clashes table.");
+      } catch (error) {
+        console.error(
+          "repeatclahes error:",
+          error.response?.data || error.message
+        );
+        alert("An error occurred while creating clashes table.");
+      }
+    };
+
+    createClashes();
+  }, [ipAddress]);
+
+  useEffect(() => {
     const fetchCourses = async () => {
       try {
         const response = await axios.get(

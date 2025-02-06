@@ -225,15 +225,21 @@ exports.checkTableExistence = async (tableName) => {
 exports.createSpecialTable = async () => {
   const connection = await DBpool.getConnection();
   try {
-
     // Proceed with your update logic if the table exists
     const createTableSQL = `CREATE TABLE new_sem_reg AS SELECT sem_reg.* FROM sem_reg INNER JOIN offer_course_exm ON sem_reg.CO_CODE = offer_course_exm.CO_CODE`;
     await connection.query(createTableSQL);
 
-    const updateTableSQL = `UPDATE new_sem_reg JOIN mapping ON new_sem_reg.CO_CODE = mapping.OLD_CODE SET new_sem_reg.LEVEL = CASE WHEN new_sem_reg.LEVEL = 100 THEN 1000 WHEN new_sem_reg.LEVEL = 200 THEN 2000 WHEN new_sem_reg.LEVEL = 300 THEN 3000 WHEN new_sem_reg.LEVEL = 400 THEN 4000 ELSE new_sem_reg.LEVEL END, new_sem_reg.CO_CODE = mapping.CO_CODE`;
-    await connection.query(updateTableSQL);
-    
-    
+    const mappingTableExists = await exports.checkTableExistence("mapping");
+    if (mappingTableExists) {
+      const updateTableSQL1 = `UPDATE new_sem_reg JOIN mapping ON new_sem_reg.CO_CODE = mapping.OLD_CODE SET new_sem_reg.LEVEL = CASE WHEN new_sem_reg.LEVEL = 100 THEN 1000 WHEN new_sem_reg.LEVEL = 200 THEN 2000 WHEN new_sem_reg.LEVEL = 300 THEN 3000 WHEN new_sem_reg.LEVEL = 400 THEN 4000 ELSE new_sem_reg.LEVEL END, new_sem_reg.CO_CODE = mapping.CO_CODE`;
+      await connection.query(updateTableSQL1);
+    }
+
+    const equivalentTableExists = await exports.checkTableExistence("equivalent");
+    if (equivalentTableExists) {
+      const updateTableSQL2 = `UPDATE new_sem_reg JOIN equivalent ON new_sem_reg.CO_CODE = equivalent.equivalent_CODE OR new_sem_reg.CO_CODE = equivalent.CO_CODE SET new_sem_reg.CO_CODE = equivalent.CO_CODE`;
+      await connection.query(updateTableSQL2);
+    }
 
     console.log(`Table created and updated successfully.`);
   } catch (error) {
@@ -244,12 +250,27 @@ exports.createSpecialTable = async () => {
   }
 };
 
-exports.createClashesTable = async () => {
+exports.createClashesTable1 = async () => {
   const connection = await DBpool.getConnection();
   try {
-
     // Proceed with your update logic if the table exists
-    const createTableSQL = `CREATE TABLE clashesTable AS SELECT r1.CO_CODE AS course1, r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM new_sem_reg r1 JOIN new_sem_reg r2 ON r1.REG_NO= r2.REG_NO AND r1.CO_CODE < r2.CO_CODE GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
+    const createTableSQL = `CREATE TABLE clashesTable1 AS SELECT r1.CO_CODE AS course1, r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM new_sem_reg r1 JOIN new_sem_reg r2 ON r1.REG_NO= r2.REG_NO AND r1.CO_CODE < r2.CO_CODE GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
+    await connection.query(createTableSQL);
+
+    console.log(`Table created successfully.`);
+  } catch (error) {
+    console.error("Error creating table:", error);
+    throw error;
+  } finally {
+    connection.release();
+  }
+};
+
+exports.createClashesTable2 = async () => {
+  const connection = await DBpool.getConnection();
+  try {
+    // Proceed with your update logic if the table exists
+    const createTableSQL = `CREATE TABLE clashesTable2 AS SELECT r1.CO_CODE AS course1, r2.CO_CODE AS course2, COUNT(DISTINCT r1.REG_NO) AS num_students FROM sem_reg r1 JOIN sem_reg r2 ON r1.REG_NO= r2.REG_NO AND r1.CO_CODE < r2.CO_CODE GROUP BY r1.CO_CODE, r2.CO_CODE HAVING num_students > 0`;
     await connection.query(createTableSQL);
 
     console.log(`Table created successfully.`);

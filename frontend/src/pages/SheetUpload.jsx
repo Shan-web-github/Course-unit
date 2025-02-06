@@ -10,9 +10,10 @@ import { Container, Card, Form, Button } from "react-bootstrap";
 
 export default function SheetUpload() {
   const [courses, setCourses] = useState(null);
-  const [mapping, setMapping] = useState(null);
   const [semReg, setSemReg] = useState(null);
   const [offerCourseExam, setOfferCourseExam] = useState(null);
+  const [mapping, setMapping] = useState(null);
+  const [equivalent, setEquivalent] = useState(null);
 
   const ipAddress = process.env.REACT_APP_IPADDRESS;
 
@@ -20,14 +21,20 @@ export default function SheetUpload() {
 
   const submit = async (event) => {
     event.preventDefault();
-    if (!courses || !mapping || !semReg || !offerCourseExam) {
+    if (!courses || !semReg || !offerCourseExam) {
       return alert("Please upload all files.");
     }
     const formData = new FormData();
     formData.append("courses", courses);
-    formData.append("mapping", mapping);
     formData.append("sem_reg", semReg);
     formData.append("offer_course_exm", offerCourseExam);
+    if (mapping) {
+      formData.append("mapping", mapping);
+    }
+    if (equivalent) {
+      formData.append("equivalent", equivalent);
+    }
+    
 
     try {
       const res = await axios.post(
@@ -92,33 +99,40 @@ export default function SheetUpload() {
           </div>
           <Form>
             <Form.Group controlId="courses" className="mb-3">
-              <Form.Label>Insert Courses File</Form.Label>
+              <Form.Label className="required">Upload the Courses File</Form.Label>
               <Form.Control
                 type="file"
                 onChange={(e) => setCourses(e.target.files[0])}
               />
             </Form.Group>
-            <Form.Group controlId="mapping" className="mb-3">
-              <Form.Label>Insert Mapping File</Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(e) => setMapping(e.target.files[0])}
-              />
-            </Form.Group>
             <Form.Group controlId="semReg" className="mb-3">
-              <Form.Label>Insert Semester Registration File</Form.Label>
+              <Form.Label className="required">Upload the Semester Registration File</Form.Label>
               <Form.Control
                 type="file"
                 onChange={(e) => setSemReg(e.target.files[0])}
               />
             </Form.Group>
             <Form.Group controlId="offerCourseExam" className="mb-3">
-              <Form.Label>
-                Insert Offered Courses for Examination File
+              <Form.Label className="required">
+              Upload Offered Courses for Examination File
               </Form.Label>
               <Form.Control
                 type="file"
                 onChange={(e) => setOfferCourseExam(e.target.files[0])}
+              />
+            </Form.Group>
+            <Form.Group controlId="mapping" className="mb-3">
+              <Form.Label>Upload the Mapping File (if necessary)</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(e) => setMapping(e.target.files[0])}
+              />
+            </Form.Group>
+            <Form.Group controlId="equivalent" className="mb-3">
+              <Form.Label>Upload the Equivalent File (if necessary)</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(e) => setEquivalent(e.target.files[0])}
               />
             </Form.Group>
           </Form>

@@ -49,7 +49,7 @@ export default function ChooseTables({ timetable, timetableIndex, originalTable 
         <Button onClick={() => setShowComponent(true)}>Continue</Button>
       </div>
       <div>
-        <timeTableCom.Provider value={{ showComponent, setShowComponent }}>
+        <timeTableCom.Provider value={{ showComponent, timetableIndex, setShowComponent }}>
           <DndProvider backend={HTML5Backend}>
             <ChooseSubTables timetable={originalTable} />
           </DndProvider>

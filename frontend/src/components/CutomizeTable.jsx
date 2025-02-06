@@ -1,11 +1,15 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
 import axios from "axios";
 
 import { Button } from "react-bootstrap";
 
 import TableRow from "../components/TableRow";
 
+import { timeTableCom } from "./ChooseTables";
+
 export default function CustomizeTable({ rows }) {
+  const {timetableIndex} = useContext(timeTableCom);
+
   const [data, setData] = useState(rows);
   const [subjectsCollection, setSubjectsCollection] = useState({});
 
@@ -31,7 +35,7 @@ export default function CustomizeTable({ rows }) {
   const fixTimeTable = async () => {
     try {
       for (const [date, schedule] of Object.entries(subjectsCollection)) {
-        await axios.post(`http://${ipAddress}:5000/studentdata/save-schedule`, {
+        await axios.post(`http://${ipAddress}:5000/studentdata/save-schedule/${timetableIndex}`, {
           date,
           schedule,
         });

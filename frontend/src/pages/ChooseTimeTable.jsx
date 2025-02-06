@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 import Navbar from "../components/Navbar";
@@ -15,6 +15,24 @@ export default function ChooseTimeTable() {
   const [combinedTimetable, setCombinedTimetable] = useState([]);
 
   const ipAddress = process.env.REACT_APP_IPADDRESS;
+
+  useEffect(()=>{
+    const createClashes = async () => {
+      try {
+        await axios.get(`http://${ipAddress}:5000/studentdata/createClashes`);
+        console.log("Successfully created clashes table.");
+      } catch (error) {
+        console.error(
+          "repeatclahes error:",
+          error.response?.data || error.message
+        );
+        alert("An error occurred while creating clashes table.");
+      }
+    };
+
+    createClashes();
+
+  },[ipAddress]);
 
   const fetchTimetable = async () => {
     setIsSplit(!isSplit);
@@ -89,7 +107,7 @@ export default function ChooseTimeTable() {
                       <br />
                       <ChooseTables
                         timetable={timetable}
-                        timetableIndex={timetableIndex}
+                        timetableIndex={timetableIndex+1}
                         originalTable={combinedTimetable[timetableIndex]}
                       />
                       {timetableIndex < leftTimetables.length - 1 && <hr />}
@@ -105,7 +123,7 @@ export default function ChooseTimeTable() {
                       <br />
                       <ChooseTables
                         timetable={timetable}
-                        timetableIndex={timetableIndex}
+                        timetableIndex={timetableIndex+3}
                         originalTable={combinedTimetable[timetableIndex+2]}
                       />
                       {timetableIndex < leftTimetables.length - 1 && <hr />}

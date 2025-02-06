@@ -9,26 +9,33 @@ const {
   existTableDrop,
   createSpecialTable,
   checkTableExistence,
-  createClashesTable,
+  createClashesTable1,
+  createClashesTable2,
 } = require("./files.functions");
 
-exports.uploadFile = (req, res) => {
+exports.uploadFile = async (req, res) => {
   const coursesFile = req.files["courses"] ? req.files["courses"][0] : null;
-  const mappingFile = req.files["mapping"] ? req.files["mapping"][0] : null;
   const sem_regFile = req.files["sem_reg"] ? req.files["sem_reg"][0] : null;
   const offer_course_exmFile = req.files["offer_course_exm"]
     ? req.files["offer_course_exm"][0]
     : null;
 
-  const fileArray = [
-    coursesFile,
-    mappingFile,
-    sem_regFile,
-    offer_course_exmFile,
-  ];
+  const mappingFile = req.files["mapping"] ? req.files["mapping"][0] : null;
+  const equivalentFile = req.files["equivalent"]
+    ? req.files["equivalent"][0]
+    : null;
+
+  const fileArray = [coursesFile, sem_regFile, offer_course_exmFile];
+
+  if (mappingFile) fileArray.push(mappingFile);
+  if (equivalentFile) fileArray.push(equivalentFile);
 
   // Loop through each file
   try {
+    if (fileArray.length > 0 && fileArray.length < 5) {
+      await existTableDrop("mapping");
+      await existTableDrop("equivalent");
+    }
     fileArray.forEach((file) => {
       if (file) {
         const filePath = file.path;
@@ -68,7 +75,7 @@ exports.uploadFile = (req, res) => {
 };
 
 exports.requiredTablesExist = async (req, res) => {
-  const requiredTables = ["courses", "mapping", "offer_course_exm", "sem_reg"];
+  const requiredTables = ["courses", "offer_course_exm", "sem_reg"];
 
   try {
     for (const tableName of requiredTables) {
@@ -132,8 +139,19 @@ exports.getFiles = async (req, res) => {
 
 exports.createClashes = async (req, res) => {
   try {
-    await existTableDrop("clashesTable");
-    await createClashesTable();
+    await existTableDrop("clashesTable1");
+    await createClashesTable1();
+    return res.status(201).send("Table created successfully.");
+  } catch (error) {
+    console.error("Error table creation:", error);
+    return res.status(501).send(error.message);
+  }
+};
+
+exports.clashesForCheck = async (req, res) => {
+  try {
+    await existTableDrop("clashesTable2");
+    await createClashesTable2();
     return res.status(201).send("Table created successfully.");
   } catch (error) {
     console.error("Error table creation:", error);
@@ -291,14 +309,14 @@ exports.getNotClashes2 = async (req, res) => {
   }
 };
 
-exports.checkClashes= async(req,res) => {
+exports.checkClashes = async (req, res) => {
   const selectedCourses = req.params.coursesList;
   const selectedCourseArray = selectedCourses.split(",");
   const placeholders = selectedCourseArray.map(() => "?").join(", ");
 
   if (selectedCourses) {
     try {
-      const coursesQuery = `SELECT num_students FROM clashestable WHERE (course1 IN (${placeholders}) AND course2 IN (${placeholders})) OR (course1 IN (${placeholders}) AND course2 IN (${placeholders}))`;
+      const coursesQuery = `SELECT num_students FROM clashesTable2 WHERE (course1 IN (${placeholders}) AND course2 IN (${placeholders})) OR (course1 IN (${placeholders}) AND course2 IN (${placeholders}))`;
       const queryParams = [
         ...selectedCourseArray,
         ...selectedCourseArray,
@@ -315,10 +333,10 @@ exports.checkClashes= async(req,res) => {
       res.status(500).send("Internal Server Error");
     }
   }
-}
+};
 
 //*************************************************************************************************************** */
-//choose timetable 
+//choose timetable
 // Below part is most important part in this Backend
 
 const generateConflictArray = (sqlResult) => {
@@ -580,11 +598,11 @@ const arrangeNoConflictSets4 = (conflictArray) => {
 //     const isConflict = (set1, set2, conflictArray) => {
 //       // Create a map from conflictArray for quick lookup
 //       const conflictMap = new Map(conflictArray);
-    
+
 //       for (let subject of set1) {
 //         // Get the list of conflicts for the current subject
 //         const conflicts = conflictMap.get(subject) || [];
-    
+
 //         // Check if any subject in set2 is in the conflicts list
 //         for (let otherSubject of set2) {
 //           if (conflicts.includes(otherSubject)) {
@@ -592,10 +610,9 @@ const arrangeNoConflictSets4 = (conflictArray) => {
 //           }
 //         }
 //       }
-    
+
 //       return false; // No conflict
 //     };
-    
 
 //     // Step 4: Loop through arr1's elements and check conflicts
 //     for (let i = 0; i < arr1.length; i++) {
@@ -641,7 +658,7 @@ const processInputArray = async (inputArray, conflictArray) => {
   const isConflict = (set1, set2) => {
     for (let subject of set1) {
       const conflicts = conflictMap.get(subject) || [];
-      if (set2.some(otherSubject => conflicts.includes(otherSubject))) {
+      if (set2.some((otherSubject) => conflicts.includes(otherSubject))) {
         return true;
       }
     }
@@ -692,9 +709,11 @@ const filterSubjects = (subjects) => {
   const level1000_3000 = [];
   const level2000 = [];
 
-  subjects.forEach(row => {
-    const row1000_3000 = row.filter(sub => /^(?:1|3)\d{3}/.test(sub.slice(3, 7)));
-    const row2000 = row.filter(sub => /^2\d{3}/.test(sub.slice(3, 7)));
+  subjects.forEach((row) => {
+    const row1000_3000 = row.filter((sub) =>
+      /^(?:1|3)\d{3}/.test(sub.slice(3, 7))
+    );
+    const row2000 = row.filter((sub) => /^2\d{3}/.test(sub.slice(3, 7)));
 
     if (row1000_3000.length > 0) level1000_3000.push(row1000_3000);
     if (row2000.length > 0) level2000.push(row2000);
@@ -702,7 +721,6 @@ const filterSubjects = (subjects) => {
 
   return { level1000_3000, level2000 };
 };
-
 
 //**************************************************************************** */
 exports.setupExam = async (req, res) => {
@@ -716,39 +734,67 @@ exports.setupExam = async (req, res) => {
     // Step 2: Apply graph coloring
     const output1 = await arrangeNoConflictSets1(conflictArray);
     const output1Sub = filterSubjects(output1);
-    const output1_1_3 = await processInputArray(output1Sub.level1000_3000, conflictArray);
-    const output1_2 = await processInputArray(output1Sub.level2000, conflictArray);
-    const combinedOutput1 = output1_1_3.map((row, index) => 
-      row.concat(output1_2[index] || []) 
+    const output1_1_3 = await processInputArray(
+      output1Sub.level1000_3000,
+      conflictArray
+    );
+    const output1_2 = await processInputArray(
+      output1Sub.level2000,
+      conflictArray
+    );
+    const combinedOutput1 = output1_1_3.map((row, index) =>
+      row.concat(output1_2[index] || [])
     );
 
     const output2 = arrangeNoConflictSets2(conflictArray);
     const output2Sub = filterSubjects(output2);
-    const output2_1_3 = await processInputArray(output2Sub.level1000_3000, conflictArray);
-    const output2_2 = await processInputArray(output2Sub.level2000, conflictArray);
-    const combinedOutput2 = output2_1_3.map((row, index) => 
-      row.concat(output2_2[index] || []) 
+    const output2_1_3 = await processInputArray(
+      output2Sub.level1000_3000,
+      conflictArray
+    );
+    const output2_2 = await processInputArray(
+      output2Sub.level2000,
+      conflictArray
+    );
+    const combinedOutput2 = output2_1_3.map((row, index) =>
+      row.concat(output2_2[index] || [])
     );
 
     const output3 = arrangeNoConflictSets3(conflictArray);
     const output3Sub = filterSubjects(output3);
-    const output3_1_3 = await processInputArray(output3Sub.level1000_3000, conflictArray);
-    const output3_2 = await processInputArray(output3Sub.level2000, conflictArray);
-    const combinedOutput3 = output3_1_3.map((row, index) => 
-      row.concat(output3_2[index] || []) 
+    const output3_1_3 = await processInputArray(
+      output3Sub.level1000_3000,
+      conflictArray
     );
-    
+    const output3_2 = await processInputArray(
+      output3Sub.level2000,
+      conflictArray
+    );
+    const combinedOutput3 = output3_1_3.map((row, index) =>
+      row.concat(output3_2[index] || [])
+    );
+
     const output4 = arrangeNoConflictSets4(conflictArray);
     const output4Sub = filterSubjects(output4);
-    const output4_1_3 = await processInputArray(output4Sub.level1000_3000, conflictArray);
-    const output4_2 = await processInputArray(output4Sub.level2000, conflictArray);
-    const combinedOutput4 = output4_1_3.map((row, index) => 
-      row.concat(output4_2[index] || []) 
+    const output4_1_3 = await processInputArray(
+      output4Sub.level1000_3000,
+      conflictArray
+    );
+    const output4_2 = await processInputArray(
+      output4Sub.level2000,
+      conflictArray
+    );
+    const combinedOutput4 = output4_1_3.map((row, index) =>
+      row.concat(output4_2[index] || [])
     );
 
-
     const output = [output1, output2, output3, output4];
-    const combinedOutput = [combinedOutput1, combinedOutput2, combinedOutput3, combinedOutput4];
+    const combinedOutput = [
+      combinedOutput1,
+      combinedOutput2,
+      combinedOutput3,
+      combinedOutput4,
+    ];
 
     // Step 3: Map colors to time slots
     console.log(output1_2);
@@ -763,5 +809,63 @@ exports.setupExam = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+exports.saveTimetable = async (req, res) => {
+  const { table_index } = req.params;
+  const { date, schedule } = req.body;
+
+  const connection = await DBpool.getConnection(); // Get connection from pool
+  try {
+    // SQL to create table if the table doesn't exist
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS table${table_index} (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        date_name VARCHAR(50) UNIQUE NOT NULL,
+        schedule_data JSON NOT NULL
+      );
+    `;
+
+    // Ensure the table exists
+    await connection.query(createTableQuery); // No callback, using await
+
+    // Now insert or update the schedule
+    const sql = `INSERT INTO table${table_index} (date_name, schedule_data) VALUES (?, ?) 
+                 ON DUPLICATE KEY UPDATE schedule_data = VALUES(schedule_data)`;
+
+    const [result] = await connection.query(sql, [
+      date,
+      JSON.stringify(schedule),
+    ]);
+    res.json({ message: "Schedule saved successfully", result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  } finally {
+    connection.release();
+  }
+};
+
+exports.viewTimetable = async (req, res) => {
+  const { table_index } = req.params;
+
+  const sql = `SELECT * FROM table${table_index}`;
+  try {
+    const [rows] = await DBpool.query(sql);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No schedule found" });
+    }
+
+    // Map results to parse JSON fields
+    const schedules = rows.map((row) => ({
+      id: row.id,
+      date_name: row.date_name,
+      schedule_data: JSON.parse(row.schedule_data),
+    }));
+
+    res.json(schedules);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

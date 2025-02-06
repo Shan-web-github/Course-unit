@@ -11,10 +11,13 @@ router.get("/newsemreg",filesController.createNewSemReg);
 router.get("/data/:table", filesController.getFiles);
 
 router.get("/generate-timetable",filesController.setupExam);
+router.post("/save-schedule/:table_index",filesController.saveTimetable);
+router.get("/view-schedule/:table_index",filesController.viewTimetable);
 
 router.get("/clashes/:level",filesController.getClashes);
 router.post("/uploadClashes/:level",filesController.uploadClashes);
 router.get("/createClashes",filesController.createClashes);
+router.get("/clashesForCheck",filesController.clashesForCheck);
 
 router.get("/courses/:coursesAttribute",filesController.getCourses);
 router.get("/allcourses",filesController.getAllCourses);
