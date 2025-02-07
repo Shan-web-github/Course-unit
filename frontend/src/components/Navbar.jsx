@@ -5,11 +5,13 @@ import {
   clearSessionData,
 } from "../utils/storage/sessionStorageUtils";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import CalendarIcon from "../assets/Icons/calendar-icon.jpg";
 import Usericon from "../assets/Icons/userIcon4.png";
 
 import UserTimeTable from "./TimetablePopup";
+import TimetableViewer from "./TimetableViewer";
 
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -18,24 +20,45 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 
 export default function NavigationBar(props) {
   const navigate = useNavigate();
+  const ipAddress = process.env.REACT_APP_IPADDRESS;
+
+  const [isTable1Exist, setIsTable1Exist] = useState(false);
+  const [isTable2Exist, setIsTable2Exist] = useState(false);
+  const [isTable3Exist, setIsTable3Exist] = useState(false);
+  const [isTable4Exist, setIsTable4Exist] = useState(false);
+
+  useEffect(() => {
+    const checkTableExist = async (tableName, setFunction) => {
+      try {
+        const { data } = await axios.get(
+          `http://${ipAddress}:5000/studentdata/checktable/${tableName}`
+        );
+        setFunction(data.tableExists);
+      } catch (error) {
+        console.error("Error checking table existence:", error);
+        alert(error);
+      }
+    };
+
+    checkTableExist("table1", setIsTable1Exist);
+    checkTableExist("table2", setIsTable2Exist);
+    checkTableExist("table3", setIsTable3Exist);
+    checkTableExist("table4", setIsTable4Exist);
+  }, [ipAddress]);
 
   const [timeTable1, setTimeTable1] = useState([]);
   const [timeTable2, setTimeTable2] = useState([]);
   const [timeTable3, setTimeTable3] = useState([]);
 
-  // Retrieve timetable data
-  const funcTimeTable1 = () => {
+  useEffect(() => {
     setTimeTable1(getSessionData("1000_level"));
-  };
-  const funcTimeTable2 = () => {
     setTimeTable2(getSessionData("2000_level"));
-  };
-  const funcTimeTable3 = () => {
     setTimeTable3(getSessionData("3000_level"));
-  };
+  }, []);
 
   // State for showing timetable
-  const [selectedTable, setSelectedTable] = useState(null);
+  const [selectedTable1, setSelectedTable1] = useState(null);
+  const [selectedTable2, setSelectedTable2] = useState(null);
 
   const logout = () => {
     removeSessionData("jwt_token");
@@ -43,16 +66,15 @@ export default function NavigationBar(props) {
     navigate("/");
   };
 
-  const popUpTable = (event, tableData, level) => {
+  const popUpTable1 = (event, tableData, level) => {
     event.preventDefault();
-    setSelectedTable({ data: tableData, level });
+    setSelectedTable1({ data: tableData, level });
   };
 
-  useEffect(() => {
-    funcTimeTable1();
-    funcTimeTable2();
-    funcTimeTable3();
-  }, []);
+  const popUpTable2 = (event, tableIndex) => {
+    event.preventDefault();
+    setSelectedTable2(tableIndex);
+  };
 
   return (
     <>
@@ -113,28 +135,60 @@ export default function NavigationBar(props) {
               >
                 {timeTable1 && (
                   <NavDropdown.Item
-                    onClick={(event) => popUpTable(event, timeTable1, 1000)}
+                    onClick={(event) => popUpTable1(event, timeTable1, 1000)}
                   >
                     1000 Level Timetable
                   </NavDropdown.Item>
                 )}
                 {timeTable2 && (
                   <NavDropdown.Item
-                    onClick={(event) => popUpTable(event, timeTable2, 2000)}
+                    onClick={(event) => popUpTable1(event, timeTable2, 2000)}
                   >
                     2000 Level Timetable
                   </NavDropdown.Item>
                 )}
                 {timeTable3 && (
                   <NavDropdown.Item
-                    onClick={(event) => popUpTable(event, timeTable3, 3000)}
+                    onClick={(event) => popUpTable1(event, timeTable3, 3000)}
                   >
                     3000 Level Timetable
                   </NavDropdown.Item>
                 )}
-                {(timeTable1 || timeTable2 || timeTable3) && (
-                  <NavDropdown.Divider />
+                {isTable1Exist && (
+                  <NavDropdown.Item
+                    onClick={(event) => popUpTable2(event, 1)}
+                  >
+                    Timetable 01
+                  </NavDropdown.Item>
                 )}
+                {isTable2Exist && (
+                  <NavDropdown.Item
+                    onClick={(event) => popUpTable2(event, 2)}
+                  >
+                    Timetable 02
+                  </NavDropdown.Item>
+                )}
+                {isTable3Exist && (
+                  <NavDropdown.Item
+                    onClick={(event) => popUpTable2(event, 3)}
+                  >
+                    Timetable 03
+                  </NavDropdown.Item>
+                )}
+                {isTable4Exist && (
+                  <NavDropdown.Item
+                    onClick={(event) => popUpTable2(event, 4)}
+                  >
+                    Timetable 04
+                  </NavDropdown.Item>
+                )}
+                {(timeTable1 ||
+                  timeTable2 ||
+                  timeTable3 ||
+                  isTable1Exist ||
+                  isTable2Exist ||
+                  isTable3Exist ||
+                  isTable4Exist) && <NavDropdown.Divider />}
                 <NavDropdown.Item onClick={logout}>Log out</NavDropdown.Item>
               </NavDropdown>
             </Nav>
@@ -143,12 +197,16 @@ export default function NavigationBar(props) {
       </Navbar>
 
       {/* Render timetable if selected */}
-      {selectedTable && (
+      {selectedTable1 && (
         <UserTimeTable
-          timetableData={selectedTable.data}
-          level={selectedTable.level}
+          timetableData={selectedTable1.data}
+          level={selectedTable1.level}
           isShow={true}
         />
+      )}
+
+      {selectedTable2 && (
+        <TimetableViewer tableIndex={selectedTable2} isShow={true} />
       )}
     </>
   );

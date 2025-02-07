@@ -98,11 +98,11 @@ exports.requiredTablesExist = async (req, res) => {
 };
 
 exports.isTablesExist = async (req, res) => {
-  const tableName = req.params.tableName
+  const tableName = req.params.tableName;
 
-  try { 
+  try {
     const tableExists = await checkTableExistence(tableName);
-    return res.json({tableExists});
+    return res.json({ tableExists });
   } catch (error) {
     console.error("Error checking table existence:", error.message);
     return res
@@ -862,8 +862,13 @@ exports.saveTimetable = async (req, res) => {
 
 exports.viewTimetable = async (req, res) => {
   const { table_index } = req.params;
+  const tableName = `table${table_index}`;
 
-  const sql = `SELECT * FROM table${table_index}`;
+  if (!(await checkTableExistence(tableName))) {
+    return res.status(404).json({ message: "Table does not exist" });
+  }
+
+  const sql = `SELECT * FROM ${tableName}`;
   try {
     const [rows] = await DBpool.query(sql);
 
@@ -871,15 +876,29 @@ exports.viewTimetable = async (req, res) => {
       return res.status(404).json({ message: "No schedule found" });
     }
 
-    // Map results to parse JSON fields
-    const schedules = rows.map((row) => ({
-      id: row.id,
-      date_name: row.date_name,
-      schedule_data: JSON.parse(row.schedule_data),
-    }));
+    const schedules = rows.map((row) => {
+      let scheduleData = row.schedule_data;
+    
+      // If scheduleData is an object, use it as is; otherwise, parse it
+      if (typeof scheduleData === "string") {
+        try {
+          scheduleData = JSON.parse(scheduleData);
+        } catch (error) {
+          console.error("Invalid JSON in schedule_data:", scheduleData);
+          scheduleData = null; // Set to null or a default empty object {}
+        }
+      }
+    
+      return {
+        id: row.id,
+        date_name: row.date_name,
+        schedule_data: scheduleData,
+      };
+    });
 
     res.json(schedules);
   } catch (err) {
+    console.error("Database error:", err);
     res.status(500).json({ error: err.message });
   }
 };

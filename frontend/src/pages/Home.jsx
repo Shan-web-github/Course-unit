@@ -19,24 +19,28 @@ export default function Home() {
 
   const ipAddress = process.env.REACT_APP_IPADDRESS;
 
-  const [isMappingExist,setIsMappingExist] = useState(false);
-  const [isEquivalentExist,setIsEquivalentExist] = useState(false);
+  const [isMappingExist, setIsMappingExist] = useState(false);
+  const [isEquivalentExist, setIsEquivalentExist] = useState(false);
 
   useEffect(() => {
     const checkTableExist = async (tableName) => {
       try {
-        const isTableExist = await axios.get(
+        const { data } = await axios.get(
           `http://${ipAddress}:5000/studentdata/checktable/${tableName}`
         );
-        return isTableExist;
+        if (tableName === "mapping") {
+          setIsMappingExist(data.tableExists);
+        }
+        if (tableName === "equivalent") {
+          setIsEquivalentExist(data.tableExists);
+        }
       } catch (error) {
         console.error("Error checking table existence:", error);
         alert(error);
-        return false;
       }
     };
-    setIsMappingExist(checkTableExist("mapping"));
-    setIsEquivalentExist(checkTableExist("equivalent"));
+    checkTableExist("mapping");
+    checkTableExist("equivalent");
   }, [ipAddress]);
 
   const load = async (event) => {

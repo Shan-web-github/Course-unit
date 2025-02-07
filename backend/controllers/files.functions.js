@@ -219,6 +219,7 @@ exports.checkTableExistence = async (tableName) => {
     return rows.length > 0;
   } catch (error) {
     console.error(`Error creating or updating table:`, error);
+    return false;
   }
 };
 
