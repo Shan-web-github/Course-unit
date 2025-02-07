@@ -9,6 +9,7 @@ router.post("/upload", fileUpload, filesController.uploadFile);
 router.get("/requiredtablesexist",filesController.requiredTablesExist);
 router.get("/newsemreg",filesController.createNewSemReg);
 router.get("/data/:table", filesController.getFiles);
+router.get("/checktable/:tableName",filesController.isTablesExist);
 
 router.get("/generate-timetable",filesController.setupExam);
 router.post("/save-schedule/:table_index",filesController.saveTimetable);

@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useEffect, useState } from "react";
 import axios from "axios";
 
 //components
@@ -18,6 +18,26 @@ export default function Home() {
   const [tableName, setTableName] = useState("");
 
   const ipAddress = process.env.REACT_APP_IPADDRESS;
+
+  const [isMappingExist,setIsMappingExist] = useState(false);
+  const [isEquivalentExist,setIsEquivalentExist] = useState(false);
+
+  useEffect(() => {
+    const checkTableExist = async (tableName) => {
+      try {
+        const isTableExist = await axios.get(
+          `http://${ipAddress}:5000/studentdata/checktable/${tableName}`
+        );
+        return isTableExist;
+      } catch (error) {
+        console.error("Error checking table existence:", error);
+        alert(error);
+        return false;
+      }
+    };
+    setIsMappingExist(checkTableExist("mapping"));
+    setIsEquivalentExist(checkTableExist("equivalent"));
+  }, [ipAddress]);
 
   const load = async (event) => {
     event.preventDefault();
@@ -75,7 +95,12 @@ export default function Home() {
                     Offered courses for exam
                   </option>
                   <option value="new_sem_reg">Semester registrations</option>
-                  <option value=" mapping">Old courses mapping</option>
+                  {isMappingExist && (
+                    <option value=" mapping">Old courses mapping</option>
+                  )}
+                  {isEquivalentExist && (
+                    <option value=" equivalent">equivalent data sheet</option>
+                  )}
                 </Form.Select>
               </Form.Group>
               <Button variant="dark" type="button" onClick={load}>

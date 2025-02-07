@@ -97,6 +97,20 @@ exports.requiredTablesExist = async (req, res) => {
   }
 };
 
+exports.isTablesExist = async (req, res) => {
+  const tableName = req.params.tableName
+
+  try { 
+    const tableExists = await checkTableExistence(tableName);
+    return res.json({tableExists});
+  } catch (error) {
+    console.error("Error checking table existence:", error.message);
+    return res
+      .status(500)
+      .send("An error occurred while checking table existence.");
+  }
+};
+
 exports.createNewSemReg = async (req, res) => {
   try {
     await existTableDrop("new_sem_reg");
