@@ -53,7 +53,7 @@ export default function TableRow({
   );
 
   const date = useMemo(()=>{
-    return `Date ${index+1}`;
+    return `Day ${index+1}`;
   },[index]);
 
   //Merged

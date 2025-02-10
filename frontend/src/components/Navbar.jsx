@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createContext } from "react";
 import {
   getSessionData,
   removeSessionData,
@@ -13,14 +13,15 @@ import Usericon from "../assets/Icons/userIcon4.png";
 import UserTimeTable from "./TimetablePopup";
 import TimetableViewer from "./TimetableViewer";
 
-import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
+import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+
+export const popUpdata = createContext();
 
 export default function NavigationBar(props) {
   const navigate = useNavigate();
   const ipAddress = process.env.REACT_APP_IPADDRESS;
+
+  const [show, setShow] = useState(false);
 
   const [isTable1Exist, setIsTable1Exist] = useState(false);
   const [isTable2Exist, setIsTable2Exist] = useState(false);
@@ -69,11 +70,13 @@ export default function NavigationBar(props) {
   const popUpTable1 = (event, tableData, level) => {
     event.preventDefault();
     setSelectedTable1({ data: tableData, level });
+    setShow(true);
   };
 
   const popUpTable2 = (event, tableIndex) => {
     event.preventDefault();
     setSelectedTable2(tableIndex);
+    setShow(true);
   };
 
   return (
@@ -97,7 +100,7 @@ export default function NavigationBar(props) {
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav
-              className="me-auto gap-3 ps-md-5 ps-sm-0 ps-xs-0"
+              className="fw-bold d-flex justify-content-start align-items-sm-start align-items-md-center align-items-lg-center me-auto gap-3 ps-md-5 ps-sm-0 ps-xs-0"
               defaultActiveKey={props.path}
             >
               <Nav.Item>
@@ -106,13 +109,27 @@ export default function NavigationBar(props) {
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href="/choosetimetable" className="me-3 fw-semibold">
+                <Nav.Link
+                  href="/choosetimetable"
+                  className="me-lg-3 fw-semibold"
+                >
                   Choose TimeTable
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href="/createtimetable" className="me-3 fw-semibold">
+                <Nav.Link
+                  href="/createtimetable"
+                  className="me-lg-3 fw-semibold"
+                >
                   Create TimeTable
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link
+                  href="/hallarrangement"
+                  className="me-lg-3 fw-semibold"
+                >
+                  Hall Arrangement
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
@@ -155,30 +172,22 @@ export default function NavigationBar(props) {
                   </NavDropdown.Item>
                 )}
                 {isTable1Exist && (
-                  <NavDropdown.Item
-                    onClick={(event) => popUpTable2(event, 1)}
-                  >
+                  <NavDropdown.Item onClick={(event) => popUpTable2(event, 1)}>
                     Timetable 01
                   </NavDropdown.Item>
                 )}
                 {isTable2Exist && (
-                  <NavDropdown.Item
-                    onClick={(event) => popUpTable2(event, 2)}
-                  >
+                  <NavDropdown.Item onClick={(event) => popUpTable2(event, 2)}>
                     Timetable 02
                   </NavDropdown.Item>
                 )}
                 {isTable3Exist && (
-                  <NavDropdown.Item
-                    onClick={(event) => popUpTable2(event, 3)}
-                  >
+                  <NavDropdown.Item onClick={(event) => popUpTable2(event, 3)}>
                     Timetable 03
                   </NavDropdown.Item>
                 )}
                 {isTable4Exist && (
-                  <NavDropdown.Item
-                    onClick={(event) => popUpTable2(event, 4)}
-                  >
+                  <NavDropdown.Item onClick={(event) => popUpTable2(event, 4)}>
                     Timetable 04
                   </NavDropdown.Item>
                 )}
@@ -197,16 +206,20 @@ export default function NavigationBar(props) {
       </Navbar>
 
       {/* Render timetable if selected */}
+
       {selectedTable1 && (
-        <UserTimeTable
-          timetableData={selectedTable1.data}
-          level={selectedTable1.level}
-          isShow={true}
-        />
+        <popUpdata.Provider value={{ show, setShow }}>
+          <UserTimeTable
+            timetableData={selectedTable1.data}
+            level={selectedTable1.level}
+          />
+        </popUpdata.Provider>
       )}
 
       {selectedTable2 && (
-        <TimetableViewer tableIndex={selectedTable2} isShow={true} />
+        <popUpdata.Provider value={{ show, setShow }}>
+          <TimetableViewer tableIndex={selectedTable2} />
+        </popUpdata.Provider>
       )}
     </>
   );

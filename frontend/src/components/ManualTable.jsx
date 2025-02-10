@@ -238,11 +238,11 @@ export default function ManualTable({ level, semester, buttonClick, onSave }) {
     }
   };
 
-  const saveAndFinish = (event) => {
-    event.preventDefault();
+  const saveAndFinish = () => {
     if (Array.isArray(finalData) && finalData.length > 0) {
       setSessionData(`${level}_level`, finalData);
       console.log("Final Data: ", finalData);
+      alert("Successfully saved");
     }
   };
 

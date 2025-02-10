@@ -11,6 +11,7 @@ import { AuthProvider } from "./Authcontext";
 import ProtectedRoute from "./ProtectedRoute";
 import { TableProvider } from "./utils/Tablecontext";
 import ClashCheck from "./pages/ClashCheck";
+import ExamHallArrangement from "./pages/ExamHallArrangement";
 
 function App() {
   return (
@@ -55,10 +56,18 @@ function App() {
           <Route
             path="/clashcheck"
             element={
-              <ProtectedRoute>
+              // <ProtectedRoute>
                 <ClashCheck />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
+          />
+          <Route
+          path="/hallarrangement"
+          element={
+            <ProtectedRoute>
+              <ExamHallArrangement />
+            </ProtectedRoute>
+          }
           />
           {/* <Route path="/" element={}/> */}
         </Routes>

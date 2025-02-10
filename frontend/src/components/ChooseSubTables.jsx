@@ -13,7 +13,7 @@ const ChooseSubTables = ({ timetable }) => {
     () =>
       timetable.map((subjectArray, index) => ({
         id: uuidv4(),
-        Date: `Date${index + 1}`,
+        Date: `Day${index + 1}`,
         Subjects: subjectArray,
       })),
     [timetable]

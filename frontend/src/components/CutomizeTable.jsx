@@ -1,4 +1,5 @@
 import { useState, useCallback, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { Button } from "react-bootstrap";
@@ -12,6 +13,8 @@ export default function CustomizeTable({ rows }) {
 
   const [data, setData] = useState(rows);
   const [subjectsCollection, setSubjectsCollection] = useState({});
+
+  const navigate = useNavigate();
 
   const moveRow = (dragIndex, hoverIndex) => {
     setData((prevData) => {
@@ -41,6 +44,7 @@ export default function CustomizeTable({ rows }) {
         });
       }
       alert("Timetable saved successfully!");
+      navigate("/home");
     } catch (error) {
       console.error("Error saving schedule:", error);
     }

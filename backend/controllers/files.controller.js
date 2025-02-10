@@ -902,3 +902,21 @@ exports.viewTimetable = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.updateTimetable = async (req, res) => {
+  const { table_index } = req.params;
+  const { timetable } = req.body;
+
+  try {
+    for (const day of timetable) {
+      await DBpool.query(
+        `UPDATE table${table_index} SET date_name = ? WHERE id = ?`,
+        [day.date_name, day.id]
+      );
+    }
+    res.json({ message: "Timetable updated successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

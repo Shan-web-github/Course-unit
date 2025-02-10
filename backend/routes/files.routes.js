@@ -14,6 +14,7 @@ router.get("/checktable/:tableName",filesController.isTablesExist);
 router.get("/generate-timetable",filesController.setupExam);
 router.post("/save-schedule/:table_index",filesController.saveTimetable);
 router.get("/view-schedule/:table_index",filesController.viewTimetable);
+router.put("/update-schedule/:table_index",filesController.updateTimetable)
 
 router.get("/clashes/:level",filesController.getClashes);
 router.post("/uploadClashes/:level",filesController.uploadClashes);

@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 
 import { removeSessionData } from "../utils/storage/sessionStorageUtils";
+import { popUpdata } from "./Navbar";
 
 import { Modal, Button, Table } from "react-bootstrap";
 
-export default function TimetablePopup({ timetableData = [], level, isShow }) {
-  const [show, setShow] = useState(isShow);
+export default function TimetablePopup({ timetableData = [], level }) {
+  const {show, setShow} = useContext(popUpdata);
 
-  if (!isShow) return null;
 
   if (!Array.isArray(timetableData) || timetableData.length === 0) {
     return <p>No timetable data available for level {level}.</p>;
