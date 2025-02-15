@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Form, Button, Table } from "react-bootstrap";
+import { Form, Button, Table, CloseButton } from "react-bootstrap";
 import jsPDF from "jspdf";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";
@@ -8,72 +8,78 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function ExamHallArrangement() {
-  const [numHalls, setNumHalls] = useState(0);
+  const [hallName, setHallName] = useState("");
+  const [hallCapacity, setHallCapacity] = useState("");
   const [halls, setHalls] = useState([]);
   const [timetableIndex, setTimetableIndex] = useState("");
   const [examData, setExamData] = useState([]);
   const [selectedHalls, setSelectedHalls] = useState({});
   const ipAddress = process.env.REACT_APP_IPADDRESS;
 
-  // Fetch available timetables
-  const [isTable1Exist, setIsTable1Exist] = useState(false);
-  const [isTable2Exist, setIsTable2Exist] = useState(false);
-  const [isTable3Exist, setIsTable3Exist] = useState(false);
-  const [isTable4Exist, setIsTable4Exist] = useState(false);
+  const [timetables, setTimetables] = useState([]);
 
   useEffect(() => {
-    const checkTableExist = async (tableName, setFunction) => {
+    // Check available timetables
+    const checkTables = async () => {
       try {
-        const { data } = await axios.get(
-          `http://${ipAddress}:5000/studentdata/checktable/${tableName}`
-        );
-        setFunction(data.tableExists);
+        const tableNames = ["table1", "table2", "table3", "table4"];
+        const existingTables = [];
+        for (const table of tableNames) {
+          const { data } = await axios.get(
+            `http://${ipAddress}:5000/studentdata/checktable/${table}`
+          );
+          if (data.tableExists)
+            existingTables.push({
+              id: table.slice(-1),
+              name: `Time Table ${table.slice(-1)}`,
+            });
+        }
+        setTimetables(existingTables);
       } catch (error) {
         console.error("Error checking table existence:", error);
-        alert(error);
+        alert("Error fetching timetable data.");
       }
     };
 
-    checkTableExist("table1", setIsTable1Exist);
-    checkTableExist("table2", setIsTable2Exist);
-    checkTableExist("table3", setIsTable3Exist);
-    checkTableExist("table4", setIsTable4Exist);
+    checkTables();
   }, [ipAddress]);
 
-  // Handle number of halls input
-  const handleNumHallsChange = (e) => {
-    const value = parseInt(e.target.value) || 0;
-    setNumHalls(value);
-    setHalls(Array.from({ length: value }, () => ({ name: "", capacity: 0 })));
+  // Add new hall
+  const addHall = (event) => {
+    event.preventDefault();
+    if (!hallName.trim() || !hallCapacity.trim()) {
+      return alert("Hall Name and Capacity are required!");
+    }
+    setHalls((prev) => [...prev, { name: hallName, capacity: hallCapacity }]);
+    setHallName("");
+    setHallCapacity("");
   };
 
-  // Update hall details
-  const updateHall = (index, field, value) => {
-    setHalls((prev) => {
-      const updated = [...prev];
-      updated[index][field] = value;
-      return updated;
-    });
+  const removeHall = (hallName) => {
+    setHalls((prev) => prev.filter((hall) => hall.name !== hallName));
   };
 
   // Select timetable
   const handleTimetableSelect = (e) => {
-    setTimetableIndex(e.target.value);
-    axios
-      .get(`http://${ipAddress}:5000/studentdata/view-schedule/${e.target.value}`)
-      .then((response) => {
-        // Assuming the response data is structured similarly to the PDF
-        setExamData(response.data);
-      })
-      .catch((error) => console.error("Error fetching exam data:", error));
+    if (e.target.value !== "") {
+      setTimetableIndex(e.target.value);
+      axios
+        .get(
+          `http://${ipAddress}:5000/studentdata/view-final-schedule/${e.target.value}`
+        )
+        .then((response) => {
+          setExamData(response.data);
+        })
+        .catch((error) => console.error("Error fetching exam data:", error));
+    }
   };
 
-  // Assign halls to exam sessions
+  // Assign hall to an exam session
   const assignHall = (examSession, hallName) => {
     setSelectedHalls((prev) => ({ ...prev, [examSession]: hallName }));
   };
 
-  // Generate PDF
+  // Export to PDF
   const exportPDF = () => {
     const doc = new jsPDF();
     doc.text("Exam Hall Arrangement", 10, 10);
@@ -85,7 +91,7 @@ export default function ExamHallArrangement() {
     doc.save("Exam_Hall_Arrangement.pdf");
   };
 
-  // Generate Word Document
+  // Export to Word
   const exportWord = () => {
     const doc = new Document({
       sections: [
@@ -111,45 +117,74 @@ export default function ExamHallArrangement() {
 
   return (
     <div className="main">
-      <div>
-        <Navbar path="/hallarrangement" />
-      </div>
+      <Navbar path="/hallarrangement" />
       <div className="main-pane container mt-4">
         <h2>Exam Hall Arrangement</h2>
+
         <Form>
           <Form.Group>
-            <Form.Label>Number of Halls</Form.Label>
-            <Form.Control
-              type="number"
-              value={numHalls}
-              onChange={handleNumHallsChange}
-            />
-          </Form.Group>
-          {halls.map((hall, index) => (
-            <div key={index} className="d-flex mt-2">
+            <Form.Label>Add a New Hall</Form.Label>
+            <div className="d-flex mt-2">
               <Form.Control
                 type="text"
                 placeholder="Hall Name"
-                value={hall.name}
-                onChange={(e) => updateHall(index, "name", e.target.value)}
+                value={hallName}
+                onChange={(e) => setHallName(e.target.value)}
                 className="me-2"
               />
               <Form.Control
                 type="number"
                 placeholder="Capacity"
-                value={hall.capacity}
-                onChange={(e) => updateHall(index, "capacity", e.target.value)}
+                value={hallCapacity}
+                onChange={(e) => setHallCapacity(e.target.value)}
               />
+              <Button variant="success" onClick={addHall} className="ms-2">
+                Add
+              </Button>
             </div>
-          ))}
+          </Form.Group>
+
+          {halls.length > 0 && (
+            <Table striped bordered hover className="mt-3">
+              <thead>
+                <tr>
+                  <th>Hall Name</th>
+                  <th>Hall Capacity</th>
+                  <th className="table-item-center">Remove</th>
+                </tr>
+              </thead>
+              <tbody>
+                {halls.map((hall, index) => (
+                  <tr key={index}>
+                    <td>{hall.name}</td>
+                    <td>{hall.capacity}</td>
+                    <td className="table-item-center">
+                      <CloseButton onClick={() => removeHall(hall.name)} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+
           <Form.Group className="mt-3">
             <Form.Label>Select Timetable</Form.Label>
-            <Form.Select onChange={handleTimetableSelect} value={timetableIndex}>
-              <option value="">Select Timetable</option>
-              <option value="1">{isTable1Exist && "Time Table 01"}</option>
-              <option value="2">{isTable2Exist && "Time Table 02"}</option>
-              <option value="3">{isTable3Exist && "Time Table 03"}</option>
-              <option value="4">{isTable4Exist && "Time Table 04"}</option>
+            <Form.Select
+              onChange={handleTimetableSelect}
+              value={timetableIndex}
+            >
+              {timetables.length > 0 ? (
+                <>
+                  <option value="">Select Timetable</option>
+                  {timetables.map((table) => (
+                    <option key={table.id} value={table.id}>
+                      {table.name}
+                    </option>
+                  ))}
+                </>
+              ) : (
+                <option value="">No Timetable Available</option>
+              )}
             </Form.Select>
           </Form.Group>
         </Form>
@@ -158,7 +193,6 @@ export default function ExamHallArrangement() {
           <thead>
             <tr>
               <th>Exam Date</th>
-              <th>Center</th>
               <th>Subject</th>
               <th>Candidates</th>
               <th>Assign Hall</th>
@@ -166,24 +200,139 @@ export default function ExamHallArrangement() {
           </thead>
           <tbody>
             {examData.map((exam, index) => (
-              <tr key={index}>
-                <td>{exam.examDate}</td>
-                <td>{exam.center}</td>
-                <td>{exam.subject}</td>
-                <td>{exam.candidates}</td>
-                <td>
-                  <Form.Select
-                    onChange={(e) => assignHall(exam.subject, e.target.value)}
-                  >
-                    <option value="">Select Hall</option>
-                    {halls.map((hall, i) => (
-                      <option key={i} value={hall.name}>
-                        {hall.name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </td>
-              </tr>
+              <React.Fragment key={index}>
+                {Object.values(exam.schedule_data?.morning?.level1 || []).map(
+                  (subject, index) => (
+                    <tr key={`morning-${exam.date_name}-${index}`}>
+                      <td>{exam.date_name}</td>
+                      <td>{subject}</td>
+                      <td>{exam.candidates}</td>
+                      <td>
+                        <Form.Select
+                          onChange={(e) => assignHall(subject, e.target.value)}
+                        >
+                          <option value="">Select Hall</option>
+                          {halls.map((hall, i) => (
+                            <option key={i} value={hall.name}>
+                              {hall.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </td>
+                    </tr>
+                  )
+                )}
+
+                {Object.values(exam.schedule_data?.morning?.level2 || []).map(
+                  (subject, index) => (
+                    <tr key={`morning-${exam.date_name}-${index}`}>
+                      <td>{exam.date_name}</td>
+                      <td>{subject}</td>
+                      <td>{exam.candidates}</td>
+                      <td>
+                        <Form.Select
+                          onChange={(e) => assignHall(subject, e.target.value)}
+                        >
+                          <option value="">Select Hall</option>
+                          {halls.map((hall, i) => (
+                            <option key={i} value={hall.name}>
+                              {hall.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </td>
+                    </tr>
+                  )
+                )}
+
+                {Object.values(exam.schedule_data?.morning?.level3 || []).map(
+                  (subject, index) => (
+                    <tr key={`morning-${exam.date_name}-${index}`}>
+                      <td>{exam.date_name}</td>
+                      <td>{subject}</td>
+                      <td>{exam.candidates}</td>
+                      <td>
+                        <Form.Select
+                          onChange={(e) => assignHall(subject, e.target.value)}
+                        >
+                          <option value="">Select Hall</option>
+                          {halls.map((hall, i) => (
+                            <option key={i} value={hall.name}>
+                              {hall.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </td>
+                    </tr>
+                  )
+                )}
+
+                {Object.values(exam.schedule_data?.evening?.level1 || []).map(
+                  (subject, index) => (
+                    <tr key={`evening-${exam.date_name}-${index}`}>
+                      <td>{exam.date_name}</td>
+                      <td>{subject}</td>
+                      <td>{exam.candidates}</td>
+                      <td>
+                        <Form.Select
+                          onChange={(e) => assignHall(subject, e.target.value)}
+                        >
+                          <option value="">Select Hall</option>
+                          {halls.map((hall, i) => (
+                            <option key={i} value={hall.name}>
+                              {hall.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </td>
+                    </tr>
+                  )
+                )}
+
+                {Object.values(exam.schedule_data?.evening?.level2 || []).map(
+                  (subject, index) => (
+                    <tr key={`evening-${exam.date_name}-${index}`}>
+                      <td>{exam.date_name}</td>
+                      <td>{subject}</td>
+                      <td>{exam.candidates}</td>
+                      <td>
+                        <Form.Select
+                          onChange={(e) => assignHall(subject, e.target.value)}
+                        >
+                          <option value="">Select Hall</option>
+                          {halls.map((hall, i) => (
+                            <option key={i} value={hall.name}>
+                              {hall.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </td>
+                    </tr>
+                  )
+                )}
+
+                {Object.values(exam.schedule_data?.evening?.level3 || []).map(
+                  (subject, index) => (
+                    <tr key={`evening-${exam.date_name}-${index}`}>
+                      <td>{exam.date_name}</td>
+                      <td>{subject}</td>
+                      <td>{exam.candidates}</td>
+                      <td>
+                        <Form.Select
+                          onChange={(e) => assignHall(subject, e.target.value)}
+                        >
+                          <option value="">Select Hall</option>
+                          {halls.map((hall, i) => (
+                            <option key={i} value={hall.name}>
+                              {hall.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </Table>
@@ -195,9 +344,7 @@ export default function ExamHallArrangement() {
           Export as Word
         </Button>
       </div>
-      <div>
-        <Footer />
-      </div>
+      <Footer />
     </div>
   );
 }

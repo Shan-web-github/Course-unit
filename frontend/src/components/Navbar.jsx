@@ -103,12 +103,12 @@ export default function NavigationBar(props) {
               className="fw-bold d-flex justify-content-start align-items-sm-start align-items-md-center align-items-lg-center me-auto gap-3 ps-md-5 ps-sm-0 ps-xs-0"
               defaultActiveKey={props.path}
             >
-              <Nav.Item>
-                <Nav.Link href="/home" className="me-3 fw-semibold">
+              <Nav.Item className="nav-item-center">
+                <Nav.Link href="/home" className="me-lg-3 fw-semibold">
                   Home
                 </Nav.Link>
               </Nav.Item>
-              <Nav.Item>
+              <Nav.Item className="nav-item-center">
                 <Nav.Link
                   href="/choosetimetable"
                   className="me-lg-3 fw-semibold"
@@ -116,7 +116,7 @@ export default function NavigationBar(props) {
                   Choose TimeTable
                 </Nav.Link>
               </Nav.Item>
-              <Nav.Item>
+              <Nav.Item className="nav-item-center">
                 <Nav.Link
                   href="/createtimetable"
                   className="me-lg-3 fw-semibold"
@@ -124,17 +124,17 @@ export default function NavigationBar(props) {
                   Create TimeTable
                 </Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link
-                  href="/hallarrangement"
-                  className="me-lg-3 fw-semibold"
-                >
-                  Hall Arrangement
+              <Nav.Item className="nav-item-center">
+                <Nav.Link href="/clashcheck" className="me-lg-3 fw-semibold">
+                  Clash Check
                 </Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link href="/clashcheck" className="fw-semibold">
-                  Clash Check
+              <Nav.Item className="nav-item-center">
+                <Nav.Link
+                  href="/hallarrangement"
+                  className="me-3 fw-semibold"
+                >
+                  Hall Arrangement
                 </Nav.Link>
               </Nav.Item>
             </Nav>

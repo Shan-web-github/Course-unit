@@ -17,6 +17,15 @@
   display: flex;
   justify-content: space-between;
 }
+.nav-item-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.table-item-center {
+  text-align: center;
+}
 label.required::after {
   content: " *";
   color: red;

@@ -878,17 +878,17 @@ exports.viewTimetable = async (req, res) => {
 
     const schedules = rows.map((row) => {
       let scheduleData = row.schedule_data;
-    
+
       // If scheduleData is an object, use it as is; otherwise, parse it
       if (typeof scheduleData === "string") {
         try {
           scheduleData = JSON.parse(scheduleData);
         } catch (error) {
           console.error("Invalid JSON in schedule_data:", scheduleData);
-          scheduleData = null; // Set to null or a default empty object {}
+          scheduleData = null; 
         }
       }
-    
+
       return {
         id: row.id,
         date_name: row.date_name,
@@ -916,6 +916,111 @@ exports.updateTimetable = async (req, res) => {
     }
     res.json({ message: "Timetable updated successfully" });
   } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.viewFinalTimetable = async (req, res) => {
+  const { table_index } = req.params;
+  const tableName = `table${table_index}`;
+
+  if (!(await checkTableExistence(tableName))) {
+    return res.status(404).json({ message: "Table does not exist" });
+  }
+
+  const sql = `SELECT * FROM ${tableName}`;
+  try {
+    const [rows] = await DBpool.query(sql);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No schedule found" });
+    }
+
+    const mappingTableExists = await checkTableExistence("mapping");
+    const equivalentTableExists = await checkTableExistence("equivalent");
+
+    const schedules = [];
+
+    for (const row of rows) {
+      let scheduleData = row.schedule_data;
+
+      // Ensure scheduleData is properly parsed
+      if (typeof scheduleData === "string") {
+        try {
+          scheduleData = JSON.parse(scheduleData);
+        } catch (error) {
+          console.error("Invalid JSON in schedule_data:", scheduleData);
+          scheduleData = {};
+        }
+      }
+
+      if (mappingTableExists || equivalentTableExists) {
+        // Extract all subjects into a flat array
+        const subjectList = [
+          ...(scheduleData?.morning?.level1 || []),
+          ...(scheduleData?.morning?.level2 || []),
+          ...(scheduleData?.morning?.level3 || []),
+          ...(scheduleData?.evening?.level1 || []),
+          ...(scheduleData?.evening?.level2 || []),
+          ...(scheduleData?.evening?.level3 || []),
+        ];
+
+        let updatedSubjects = [];
+
+        // Sequentially process subjects (instead of parallel execution)
+        for (const subject of subjectList) {
+          let updatedSubject = subject;
+
+          // Fetch mapping subject
+          const [mappingSubject] = await DBpool.query(
+            `SELECT OLD_CODE FROM mapping WHERE CO_CODE = ?`, 
+            [subject]
+          );
+
+          if (mappingSubject.length > 0) {
+            updatedSubject += `/${mappingSubject[0].OLD_CODE}`;
+          }
+
+          // Fetch equivalent subject
+          const [equivalentSubject] = await DBpool.query(
+            `SELECT EQUIVALENT_CODE FROM equivalent WHERE CO_CODE = ?`, 
+            [subject]
+          );
+
+          if (equivalentSubject.length > 0) {
+            updatedSubject += `/${equivalentSubject[0].EQUIVALENT_CODE}`;
+          }
+
+          updatedSubjects.push(updatedSubject);
+        }
+
+        // Reconstruct scheduleData with updated subjects
+        let index = 0;
+        scheduleData = {
+          ...scheduleData,
+          morning: {
+            level1: updatedSubjects.slice(index, index += (scheduleData?.morning?.level1?.length || 0)),
+            level2: updatedSubjects.slice(index, index += (scheduleData?.morning?.level2?.length || 0)),
+            level3: updatedSubjects.slice(index, index += (scheduleData?.morning?.level3?.length || 0)),
+          },
+          evening: {
+            level1: updatedSubjects.slice(index, index += (scheduleData?.evening?.level1?.length || 0)),
+            level2: updatedSubjects.slice(index, index += (scheduleData?.evening?.level2?.length || 0)),
+            level3: updatedSubjects.slice(index),
+          }
+        };
+      }
+
+      schedules.push({
+        id: row.id,
+        date_name: row.date_name,
+        schedule_data: scheduleData,
+      });
+    }
+
+    res.json(schedules);
+  } catch (err) {
+    console.error("Database error:", err);
     res.status(500).json({ error: err.message });
   }
 };
