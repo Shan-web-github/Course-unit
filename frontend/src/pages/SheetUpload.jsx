@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as XLSX from "xlsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -8,12 +9,73 @@ import CalendarIcon from "../assets/Icons/table_icon.png";
 //bootstrapt lib
 import { Container, Card, Form, Button } from "react-bootstrap";
 
+const requiredHeaders = {
+  courses: [
+    "BATCH",
+    "LEVEL",
+    "CO_CODE",
+    "CO_TITLE",
+    "CREDITS",
+    "ACYEAR",
+    "SEMESTER",
+  ],
+  semReg: [
+    "ACYEAR",
+    "SEMESTER",
+    "LEVEL",
+    "BATCH",
+    "REG_NO",
+    "CO_CODE",
+    "REMARK",
+  ],
+  offerCourseExam: [
+    "SUB_CODE",
+    "BATCH",
+    "LEVEL",
+    "CO_CODE",
+    "CO_TITLE",
+    "CREDITS",
+    "ACYEAR",
+    "SEMESTER",
+  ],
+  mapping: ["CO_CODE", "OLD_CODE"],
+  equivalent: ["CO_CODE", "EQUIVALENT_CODE"],
+};
+
 export default function SheetUpload() {
   const [courses, setCourses] = useState(null);
   const [semReg, setSemReg] = useState(null);
   const [offerCourseExam, setOfferCourseExam] = useState(null);
   const [mapping, setMapping] = useState(null);
   const [equivalent, setEquivalent] = useState(null);
+
+  const validateExcelFile = async (file, type) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const fileHeaders = jsonData[0];
+
+        const missingHeaders = requiredHeaders[type].filter(
+          (header) => !fileHeaders.includes(header)
+        );
+
+        if (missingHeaders.length > 0) {
+          alert(`Missing headers in ${type}: ${missingHeaders.join(", ")}`);
+          reject(false);
+        } else {
+          resolve(true);
+        }
+      };
+      reader.onerror = (error) => reject(error);
+      reader.readAsArrayBuffer(file);
+    });
+  };
 
   const ipAddress = process.env.REACT_APP_IPADDRESS;
 
@@ -25,16 +87,40 @@ export default function SheetUpload() {
       return alert("Please upload all files.");
     }
     const formData = new FormData();
-    formData.append("courses", courses);
-    formData.append("sem_reg", semReg);
-    formData.append("offer_course_exm", offerCourseExam);
-    if (mapping) {
-      formData.append("mapping", mapping);
+    try {
+      const isValidCourese = await validateExcelFile(courses, "courses");
+      if (!isValidCourese) {
+        formData.append("courses", courses);
+      }
+      const isValidSemReg = await validateExcelFile(semReg, "semReg");
+      if (isValidSemReg) {
+        formData.append("sem_reg", semReg);
+      }
+      const isValidOfferCourseExam = await validateExcelFile(
+        offerCourseExam,
+        "offerCourseExam"
+      );
+      if (isValidOfferCourseExam) {
+        formData.append("offer_course_exm", offerCourseExam);
+      }
+      if (mapping) {
+        const isValidMapping = await validateExcelFile(mapping, "mapping");
+        if (isValidMapping) {
+          formData.append("mapping", mapping);
+        }
+      }
+      if (equivalent) {
+        const isValidEquivalent = await validateExcelFile(
+          equivalent,
+          "equivalent"
+        );
+        if (isValidEquivalent) {
+          formData.append("equivalent", equivalent);
+        }
+      }
+    } catch (error) {
+      console.error("File validation failed", error);
     }
-    if (equivalent) {
-      formData.append("equivalent", equivalent);
-    }
-    
 
     try {
       const res = await axios.post(
@@ -59,7 +145,11 @@ export default function SheetUpload() {
         `http://${ipAddress}:5000/studentdata/requiredtablesexist`
       );
       if (res.status === 200) {
-        await createNewSemReg();
+        if (courses === null && semReg === null && offerCourseExam === null) {
+          navigate("/home");
+        } else {
+          await createNewSemReg();
+        }
       }
     } catch (error) {
       console.error(
@@ -99,25 +189,32 @@ export default function SheetUpload() {
           </div>
           <Form>
             <Form.Group controlId="courses" className="mb-3">
-              <Form.Label className="required">Upload the Courses File</Form.Label>
+              <Form.Label className="required">
+                Upload the Courses File
+              </Form.Label>
               <Form.Control
                 type="file"
+                accept=".xls,.xlsx"
                 onChange={(e) => setCourses(e.target.files[0])}
               />
             </Form.Group>
             <Form.Group controlId="semReg" className="mb-3">
-              <Form.Label className="required">Upload the Semester Registration File</Form.Label>
+              <Form.Label className="required">
+                Upload the Semester Registration File
+              </Form.Label>
               <Form.Control
                 type="file"
+                accept=".xls,.xlsx"
                 onChange={(e) => setSemReg(e.target.files[0])}
               />
             </Form.Group>
             <Form.Group controlId="offerCourseExam" className="mb-3">
               <Form.Label className="required">
-              Upload Offered Courses for Examination File
+                Upload Offered Courses for Examination File
               </Form.Label>
               <Form.Control
                 type="file"
+                accept=".xls,.xlsx"
                 onChange={(e) => setOfferCourseExam(e.target.files[0])}
               />
             </Form.Group>
@@ -125,6 +222,7 @@ export default function SheetUpload() {
               <Form.Label>Upload the Mapping File (if necessary)</Form.Label>
               <Form.Control
                 type="file"
+                accept=".xls,.xlsx"
                 onChange={(e) => setMapping(e.target.files[0])}
               />
             </Form.Group>
@@ -132,6 +230,7 @@ export default function SheetUpload() {
               <Form.Label>Upload the Equivalent File (if necessary)</Form.Label>
               <Form.Control
                 type="file"
+                accept=".xls,.xlsx"
                 onChange={(e) => setEquivalent(e.target.files[0])}
               />
             </Form.Group>

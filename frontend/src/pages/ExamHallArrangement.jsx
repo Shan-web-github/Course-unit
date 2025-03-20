@@ -8,9 +8,38 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function ExamHallArrangement() {
+  const [hallNo, setHallNo] = useState("");
   const [hallName, setHallName] = useState("");
   const [hallCapacity, setHallCapacity] = useState("");
-  const [halls, setHalls] = useState([]);
+
+  const prevHalls = [
+    { no: "BT2", name: "Botany New", capacity: 80 },
+    { no: "BT3", name: "Botany Old", capacity: 45 },
+    { no: "CH2", name: "Chemistry Lower", capacity: 32 },
+    { no: "CH3", name: "Chemistry New", capacity: 80 },
+    { no: "CH1", name: "Chemistry Upper", capacity: 115 },
+    { no: "GL1", name: "Geology", capacity: 54 },
+    { no: "GL2", name: "Geology", capacity: 44 },
+    { no: "MT1", name: "Mathematics", capacity: 80 },
+    { no: "MB1", name: "Molecular Biology", capacity: 68 },
+    { no: "PH2", name: "Physics Lower", capacity: 32 },
+    { no: "PH3", name: "Physics New - P1", capacity: 120 },
+    { no: "PH4", name: "Physics -P2", capacity: 54 },
+    { no: "PH5", name: "Physics -P3", capacity: 54 },
+    { no: "PH1", name: "Physics Upper", capacity: 115 },
+    { no: "SE1", name: "Science Education", capacity: 50 },
+    { no: "SC2", name: "SCLT1 Lecture Theatre", capacity: 100 },
+    { no: "SC3", name: "SCLT2 Lecture Theatre", capacity: 100 },
+    { no: "SC6", name: "SCLT3 Lecture Theatre", capacity: 50 },
+    { no: "SC4", name: "Statistics and Computer Science  Lab-4", capacity: 45 },
+    { no: "ZL2", name: "Zoology New", capacity: 80 },
+    { no: "ZL1", name: "Zoology Old", capacity: 45 },
+  ];
+
+  const [halls, setHalls] = useState(prevHalls);
+
+  const [viewHalls, setViewHalls] = useState(false);
+
   const [timetableIndex, setTimetableIndex] = useState("");
   const [examData, setExamData] = useState([]);
   const [selectedHalls, setSelectedHalls] = useState({});
@@ -47,16 +76,20 @@ export default function ExamHallArrangement() {
   // Add new hall
   const addHall = (event) => {
     event.preventDefault();
-    if (!hallName.trim() || !hallCapacity.trim()) {
+    if (!hallName.trim() || !hallCapacity.trim() || !hallNo.trim()) {
       return alert("Hall Name and Capacity are required!");
     }
-    setHalls((prev) => [...prev, { name: hallName, capacity: hallCapacity }]);
+    setHalls((prev) => [
+      ...prev,
+      { no: hallNo, name: hallName, capacity: hallCapacity },
+    ]);
+    setHallNo("");
     setHallName("");
     setHallCapacity("");
   };
 
-  const removeHall = (hallName) => {
-    setHalls((prev) => prev.filter((hall) => hall.name !== hallName));
+  const removeHall = (hallNo) => {
+    setHalls((prev) => prev.filter((hall) => hall.no !== hallNo));
   };
 
   // Select timetable
@@ -119,12 +152,19 @@ export default function ExamHallArrangement() {
     <div className="main">
       <Navbar path="/hallarrangement" />
       <div className="main-pane container mt-4">
-        <h2>Exam Hall Arrangement</h2>
+        {/* <h2>Exam Hall Arrangement</h2> */}
 
         <Form>
           <Form.Group>
             <Form.Label>Add a New Hall</Form.Label>
             <div className="d-flex mt-2">
+              <Form.Control
+                type="text"
+                placeholder="Hall Number"
+                value={hallNo}
+                onChange={(e) => setHallNo(e.target.value)}
+                className="me-2"
+              />
               <Form.Control
                 type="text"
                 placeholder="Hall Name"
@@ -144,7 +184,9 @@ export default function ExamHallArrangement() {
             </div>
           </Form.Group>
 
-          {halls.length > 0 && (
+          <br />
+
+          {halls.length > 0 && viewHalls && (
             <Table striped bordered hover className="mt-3">
               <thead>
                 <tr>
@@ -156,16 +198,28 @@ export default function ExamHallArrangement() {
               <tbody>
                 {halls.map((hall, index) => (
                   <tr key={index}>
+                    <td>{hall.no}</td>
                     <td>{hall.name}</td>
                     <td>{hall.capacity}</td>
                     <td className="table-item-center">
-                      <CloseButton onClick={() => removeHall(hall.name)} />
+                      <CloseButton onClick={() => removeHall(hall.no)} />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </Table>
           )}
+
+          <Form.Group className="d-flex justify-content-end">
+            <Button
+              variant="secondary"
+              onClick={() => setViewHalls(!viewHalls)}
+            >
+              {viewHalls ? "Hide Exam Halls" : "Show Exam Halls"}
+            </Button>
+          </Form.Group>
+
+          <hr />
 
           <Form.Group className="mt-3">
             <Form.Label>Select Timetable</Form.Label>
@@ -194,8 +248,8 @@ export default function ExamHallArrangement() {
             <tr>
               <th>Exam Date</th>
               <th>Subject</th>
-              <th>Candidates</th>
               <th>Assign Hall</th>
+              <th>Candidates</th>
             </tr>
           </thead>
           <tbody>
@@ -206,7 +260,6 @@ export default function ExamHallArrangement() {
                     <tr key={`morning-${exam.date_name}-${index}`}>
                       <td>{exam.date_name}</td>
                       <td>{subject}</td>
-                      <td>{exam.candidates}</td>
                       <td>
                         <Form.Select
                           onChange={(e) => assignHall(subject, e.target.value)}
@@ -218,6 +271,32 @@ export default function ExamHallArrangement() {
                             </option>
                           ))}
                         </Form.Select>
+                      </td>
+                      <td>
+                        {halls.length > 0 && (
+                          <Form.Select
+                          // onChange={(e) => assignHall(subject, e.target.value)}
+                          >
+                            <option value="">Select Subject</option>
+                            {!subject.includes("/") ? (
+                              <option value={subject}>{subject}</option>
+                            ) : (
+                              <>
+                                <option value={subject.split("/")[0]}>
+                                  {subject.split("/")[0]}
+                                </option>
+                                <option value={subject.split("/")[1]}>
+                                  {subject.split("/")[1]}
+                                </option>
+                                {subject.split("/")[2] && (
+                                  <option value={subject.split("/")[2]}>
+                                    {subject.split("/")[2]}
+                                  </option>
+                                )}
+                              </>
+                            )}
+                          </Form.Select>
+                        )}
                       </td>
                     </tr>
                   )
@@ -228,7 +307,6 @@ export default function ExamHallArrangement() {
                     <tr key={`morning-${exam.date_name}-${index}`}>
                       <td>{exam.date_name}</td>
                       <td>{subject}</td>
-                      <td>{exam.candidates}</td>
                       <td>
                         <Form.Select
                           onChange={(e) => assignHall(subject, e.target.value)}
@@ -240,6 +318,32 @@ export default function ExamHallArrangement() {
                             </option>
                           ))}
                         </Form.Select>
+                      </td>
+                      <td>
+                        {halls.length > 0 && (
+                          <Form.Select
+                          // onChange={(e) => assignHall(subject, e.target.value)}
+                          >
+                            <option value="">Select Subject</option>
+                            {!subject.includes("/") ? (
+                              <option value={subject}>{subject}</option>
+                            ) : (
+                              <>
+                                <option value={subject.split("/")[0]}>
+                                  {subject.split("/")[0]}
+                                </option>
+                                <option value={subject.split("/")[1]}>
+                                  {subject.split("/")[1]}
+                                </option>
+                                {subject.split("/")[2] && (
+                                  <option value={subject.split("/")[2]}>
+                                    {subject.split("/")[2]}
+                                  </option>
+                                )}
+                              </>
+                            )}
+                          </Form.Select>
+                        )}
                       </td>
                     </tr>
                   )
@@ -250,7 +354,6 @@ export default function ExamHallArrangement() {
                     <tr key={`morning-${exam.date_name}-${index}`}>
                       <td>{exam.date_name}</td>
                       <td>{subject}</td>
-                      <td>{exam.candidates}</td>
                       <td>
                         <Form.Select
                           onChange={(e) => assignHall(subject, e.target.value)}
@@ -262,6 +365,32 @@ export default function ExamHallArrangement() {
                             </option>
                           ))}
                         </Form.Select>
+                      </td>
+                      <td>
+                        {halls.length > 0 && (
+                          <Form.Select
+                          // onChange={(e) => assignHall(subject, e.target.value)}
+                          >
+                            <option value="">Select Subject</option>
+                            {!subject.includes("/") ? (
+                              <option value={subject}>{subject}</option>
+                            ) : (
+                              <>
+                                <option value={subject.split("/")[0]}>
+                                  {subject.split("/")[0]}
+                                </option>
+                                <option value={subject.split("/")[1]}>
+                                  {subject.split("/")[1]}
+                                </option>
+                                {subject.split("/")[2] && (
+                                  <option value={subject.split("/")[2]}>
+                                    {subject.split("/")[2]}
+                                  </option>
+                                )}
+                              </>
+                            )}
+                          </Form.Select>
+                        )}
                       </td>
                     </tr>
                   )
@@ -272,7 +401,6 @@ export default function ExamHallArrangement() {
                     <tr key={`evening-${exam.date_name}-${index}`}>
                       <td>{exam.date_name}</td>
                       <td>{subject}</td>
-                      <td>{exam.candidates}</td>
                       <td>
                         <Form.Select
                           onChange={(e) => assignHall(subject, e.target.value)}
@@ -284,6 +412,32 @@ export default function ExamHallArrangement() {
                             </option>
                           ))}
                         </Form.Select>
+                      </td>
+                      <td>
+                        {halls.length > 0 && (
+                          <Form.Select
+                          // onChange={(e) => assignHall(subject, e.target.value)}
+                          >
+                            <option value="">Select Subject</option>
+                            {!subject.includes("/") ? (
+                              <option value={subject}>{subject}</option>
+                            ) : (
+                              <>
+                                <option value={subject.split("/")[0]}>
+                                  {subject.split("/")[0]}
+                                </option>
+                                <option value={subject.split("/")[1]}>
+                                  {subject.split("/")[1]}
+                                </option>
+                                {subject.split("/")[2] && (
+                                  <option value={subject.split("/")[2]}>
+                                    {subject.split("/")[2]}
+                                  </option>
+                                )}
+                              </>
+                            )}
+                          </Form.Select>
+                        )}
                       </td>
                     </tr>
                   )
@@ -294,7 +448,6 @@ export default function ExamHallArrangement() {
                     <tr key={`evening-${exam.date_name}-${index}`}>
                       <td>{exam.date_name}</td>
                       <td>{subject}</td>
-                      <td>{exam.candidates}</td>
                       <td>
                         <Form.Select
                           onChange={(e) => assignHall(subject, e.target.value)}
@@ -307,6 +460,32 @@ export default function ExamHallArrangement() {
                           ))}
                         </Form.Select>
                       </td>
+                      <td>
+                        {halls.length > 0 && (
+                          <Form.Select
+                          // onChange={(e) => assignHall(subject, e.target.value)}
+                          >
+                            <option value="">Select Subject</option>
+                            {!subject.includes("/") ? (
+                              <option value={subject}>{subject}</option>
+                            ) : (
+                              <>
+                                <option value={subject.split("/")[0]}>
+                                  {subject.split("/")[0]}
+                                </option>
+                                <option value={subject.split("/")[1]}>
+                                  {subject.split("/")[1]}
+                                </option>
+                                {subject.split("/")[2] && (
+                                  <option value={subject.split("/")[2]}>
+                                    {subject.split("/")[2]}
+                                  </option>
+                                )}
+                              </>
+                            )}
+                          </Form.Select>
+                        )}
+                      </td>
                     </tr>
                   )
                 )}
@@ -316,7 +495,6 @@ export default function ExamHallArrangement() {
                     <tr key={`evening-${exam.date_name}-${index}`}>
                       <td>{exam.date_name}</td>
                       <td>{subject}</td>
-                      <td>{exam.candidates}</td>
                       <td>
                         <Form.Select
                           onChange={(e) => assignHall(subject, e.target.value)}
@@ -328,6 +506,32 @@ export default function ExamHallArrangement() {
                             </option>
                           ))}
                         </Form.Select>
+                      </td>
+                      <td>
+                        {halls.length > 0 && (
+                          <Form.Select
+                          // onChange={(e) => assignHall(subject, e.target.value)}
+                          >
+                            <option value="">Select Subject</option>
+                            {!subject.includes("/") ? (
+                              <option value={subject}>{subject}</option>
+                            ) : (
+                              <>
+                                <option value={subject.split("/")[0]}>
+                                  {subject.split("/")[0]}
+                                </option>
+                                <option value={subject.split("/")[1]}>
+                                  {subject.split("/")[1]}
+                                </option>
+                                {subject.split("/")[2] && (
+                                  <option value={subject.split("/")[2]}>
+                                    {subject.split("/")[2]}
+                                  </option>
+                                )}
+                              </>
+                            )}
+                          </Form.Select>
+                        )}
                       </td>
                     </tr>
                   )
