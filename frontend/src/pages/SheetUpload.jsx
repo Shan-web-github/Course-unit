@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 // Components
 import CalendarIcon from "../assets/Icons/table_icon.png";
+import ExcelIcon from "../assets/Icons/excel icon2.jpg";
 
 //bootstrapt lib
 import { Container, Card, Form, Button } from "react-bootstrap";
@@ -40,6 +41,14 @@ const requiredHeaders = {
   ],
   mapping: ["CO_CODE", "OLD_CODE"],
   equivalent: ["CO_CODE", "EQUIVALENT_CODE"],
+};
+
+const sampleFiles = {
+  courses: "../assets/sample/course_sample.xlsx",
+  semReg: "../assets/sample/sem_Reg_sample.xlsx",
+  offerCourseExam: "../assets/sample/sem_courses_sample.xlsx",
+  mapping: "../assets/sample/mapping_sample.xlsx",
+  equivalent: "../assets/sample/equivalent_sample.xlsx",
 };
 
 export default function SheetUpload() {
@@ -180,7 +189,7 @@ export default function SheetUpload() {
         fluid
         className="d-flex justify-content-center align-items-center min-vh-100 bg-light"
       >
-        <Card className="p-4 shadow-sm" style={{ width: "24rem" }}>
+        <Card className="p-4 shadow-sm" style={{ width: "26rem" }}>
           <div className="text-center mb-4">
             <h2 className="fw-bold d-flex justify-content-center align-items-center">
               <img src={CalendarIcon} alt="Logo" className="me-2" width="30" />
@@ -190,7 +199,22 @@ export default function SheetUpload() {
           <Form>
             <Form.Group controlId="courses" className="mb-3">
               <Form.Label className="required">
-                Upload the Courses File
+                Upload the Courses File{" "}
+                <a
+                  href={sampleFiles["courses"]}
+                  download
+                  style={{
+                    marginLeft: "10px",
+                    textDecoration: "none",
+                    color: "blue",
+                  }}
+                >
+                  <img
+                    src={ExcelIcon}
+                    alt="Download Excel"
+                    style={{ width: "25px", cursor: "pointer" }}
+                  />
+                </a>
               </Form.Label>
               <Form.Control
                 type="file"
@@ -200,7 +224,22 @@ export default function SheetUpload() {
             </Form.Group>
             <Form.Group controlId="semReg" className="mb-3">
               <Form.Label className="required">
-                Upload the Semester Registration File
+                Upload the Semester Registration File{" "}
+                <a
+                  href={sampleFiles["semReg"]}
+                  download
+                  style={{
+                    marginLeft: "10px",
+                    textDecoration: "none",
+                    color: "blue",
+                  }}
+                >
+                  <img
+                    src={ExcelIcon}
+                    alt="Download Excel"
+                    style={{ width: "25px", cursor: "pointer" }}
+                  />
+                </a>
               </Form.Label>
               <Form.Control
                 type="file"
@@ -210,7 +249,22 @@ export default function SheetUpload() {
             </Form.Group>
             <Form.Group controlId="offerCourseExam" className="mb-3">
               <Form.Label className="required">
-                Upload Offered Courses for Examination File
+                Upload Offered Courses for Examination File{" "}
+                <a
+                  href={sampleFiles["offerCourseExam"]}
+                  download
+                  style={{
+                    marginLeft: "10px",
+                    textDecoration: "none",
+                    color: "blue",
+                  }}
+                >
+                  <img
+                    src={ExcelIcon}
+                    alt="Download Excel"
+                    style={{ width: "25px", cursor: "pointer" }}
+                  />
+                </a>
               </Form.Label>
               <Form.Control
                 type="file"
@@ -219,7 +273,24 @@ export default function SheetUpload() {
               />
             </Form.Group>
             <Form.Group controlId="mapping" className="mb-3">
-              <Form.Label>Upload the Mapping File (if necessary)</Form.Label>
+              <Form.Label>
+                Upload the Mapping File (if necessary){" "}
+                <a
+                  href={sampleFiles["mapping"]}
+                  download
+                  style={{
+                    marginLeft: "10px",
+                    textDecoration: "none",
+                    color: "blue",
+                  }}
+                >
+                  <img
+                    src={ExcelIcon}
+                    alt="Download Excel"
+                    style={{ width: "25px", cursor: "pointer" }}
+                  />
+                </a>
+              </Form.Label>
               <Form.Control
                 type="file"
                 accept=".xls,.xlsx"
@@ -227,7 +298,24 @@ export default function SheetUpload() {
               />
             </Form.Group>
             <Form.Group controlId="equivalent" className="mb-3">
-              <Form.Label>Upload the Equivalent File (if necessary)</Form.Label>
+              <Form.Label>
+                Upload the Equivalent File (if necessary){" "}
+                <a
+                  href={sampleFiles["equivalent"]}
+                  download
+                  style={{
+                    marginLeft: "10px",
+                    textDecoration: "none",
+                    color: "blue",
+                  }}
+                >
+                  <img
+                    src={ExcelIcon}
+                    alt="Download Excel"
+                    style={{ width: "25px", cursor: "pointer" }}
+                  />
+                </a>
+              </Form.Label>
               <Form.Control
                 type="file"
                 accept=".xls,.xlsx"
