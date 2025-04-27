@@ -7,6 +7,237 @@ import { popUpdata } from "./Navbar";
 
 import { Card, Badge, Modal, CloseButton, Form, Button } from "react-bootstrap";
 
+// import {
+//   PDFDownloadLink,
+//   Document,
+//   Page,
+//   Text,
+//   View,
+//   StyleSheet,
+// } from "@react-pdf/renderer";
+
+// const styles = StyleSheet.create({
+//   page: { padding: 30, fontFamily: "Helvetica" },
+//   title:{fontSize: 28, textAlign: "center", fontWeight: "bold" },
+//   dayContainer: { marginBottom: 20 },
+//   dayTitle: { fontSize: 18, marginBottom: 10, textAlign: "center", fontWeight: "bold" },
+//   sessionTitle: { fontSize: 16, textTransform: "capitalize", marginBottom: 5 },
+//   levelTitle: { fontSize: 14, marginTop: 5 },
+//   subjectBadge: {
+//     fontSize: 12,
+//     marginRight: 5,
+//     fontWeight: "bold",
+//     padding: 5,
+//     // backgroundColor: "#007bff",
+//     color: "black",
+//     borderRadius: 5,
+//   },
+//   noSubjects: { fontSize: 12, color: "gray" },
+// });
+
+// const TimetableDocument = ({ timetable }) => (
+//   <Document>
+//     <Page size="A4" style={styles.page}>
+//     <Text style={styles.title}>Time Table</Text>
+//       {timetable.map((day) => (
+//         <View key={day.id} style={styles.dayContainer}>
+//           <Text style={styles.dayTitle}>{day.date_name}</Text>
+//           {["morning", "evening"].map((session) => (
+//             <View key={session}>
+//               <Text style={styles.sessionTitle}>{session} Session</Text>
+//               {Object.entries(day.schedule_data[session] || {}).map(
+//                 ([level, subjects]) => (
+//                   <View key={level}>
+//                     <Text style={styles.levelTitle}>{level.toUpperCase()}</Text>
+//                     {subjects.length > 0 ? (
+//                       subjects.map((subject) => (
+//                         <Text key={subject} style={styles.subjectBadge}>
+//                           {subject}
+//                         </Text>
+//                       ))
+//                     ) : (
+//                       <Text style={styles.noSubjects}>No subjects</Text>
+//                     )}
+//                   </View>
+//                 )
+//               )}
+//             </View>
+//           ))}
+//         </View>
+//       ))}
+//     </Page>
+//   </Document>
+// );
+
+// import {
+//   Document,
+//   Page,
+//   Text,
+//   View,
+//   StyleSheet,
+//   PDFDownloadLink,
+// } from "@react-pdf/renderer";
+
+// const styles = StyleSheet.create({
+//   page: { padding: 30, fontFamily: "Helvetica" },
+//   title: { fontSize: 24, textAlign: "center", marginBottom: 20 },
+
+//   dayBlock: { marginBottom: 30 },
+//   dayTitle: { fontSize: 18, textAlign: "center", marginBottom: 10, fontWeight: "bold" },
+
+//   sessionCard: {
+//     borderWidth: 1,
+//     borderColor: "#ccc",
+//     borderRadius: 6,
+//     padding: 10,
+//     marginBottom: 15,
+//   },
+//   sessionTitle: {
+//     fontSize: 16,
+//     fontWeight: "bold",
+//     marginBottom: 5,
+//     borderBottomWidth: 1,
+//     borderBottomColor: "#eee",
+//     paddingBottom: 3,
+//   },
+
+//   levelBlock: { marginTop: 8, marginBottom: 5 },
+//   levelTitle: { fontSize: 14, marginBottom: 3, fontWeight: "bold" },
+
+//   subjectTag: {
+//     fontSize: 12,
+//     padding: 4,
+//     borderRadius: 4,
+//     backgroundColor: "#e0e0e0",
+//     marginRight: 5,
+//     marginBottom: 5,
+//     display: "inline-block",
+//   },
+//   tagContainer: {
+//     flexDirection: "row",
+//     flexWrap: "wrap",
+//   },
+//   noSubjects: { fontSize: 12, color: "gray" },
+// });
+
+// const TimetableDocument = ({ timetable }) => (
+//   <Document>
+//     <Page size="A4" style={styles.page}>
+//       <Text style={styles.title}>Time Table</Text>
+
+//       {timetable.map((day) => (
+//         <View key={day.id} style={styles.dayBlock}>
+//           <Text style={styles.dayTitle}>{day.date_name}</Text>
+
+//           {["morning", "evening"].map((session) => (
+//             <View key={session} style={styles.sessionCard}>
+//               <Text style={styles.sessionTitle}>{session.toUpperCase()} SESSION</Text>
+
+//               {Object.entries(day.schedule_data[session] || {}).map(
+//                 ([level, subjects]) => (
+//                   <View key={level} style={styles.levelBlock}>
+//                     <Text style={styles.levelTitle}>{level.toUpperCase()}</Text>
+//                     {subjects.length > 0 ? (
+//                       <View style={styles.tagContainer}>
+//                         {subjects.map((subject, idx) => (
+//                           <Text key={idx} style={styles.subjectTag}>
+//                             {subject}
+//                           </Text>
+//                         ))}
+//                       </View>
+//                     ) : (
+//                       <Text style={styles.noSubjects}>No subjects</Text>
+//                     )}
+//                   </View>
+//                 )
+//               )}
+//             </View>
+//           ))}
+//         </View>
+//       ))}
+//     </Page>
+//   </Document>
+// );
+
+// import {
+//   PDFDownloadLink,
+//   Document,
+//   Page,
+//   Text,
+//   View,
+//   StyleSheet,
+// } from "@react-pdf/renderer";
+
+// const styles = StyleSheet.create({
+//   page: { padding: 30, fontFamily: "Helvetica" },
+//   title: { fontSize: 24, textAlign: "center", marginBottom: 20 },
+
+//   table: {
+//     display: "table",
+//     width: "auto",
+//     borderStyle: "solid",
+//     borderWidth: 1,
+//     borderRightWidth: 0,
+//     borderBottomWidth: 0,
+//   },
+//   tableRow: { flexDirection: "row" },
+//   tableColHeader: {
+//     width: "25%",
+//     borderStyle: "solid",
+//     borderWidth: 1,
+//     borderLeftWidth: 0,
+//     borderTopWidth: 0,
+//     backgroundColor: "#f0f0f0",
+//     padding: 5,
+//     fontWeight: "bold",
+//   },
+//   tableCol: {
+//     width: "25%",
+//     borderStyle: "solid",
+//     borderWidth: 1,
+//     borderLeftWidth: 0,
+//     borderTopWidth: 0,
+//     padding: 5,
+//     fontSize: 10,
+//   },
+// });
+
+// const TimetableDocument = ({ timetable }) => (
+//   <Document>
+//     <Page size="A4" style={styles.page}>
+//       <Text style={styles.title}>Time Table</Text>
+
+//       <View style={styles.table}>
+//         {/* Table Header */}
+//         <View style={styles.tableRow}>
+//           <Text style={styles.tableColHeader}>Date</Text>
+//           <Text style={styles.tableColHeader}>Session</Text>
+//           <Text style={styles.tableColHeader}>Level</Text>
+//           <Text style={styles.tableColHeader}>Subjects</Text>
+//         </View>
+
+//         {/* Table Data */}
+//         {timetable.map((day) =>
+//           ["morning", "evening"].flatMap((session) =>
+//             Object.entries(day.schedule_data[session] || {}).map(
+//               ([level, subjects]) => (
+//                 <View key={`${day.id}-${session}-${level}`} style={styles.tableRow}>
+//                   <Text style={styles.tableCol}>{day.date_name}</Text>
+//                   <Text style={styles.tableCol}>{session}</Text>
+//                   <Text style={styles.tableCol}>{level.toUpperCase()}</Text>
+//                   <Text style={styles.tableCol}>
+//                     {subjects.length > 0 ? subjects.join(", ") : "No subjects"}
+//                   </Text>
+//                 </View>
+//               )
+//             )
+//           )
+//         )}
+//       </View>
+//     </Page>
+//   </Document>
+// );
+
 import {
   PDFDownloadLink,
   Document,
@@ -18,51 +249,74 @@ import {
 
 const styles = StyleSheet.create({
   page: { padding: 30, fontFamily: "Helvetica" },
-  title:{fontSize: 28, textAlign: "center", fontWeight: "bold" },
-  dayContainer: { marginBottom: 20 },
-  dayTitle: { fontSize: 18, marginBottom: 10, fontWeight: "bold" },
-  sessionTitle: { fontSize: 16, textTransform: "capitalize", marginBottom: 5 },
-  levelTitle: { fontSize: 14, marginTop: 5 },
-  subjectBadge: {
-    fontSize: 12,
-    marginRight: 5,
-    fontWeight: "bold",
-    padding: 5,
-    // backgroundColor: "#007bff",
-    color: "black",
-    borderRadius: 5,
+  title: { fontSize: 24, textAlign: "center", marginBottom: 20 },
+  dateTitle: { fontSize: 18, fontWeight: "bold", marginTop: 20, marginBottom: 10 },
+
+  table: {
+    display: "table",
+    width: "auto",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
   },
-  noSubjects: { fontSize: 12, color: "gray" },
+  tableRow: { flexDirection: "row" },
+  tableColHeader: {
+    width: "33.33%",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    backgroundColor: "#f0f0f0",
+    padding: 5,
+    fontWeight: "bold",
+  },
+  tableCol: {
+    width: "33.33%",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    padding: 5,
+    fontSize: 10,
+  },
 });
 
 const TimetableDocument = ({ timetable }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-    <Text style={styles.title}>Time Table</Text>
+      <Text style={styles.title}>Time Table</Text>
+
       {timetable.map((day) => (
-        <View key={day.id} style={styles.dayContainer}>
-          <Text style={styles.dayTitle}>{day.date_name}</Text>
-          {["morning", "evening"].map((session) => (
-            <View key={session}>
-              <Text style={styles.sessionTitle}>{session} Session</Text>
-              {Object.entries(day.schedule_data[session] || {}).map(
+        <View key={day.id}>
+          <Text style={styles.dateTitle}>{day.date_name}</Text>
+
+          <View style={styles.table}>
+            {/* Table Header */}
+            <View style={styles.tableRow}>
+              <Text style={styles.tableColHeader}>Session</Text>
+              <Text style={styles.tableColHeader}>Level</Text>
+              <Text style={styles.tableColHeader}>Subjects</Text>
+            </View>
+
+            {/* Table Body */}
+            {["morning", "evening"].flatMap((session) =>
+              Object.entries(day.schedule_data[session] || {}).map(
                 ([level, subjects]) => (
-                  <View key={level}>
-                    <Text style={styles.levelTitle}>{level.toUpperCase()}</Text>
-                    {subjects.length > 0 ? (
-                      subjects.map((subject) => (
-                        <Text key={subject} style={styles.subjectBadge}>
-                          {subject}
-                        </Text>
-                      ))
-                    ) : (
-                      <Text style={styles.noSubjects}>No subjects</Text>
-                    )}
+                  <View
+                    key={`${day.id}-${session}-${level}`}
+                    style={styles.tableRow}
+                  >
+                    <Text style={styles.tableCol}>{session}</Text>
+                    <Text style={styles.tableCol}>{level.toUpperCase()}</Text>
+                    <Text style={styles.tableCol}>
+                      {subjects.length > 0 ? subjects.join(", ") : "No subjects"}
+                    </Text>
                   </View>
                 )
-              )}
-            </View>
-          ))}
+              )
+            )}
+          </View>
         </View>
       ))}
     </Page>

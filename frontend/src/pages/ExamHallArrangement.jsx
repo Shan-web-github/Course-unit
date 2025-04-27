@@ -190,6 +190,7 @@ export default function ExamHallArrangement() {
             <Table striped bordered hover className="mt-3">
               <thead>
                 <tr>
+                  <th>Hall Id</th>
                   <th>Hall Name</th>
                   <th>Hall Capacity</th>
                   <th className="table-item-center">Remove</th>

@@ -10,14 +10,14 @@ exports.isEmailExist = async (email) => {
     return rows.length > 0;
   } catch (error) {
     console.error("Error checking email existence:", error);
-    throw error; // Ensure the error propagates.
+    throw error;
   }
 };
 
 // Function to hash a password
 exports.hashPassword = async (password) => {
   try {
-    const saltRounds = 10; // Adjust as needed, higher rounds = more security but slower
+    const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     return hashedPassword;
   } catch (error) {

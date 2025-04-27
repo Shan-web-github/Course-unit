@@ -55,7 +55,7 @@ export default function SignIn() {
       alert(`Login successful! Status: ${response.status}`);
       navigate("/sheetupload");
     } catch (error) {
-      alert(`Login failed: ${error.response?.data?.message || error.message}`);
+      alert(`Login failed: ${error.response?.data || error.message}`);
     }
   };
 
